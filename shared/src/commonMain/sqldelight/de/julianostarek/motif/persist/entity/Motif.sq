@@ -1,0 +1,28 @@
+import kotlin.Boolean;
+import kotlin.Int;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE motifEntity (
+    id INTEGER PRIMARY KEY NOT NULL,
+    spotifyTrackId TEXT NOT NULL,
+    createdAt INTEGER AS Instant NOT NULL,
+    offset INTEGER AS Int NOT NULL,
+    listened INTEGER AS Boolean NOT NULL DEFAULT 0,
+    creatorId TEXT NOT NULL,
+    FOREIGN KEY (creatorId) REFERENCES profileEntity (id)
+);
+
+selectUnlistened:
+SELECT * FROM motifEntity, profileEntity
+WHERE motifEntity.creatorId = profileEntity.id
+ORDER BY motifEntity.listened, motifEntity.createdAt;
+
+upsert:
+INSERT OR REPLACE INTO motifEntity
+VALUES ?;
+
+deleteById:
+DELETE FROM motifEntity WHERE id = :id;
+
+deleteExceptIds:
+DELETE FROM motifEntity WHERE id NOT IN :ids;

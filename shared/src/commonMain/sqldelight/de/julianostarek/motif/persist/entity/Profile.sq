@@ -1,0 +1,20 @@
+CREATE TABLE profileEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    displayName TEXT NOT NULL,
+    username TEXT NOT NULL,
+    photoUrl TEXT
+);
+
+search:
+SELECT * FROM profileEntity
+WHERE username LIKE ('%' || :query)
+OR displayName LIKE ('%' || :query)
+ORDER BY displayName;
+
+selectByIds:
+SELECT * FROM profileEntity
+WHERE id IN ?;
+
+upsert:
+INSERT OR REPLACE INTO profileEntity
+VALUES ?;

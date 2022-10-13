@@ -1,0 +1,27 @@
+{
+  "name": "SpotifyiOS",
+  "version": "1.2.2",
+  "summary": "Spotify SDK for iOS",
+  "description": "The Spotify iOS SDK allows your iOS application to authenticate users, as well as interact and always stay in sync with the main Spotify application running on the user’s device in the background.",
+  "homepage": "https://developer.spotify.com/documentation/ios/",
+  "license": {
+    "type": "MIT",
+    "file": "Licenses/MPMessagePack-LICENSE.md"
+  },
+  "authors": {
+    "jackfreeman": "jackfreeman@google.com",
+    "Arielle Vaniderstine": "hack@ariari.io",
+    "Konstantinos Karagiannis": "konstantinosk@spotify.com"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source": {
+    "git": "https://github.com/spotify/ios-sdk.git",
+    "tag": "v1.2.2"
+  },
+  "source_files": "SpotifyiOS.framework/Versions/A/Headers/*{.h}",
+  "public_header_files": "SpotifyiOS.framework/Versions/A/Headers/*{.h}",
+  "vendored_frameworks": "SpotifyiOS.framework",
+  "exclude_files": "DemoProjects"
+}

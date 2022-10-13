@@ -1,0 +1,24 @@
+import kotlinx.datetime.Instant;
+
+CREATE TABLE collectionEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    createdAt INTEGER AS Instant NOT NULL,
+    updatedAt INTEGER AS Instant NOT NULL,
+    followersCount INTEGER NOT NULL
+);
+
+CREATE TABLE collection_owner (
+    collectionId TEXT,
+    profileId TEXT,
+    FOREIGN KEY (collectionId) REFERENCES collectionEntity (id),
+    FOREIGN KEY (profileId) REFERENCES profileEntity (id)
+);
+
+selectAll:
+SELECT * FROM collectionEntity;
+
+upsert:
+INSERT OR REPLACE INTO collectionEntity
+VALUES ?;

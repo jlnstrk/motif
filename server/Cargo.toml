@@ -1,0 +1,33 @@
+[package]
+name = "motif-server"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [".", "entity"]
+
+[dependencies]
+entity = { path = "entity" }
+async-graphql = { version = "4.0.14", features = [ "uuid", "chrono", "dataloader" ] }
+async-graphql-axum = "4.0.14"
+async-stream = "0.3.3"
+async-trait = "0.1.57"
+axum = { version = "0.5.16", features = ["json"] }
+chrono = "0.4.1"
+chrono-tz = "0.6.3"
+dotenvy = "0.15"
+env_logger = "0.9.1"
+fred = { version = "5.2.0", features = ["subscriber-client"] }
+jsonwebtoken = "8.1.1"
+log = "0.4.17"
+rand = "0.8.5"
+rspotify = "0.11.5"
+sea-orm = { version = "0.9.3", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+serde = "1.0.145"
+serde_json = "1.0.85"
+sqlx = { version = "0.6.1", features = ["postgres", "runtime-tokio-rustls", "uuid", "chrono"] }
+tokio = { version = "1.21.2", features = ["full"] }
+uuid = "1.1.2"
+anyhow = "1.0.65"
+futures = "0.3.24"
+futures-util = "0.3.24"
