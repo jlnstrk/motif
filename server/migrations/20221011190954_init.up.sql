@@ -72,7 +72,7 @@ CREATE TABLE motifs
 );
 CREATE TABLE motif_service_ids
 (
-    id         INTEGER NOT NULL, -- Can't use (motif_id, service) composite bc/o lacking PG type PK support from SeaORM
+    id         SERIAL  NOT NULL, -- Can't use (motif_id, service) composite bc/o lacking PG type PK support from SeaORM
     motif_id   INTEGER NOT NULL,
     service    service NOT NULL,
     service_id VARCHAR NOT NULL,

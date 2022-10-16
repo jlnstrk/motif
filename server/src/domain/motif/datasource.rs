@@ -194,9 +194,11 @@ pub async fn create(
                     service_id: Set(id.id),
                 })
                 .collect();
-            MotifServiceIdEntity::insert_many(service_id_models)
-                .exec(txn)
-                .await?;
+            if !service_id_models.is_empty() {
+                MotifServiceIdEntity::insert_many(service_id_models)
+                    .exec(txn)
+                    .await?;
+            }
 
             Ok(motif.into())
         })
