@@ -19,7 +19,7 @@ pub trait PubSubStart<V: Clone + Debug + Sync + Send + 'static> {
         engine_ref: Arc<Box<Mutex<dyn PubSubEngine<V> + Sync + Send>>>,
     ) -> (PubSubCommandSender<V>, PubSubCancellationSender) {
         let (cancel_sender, cancel_receiver) = oneshot::channel();
-        let (register_sender, mut handler_receiver) = mpsc::channel::<PubSubCommand<V>>(32);
+        let (register_sender, handler_receiver) = mpsc::channel::<PubSubCommand<V>>(32);
         pubsub_main(engine_ref, handler_receiver, cancel_receiver).await;
         (register_sender, cancel_sender)
     }

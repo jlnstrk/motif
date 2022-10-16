@@ -1,11 +1,9 @@
-use std::error::Error;
-
 use chrono::{FixedOffset, Offset, TimeZone, Utc};
 use sea_orm::sea_query::{OnConflict, Query};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, ModelTrait,
-    NotSet, Order, PaginatorTrait, QueryFilter, QueryOrder, TransactionError, TransactionTrait,
+    NotSet, Order, PaginatorTrait, QueryFilter, QueryOrder, TransactionTrait,
 };
 use uuid::Uuid;
 
@@ -19,7 +17,7 @@ use entity::{motif_listeners, motif_service_ids, motifs, profile_follows};
 use crate::domain::common::typedef::Service;
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
-use anyhow::{anyhow, Context, Result};
+use crate::rest::util::{ApiError, ApiResult, DataError};
 
 impl From<MotifModel> for Motif {
     fn from(model: MotifModel) -> Self {
@@ -42,16 +40,16 @@ impl From<MotifServiceIdModel> for ServiceId {
     }
 }
 
-pub async fn get_by_id(db: &DatabaseConnection, motif_id: i32) -> Result<Motif> {
+pub async fn get_by_id(db: &DatabaseConnection, motif_id: i32) -> ApiResult<Motif> {
     let model = MotifEntity::find_by_id(motif_id).one(db).await?;
-    let motif = model.context("Motif not found")?;
+    let motif = model.ok_or(DataError::NotFound("Motif not found".to_owned()))?;
     Ok(motif.into())
 }
 
 pub async fn get_service_ids_by_id(
     db: &DatabaseConnection,
     motif_id: i32,
-) -> Result<Vec<ServiceId>, DbErr> {
+) -> ApiResult<Vec<ServiceId>> {
     let models = MotifServiceIdEntity::find()
         .filter(motif_service_ids::Column::MotifId.eq(motif_id))
         .all(db)
@@ -63,7 +61,7 @@ pub async fn get_service_ids_by_id(
 pub async fn get_feed_by_profile_id(
     db: &DatabaseConnection,
     profile_id: Uuid,
-) -> Result<Vec<Motif>, DbErr> {
+) -> ApiResult<Vec<Motif>> {
     let models = MotifEntity::find()
         .filter(
             Condition::all()
@@ -86,21 +84,19 @@ pub async fn get_feed_by_profile_id(
     Ok(mapped)
 }
 
-pub async fn get_listeners_count_by_id(
-    db: &DatabaseConnection,
-    motif_id: i32,
-) -> Result<i32, DbErr> {
+pub async fn get_listeners_count_by_id(db: &DatabaseConnection, motif_id: i32) -> ApiResult<i32> {
     MotifListenerEntity::find()
         .filter(motif_listeners::Column::MotifId.eq(motif_id))
         .count(db)
         .await
+        .map_err(|err| err.into())
         .map(|count| count as i32)
 }
 
 pub async fn get_listeners_by_id(
     db: &DatabaseConnection,
     motif_id: i32,
-) -> Result<Vec<Profile>, DbErr> {
+) -> ApiResult<Vec<Profile>> {
     let models = MotifListenerEntity::find()
         .find_with_related(ProfileEntity)
         .filter(motif_listeners::Column::MotifId.eq(motif_id))
@@ -125,7 +121,7 @@ pub async fn listen_by_id(
     db: &DatabaseConnection,
     listener_id: Uuid,
     motif_id: i32,
-) -> Result<bool, DbErr> {
+) -> ApiResult<bool> {
     if MotifListenerEntity::find()
         .filter(
             Condition::all()
@@ -156,11 +152,13 @@ pub async fn delete_by_id(
     db: &DatabaseConnection,
     creator_id: Uuid,
     motif_id: i32,
-) -> Result<bool> {
+) -> ApiResult<bool> {
     let existing = MotifEntity::find_by_id(motif_id).one(db).await?;
     if let Some(existing) = existing {
         if existing.creator_id != creator_id {
-            Err(anyhow!("Not creator of motif"))
+            Err(ApiError::Authorization(
+                "Must be creator of motif to delete".to_owned(),
+            ))
         } else {
             existing.delete(db).await?;
             Ok(true)
@@ -174,7 +172,7 @@ pub async fn create(
     db: &DatabaseConnection,
     creator_id: Uuid,
     input: CreateMotif,
-) -> Result<Motif, impl Error> {
+) -> ApiResult<Motif> {
     db.transaction::<_, Motif, DbErr>(|txn| {
         Box::pin(async move {
             let model = motifs::ActiveModel {
@@ -204,4 +202,5 @@ pub async fn create(
         })
     })
     .await
+    .map_err(|err| err.into())
 }

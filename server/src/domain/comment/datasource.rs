@@ -1,18 +1,16 @@
-use std::error::Error;
-
-use anyhow::{anyhow, Context, Result};
 use chrono::{FixedOffset, Utc};
-use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, EntityTrait, ModelTrait, NotSet,
     PaginatorTrait, QueryFilter,
 };
+use sea_orm::ActiveValue::Set;
 use uuid::Uuid;
 
 use entity::comments;
 use entity::comments::{Entity as CommentEntity, Model as CommentModel};
 
 use crate::domain::comment::typedef::{Comment, CreateComment};
+use crate::rest::util::{ApiError, ApiResult, DataError, GeneralError};
 
 impl From<CommentModel> for Comment {
     fn from(model: CommentModel) -> Self {
@@ -28,11 +26,11 @@ impl From<CommentModel> for Comment {
     }
 }
 
-pub async fn get_by_id(db: &DatabaseConnection, comment_id: i32) -> Result<Comment> {
+pub async fn get_by_id(db: &DatabaseConnection, comment_id: i32) -> ApiResult<Comment> {
     let model = CommentEntity::find_by_id(comment_id).one(db).await?;
     let comment: Comment = model
         .map(|model| model.into())
-        .context("Comment does not exist")?;
+        .ok_or(DataError::NotFound("Comment not found".to_owned()))?;
     Ok(comment)
 }
 
@@ -50,7 +48,7 @@ pub async fn get_motif_comments_count_by_id(
 pub async fn get_motif_comments_by_id(
     db: &DatabaseConnection,
     motif_id: i32,
-) -> Result<Vec<Comment>> {
+) -> ApiResult<Vec<Comment>> {
     let models = CommentEntity::find()
         .filter(comments::Column::MotifId.eq(motif_id))
         .all(db)
@@ -90,11 +88,11 @@ pub async fn delete_by_id(
     db: &DatabaseConnection,
     author_id: Uuid,
     comment_id: i32,
-) -> Result<bool> {
+) -> ApiResult<bool> {
     let existing = CommentEntity::find_by_id(comment_id).one(db).await?;
     if let Some(existing) = existing {
         if existing.author_id != author_id {
-            Err(anyhow!("Not creator of motif"))
+            Err(ApiError::Authorization("Not creator of motif".to_owned()))
         } else {
             existing.delete(db).await?;
             Ok(true)
@@ -110,17 +108,17 @@ pub async fn create(
     motif_id: Option<i32>,
     parent_id: Option<i32>,
     input: CreateComment,
-) -> Result<Comment> {
+) -> ApiResult<Comment> {
     let motif_id = if let Some(value) = motif_id {
         value
     } else if let Some(parent_id) = parent_id {
         CommentEntity::find_by_id(parent_id)
             .one(db)
             .await?
-            .context("Parent does not exist")?
+            .ok_or(DataError::NotFound("Parent does not exist".to_owned()))?
             .motif_id
     } else {
-        return Err(anyhow!("Must set either motif_id or parent_id"));
+        return Err(ApiError::General(GeneralError::Internal));
     };
     let model = comments::ActiveModel {
         id: NotSet,

@@ -1,9 +1,10 @@
-use std::error::Error;
+#![allow(dead_code)]
 
-use async_graphql::futures_util::Stream;
 use async_graphql::{ComplexObject, Context, Object, Subscription};
+use async_graphql::*;
+use async_graphql::futures_util::Stream;
+use async_stream::stream;
 use fred::prelude::RedisValue;
-use sea_orm::DbErr;
 use uuid::Uuid;
 
 use crate::domain::motif::datasource;
@@ -13,27 +14,29 @@ use crate::domain::motif::pubsub::{
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
 use crate::domain::profile;
 use crate::domain::profile::typedef::Profile;
-use crate::gql::util::{AuthClaims, ContextDependencies};
-use crate::{PubSubHandle, Str};
-use anyhow::Result;
-use async_stream::stream;
+use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
+use crate::PubSubHandle;
 
 #[ComplexObject]
 impl Motif {
-    async fn service_ids(&self, ctx: &Context<'_>) -> Result<Vec<ServiceId>, impl Error> {
+    async fn service_ids(&self, ctx: &Context<'_>) -> Result<Vec<ServiceId>> {
         datasource::get_service_ids_by_id(ctx.require(), self.id).await
+            .coerce_gql_err()
     }
 
     async fn creator(&self, ctx: &Context<'_>) -> Result<Profile> {
         profile::datasource::get_by_id(ctx.require(), self.creator_id).await
+            .coerce_gql_err()
     }
 
-    async fn listeners_count(&self, ctx: &Context<'_>) -> Result<i32, impl Error> {
+    async fn listeners_count(&self, ctx: &Context<'_>) -> Result<i32> {
         datasource::get_listeners_count_by_id(ctx.require(), self.id).await
+            .coerce_gql_err()
     }
 
-    async fn listeners(&self, ctx: &Context<'_>) -> Result<Vec<Profile>, impl Error> {
+    async fn listeners(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
         datasource::get_listeners_by_id(ctx.require(), self.id).await
+            .coerce_gql_err()
     }
 }
 
@@ -42,8 +45,9 @@ pub struct MotifQuery;
 
 #[Object]
 impl MotifQuery {
-    async fn motif_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>, impl Error> {
+    async fn motif_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
         datasource::get_feed_by_profile_id(ctx.require(), ctx.require::<AuthClaims>().id).await
+            .coerce_gql_err()
     }
 }
 

@@ -1,6 +1,9 @@
-use async_graphql::futures_util::Stream;
+#![allow(dead_code)]
+
 use async_graphql::*;
+use async_graphql::futures_util::Stream;
 use fred::prelude::RedisValue;
+use futures::stream::StreamExt;
 use uuid::Uuid;
 
 use crate::domain::profile::datasource;
@@ -8,7 +11,6 @@ use crate::domain::profile::pubsub::{topic_profile_followed, topic_profile_updat
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
-use futures::stream::StreamExt;
 
 #[ComplexObject]
 impl Profile {
@@ -79,7 +81,7 @@ impl ProfileMutation {
         let updated = datasource::update_by_id(ctx.require(), profile_id.clone(), update).await?;
         let topic = topic_profile_updated(profile_id);
         ctx.require::<PubSubHandle<RedisValue>>()
-            .publish(topic, RedisValue::Null)
+            .publish(topic, RedisValue::String("".into()))
             .await;
         Ok(updated)
     }
@@ -113,7 +115,7 @@ impl ProfileSubscription {
     async fn profile_me<'a>(&self, ctx: &'a Context<'_>) -> impl Stream<Item = Profile> + 'a {
         let profile_id: Uuid = ctx.require::<AuthClaims>().id;
         let topic = topic_profile_updated(profile_id.clone());
-        let mut subscription = ctx
+        let subscription = ctx
             .require::<PubSubHandle<RedisValue>>()
             .subscribe(vec![topic])
             .await;

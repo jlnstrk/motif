@@ -17,6 +17,8 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(has_many = "super::service_credentials::Entity")]
     ServiceCredentials,
+    #[sea_orm(has_many = "super::refresh_tokens::Entity")]
+    RefreshTokens,
     #[sea_orm(has_many = "super::profiles::Entity")]
     Profiles,
 }
@@ -24,6 +26,12 @@ pub enum Relation {
 impl Related<super::service_credentials::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::ServiceCredentials.def()
+    }
+}
+
+impl Related<super::refresh_tokens::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::RefreshTokens.def()
     }
 }
 

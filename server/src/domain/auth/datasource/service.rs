@@ -1,10 +1,8 @@
-use std::error::Error;
-
 use chrono::{FixedOffset, Utc};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait,
-    IntoActiveModel, NotSet, QueryFilter, TransactionTrait,
+    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, EntityTrait, IntoActiveModel,
+    NotSet, QueryFilter, TransactionTrait,
 };
 use uuid::Uuid;
 
@@ -14,21 +12,20 @@ use entity::service_credentials::{
 use entity::{profiles, sea_orm_active_enums, service_credentials, users};
 
 use crate::domain::auth::dto::{ServiceCredentialsDto, ServiceLoginDto};
-use crate::domain::auth::typedef::ServiceToken::Full;
-use crate::domain::auth::typedef::{FullServiceToken, ServiceToken};
+use crate::domain::auth::typedef::{AuthTokenWithRefresh, ServiceToken};
 use crate::domain::common::typedef::Service;
-use anyhow::{Context, Result};
-use serde::ser;
+use crate::rest::util::{ApiError, AuthenticationError};
 
-impl From<ServiceCredentialsModel> for FullServiceToken {
+impl From<ServiceCredentialsModel> for ServiceToken<AuthTokenWithRefresh> {
     fn from(model: ServiceCredentialsModel) -> Self {
         Self {
             service: Service::from(model.service),
             service_id: model.service_id,
-            access_token: model.access_token,
-            access_token_expires: model.access_token_expires.map(|dt| dt.with_timezone(&Utc)),
-            refresh_token: model.refresh_token,
-            refresh_token_expires: model.refresh_token_expires.map(|dt| dt.with_timezone(&Utc)),
+            token: AuthTokenWithRefresh {
+                access_token: model.access_token,
+                access_token_expires: model.access_token_expires.map(|dt| dt.with_timezone(&Utc)),
+                refresh_token: model.refresh_token,
+            },
         }
     }
 }
@@ -42,11 +39,11 @@ pub fn build_username(display_name: &String) -> String {
     username
 }
 
-pub async fn get_credentials_by_user_and_service(
+pub async fn get_credentials_by_user_id(
     db: &DatabaseConnection,
     user_id: Uuid,
     service: Service,
-) -> Result<FullServiceToken> {
+) -> Result<ServiceToken<AuthTokenWithRefresh>, ApiError> {
     let service: sea_orm_active_enums::Service = service.into();
     let model = ServiceCredentialsEntity::find()
         .filter(
@@ -56,14 +53,14 @@ pub async fn get_credentials_by_user_and_service(
         )
         .one(db)
         .await?;
-    let model: ServiceCredentialsModel = model.context("Credentials not found")?;
+    let model: ServiceCredentialsModel = model.ok_or(AuthenticationError::UserNotFound)?;
     Ok(model.into())
 }
 
-pub async fn update_from_credentials(
+pub async fn update_credentials(
     db: &DatabaseConnection,
     dto: &ServiceCredentialsDto,
-) -> Result<FullServiceToken> {
+) -> Result<ServiceToken<AuthTokenWithRefresh>, ApiError> {
     let service: sea_orm_active_enums::Service = dto.service.into();
     let existing = ServiceCredentialsEntity::find()
         .filter(
@@ -73,7 +70,7 @@ pub async fn update_from_credentials(
         )
         .one(db)
         .await?
-        .context("No credentials to update")?;
+        .ok_or(AuthenticationError::UserNotFound)?;
     let mut existing = existing.into_active_model();
     existing.access_token = Set(dto.access_token.clone());
     existing.access_token_expires = Set(dto
@@ -91,9 +88,9 @@ pub async fn update_from_credentials(
 pub async fn upsert_from_service_login(
     db: &DatabaseConnection,
     dto: ServiceLoginDto,
-) -> Result<FullServiceToken, impl Error> {
+) -> Result<(Uuid, ServiceToken<AuthTokenWithRefresh>), ApiError> {
     let service: sea_orm_active_enums::Service = dto.credentials.service.into();
-    db.transaction::<_, FullServiceToken, DbErr>(|txn| {
+    db.transaction::<_, (Uuid, ServiceToken<AuthTokenWithRefresh>), ApiError>(|txn| {
         Box::pin(async move {
             let existing = ServiceCredentialsEntity::find()
                 .filter(
@@ -121,47 +118,54 @@ pub async fn upsert_from_service_login(
                     .map(|dt| dt.with_timezone(&FixedOffset::east(0))));
                 let credentials = credentials.update(txn).await?;
 
-                Ok(credentials.into())
+                Ok((credentials.user_id, credentials.into()))
             } else {
-                let user = users::ActiveModel {
-                    id: NotSet,
-                    email: Set(dto.account.email.clone()),
-                    created_at: Set(Utc::now().with_timezone(&FixedOffset::east(0))),
-                    updated_at: Set(Utc::now().with_timezone(&FixedOffset::east(0))),
-                };
-                let user = user.insert(txn).await?;
+                if let Some(account) = dto.account {
+                    let user = users::ActiveModel {
+                        id: NotSet,
+                        email: Set(account.email.clone()),
+                        created_at: Set(Utc::now().with_timezone(&FixedOffset::east(0))),
+                        updated_at: Set(Utc::now().with_timezone(&FixedOffset::east(0))),
+                    };
+                    let user = user.insert(txn).await?;
 
-                let username = build_username(&dto.account.display_name);
-                let profile = profiles::ActiveModel {
-                    user_id: Set(user.id),
-                    username: Set(username),
-                    biography: Set(None),
-                    photo_url: Set(dto.account.photo_url.clone()),
-                    display_name: Set(dto.account.display_name.clone()),
-                };
-                profile.insert(txn).await?;
+                    let username = build_username(&account.display_name);
+                    let profile = profiles::ActiveModel {
+                        user_id: Set(user.id),
+                        username: Set(username),
+                        biography: Set(None),
+                        photo_url: Set(account.photo_url.clone()),
+                        display_name: Set(account.display_name.clone()),
+                    };
+                    profile.insert(txn).await?;
 
-                let credentials = service_credentials::ActiveModel {
-                    user_id: Set(user.id),
-                    service: Set(dto.credentials.service.into()),
-                    service_id: Set(dto.credentials.service_id.clone()),
-                    access_token: Set(dto.credentials.access_token.clone()),
-                    access_token_expires: Set(dto
-                        .credentials
-                        .access_token_expires
-                        .map(|dt| dt.with_timezone(&FixedOffset::east(0)))),
-                    refresh_token: Set(dto.credentials.refresh_token.clone()),
-                    refresh_token_expires: Set(dto
-                        .credentials
-                        .refresh_token_expires
-                        .map(|dt| dt.with_timezone(&FixedOffset::east(0)))),
-                };
+                    let credentials = service_credentials::ActiveModel {
+                        user_id: Set(user.id),
+                        service: Set(dto.credentials.service.into()),
+                        service_id: Set(dto.credentials.service_id.clone()),
+                        access_token: Set(dto.credentials.access_token.clone()),
+                        access_token_expires: Set(dto
+                            .credentials
+                            .access_token_expires
+                            .map(|dt| dt.with_timezone(&FixedOffset::east(0)))),
+                        refresh_token: Set(dto.credentials.refresh_token.clone()),
+                        refresh_token_expires: Set(dto
+                            .credentials
+                            .refresh_token_expires
+                            .map(|dt| dt.with_timezone(&FixedOffset::east(0)))),
+                    };
 
-                let credentials = credentials.insert(txn).await?;
+                    let credentials = credentials.insert(txn).await?;
 
-                Ok(credentials.into())
+                    Ok((credentials.user_id, credentials.into()))
+                } else {
+                    Err(ApiError::Authentication(
+                        AuthenticationError::OAuthInsufficientClaims,
+                    ))
+                }
             }
         })
     })
     .await
+    .map_err(|err| err.into())
 }

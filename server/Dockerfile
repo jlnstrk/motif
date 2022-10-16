@@ -4,6 +4,7 @@ FROM rust:latest as builder
 RUN USER=root cargo new app
 WORKDIR /usr/src/app
 COPY Cargo.toml Cargo.lock ./
+ADD entity ./entity
 # Needs at least a main.rs file with a main function
 RUN mkdir src && echo "fn main(){}" > src/main.rs
 # Will build all dependent crates in release mode
@@ -18,6 +19,10 @@ RUN cargo install --path .
 
 # Runtime image
 FROM debian:bullseye-slim
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates
+RUN update-ca-certificates
 
 # Run as "app" auth
 RUN useradd -ms /bin/bash app

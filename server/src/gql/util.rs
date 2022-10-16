@@ -1,7 +1,7 @@
-use async_graphql::{Context, Error, ErrorExtensions, Result};
-use sea_orm::DbErr;
 use std::fmt::Display;
 use std::sync::Arc;
+
+use async_graphql::{Context, ErrorExtensions, Result};
 use uuid::Uuid;
 
 pub trait ContextDependencies {

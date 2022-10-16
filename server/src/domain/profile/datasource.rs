@@ -1,22 +1,19 @@
-use anyhow::Context;
 use sea_orm::sea_query::{OnConflict, SimpleExpr};
 use sea_orm::ActiveValue::{Set, Unchanged};
+use sea_orm::IdenStatic;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, DeriveColumn, EntityTrait,
-    EnumIter, FromQueryResult, IntoActiveValue, Linked, NotSet, PaginatorTrait, QueryFilter,
-    QuerySelect,
+    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DeriveColumn, EntityTrait,
+    EnumIter, IntoActiveValue, Linked, NotSet, PaginatorTrait, QueryFilter, QuerySelect,
 };
-use serde::de::Error;
 use uuid::Uuid;
 
-use anyhow::Result;
 use entity::profile_follows::Entity as ProfileFollowEntity;
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
 use entity::profiles_links::{ProfileFollowToFollower, ProfileFollowToFollowing};
 use entity::{profile_follows, profiles};
-use sea_orm::IdenStatic;
 
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
+use crate::rest::util::{ApiResult, DataError};
 
 impl From<ProfileModel> for Profile {
     fn from(model: ProfileModel) -> Self {
@@ -30,24 +27,24 @@ impl From<ProfileModel> for Profile {
     }
 }
 
-pub async fn get_by_id(db: &DatabaseConnection, profile_id: Uuid) -> Result<Profile> {
+pub async fn get_by_id(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<Profile> {
     let model = ProfileEntity::find_by_id(profile_id).one(db).await?;
 
-    let model = model.context("Profile not found")?;
+    let model = model.ok_or(DataError::NotFound("Profile not found".to_owned()))?;
     Ok(model.into())
 }
 
-pub async fn get_by_username(db: &DatabaseConnection, username: String) -> Result<Profile> {
+pub async fn get_by_username(db: &DatabaseConnection, username: String) -> ApiResult<Profile> {
     let model = ProfileEntity::find()
         .filter(profiles::Column::Username.eq(username))
         .one(db)
         .await?;
 
-    let model = model.context("Profile not found")?;
+    let model = model.ok_or(DataError::NotFound("Profile not found".to_owned()))?;
     Ok(model.into())
 }
 
-pub async fn search(db: &DatabaseConnection, query: String) -> Result<Vec<Profile>, DbErr> {
+pub async fn search(db: &DatabaseConnection, query: String) -> ApiResult<Vec<Profile>> {
     let models = ProfileEntity::find()
         .filter(
             Condition::any()
@@ -67,7 +64,7 @@ async fn get_profiles_from_follows<
     db: &DatabaseConnection,
     cond: SimpleExpr,
     link: L,
-) -> Result<Vec<Profile>, DbErr> {
+) -> ApiResult<Vec<Profile>> {
     let follows_with_profiles = ProfileFollowEntity::find()
         .find_also_linked(link)
         .filter(cond)
@@ -84,10 +81,7 @@ async fn get_profiles_from_follows<
     Ok(mapped)
 }
 
-pub async fn get_followers(
-    db: &DatabaseConnection,
-    profile_id: Uuid,
-) -> Result<Vec<Profile>, DbErr> {
+pub async fn get_followers(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<Vec<Profile>> {
     get_profiles_from_follows(
         db,
         profile_follows::Column::FollowedId.eq(profile_id),
@@ -96,18 +90,16 @@ pub async fn get_followers(
     .await
 }
 
-pub async fn get_followers_count(db: &DatabaseConnection, profile_id: Uuid) -> Result<i64, DbErr> {
+pub async fn get_followers_count(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<i64> {
     ProfileFollowEntity::find()
         .filter(profile_follows::Column::FollowedId.eq(profile_id))
         .count(db)
         .await
+        .map_err(|err| err.into())
         .map(|count| count as i64)
 }
 
-pub async fn get_following(
-    db: &DatabaseConnection,
-    profile_id: Uuid,
-) -> Result<Vec<Profile>, DbErr> {
+pub async fn get_following(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<Vec<Profile>> {
     get_profiles_from_follows(
         db,
         profile_follows::Column::FollowerId.eq(profile_id),
@@ -116,10 +108,7 @@ pub async fn get_following(
     .await
 }
 
-pub async fn get_following_ids(
-    db: &DatabaseConnection,
-    profile_id: Uuid,
-) -> Result<Vec<Uuid>, DbErr> {
+pub async fn get_following_ids(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<Vec<Uuid>> {
     #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
     enum QueryAs {
         FollowedId,
@@ -135,11 +124,12 @@ pub async fn get_following_ids(
     Ok(ids)
 }
 
-pub async fn get_following_count(db: &DatabaseConnection, profile_id: Uuid) -> Result<i64, DbErr> {
+pub async fn get_following_count(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<i64> {
     ProfileFollowEntity::find()
         .filter(profile_follows::Column::FollowerId.eq(profile_id))
         .count(db)
         .await
+        .map_err(|err| err.into())
         .map(|count| count as i64)
 }
 
@@ -147,7 +137,7 @@ pub async fn update_by_id(
     db: &DatabaseConnection,
     profile_id: Uuid,
     update: ProfileUpdate,
-) -> Result<Profile, DbErr> {
+) -> ApiResult<Profile> {
     let model = profiles::ActiveModel {
         user_id: Unchanged(profile_id),
         username: if let Some(username) = update.username {
@@ -172,7 +162,7 @@ pub async fn follow(
     db: &DatabaseConnection,
     follower_id: Uuid,
     followed_id: Uuid,
-) -> Result<bool, DbErr> {
+) -> ApiResult<bool> {
     let model = profile_follows::ActiveModel {
         follower_id: Set(follower_id),
         followed_id: Set(followed_id),
@@ -188,7 +178,7 @@ pub async fn unfollow(
     db: &DatabaseConnection,
     follower_id: Uuid,
     followed_id: Uuid,
-) -> Result<bool, DbErr> {
+) -> ApiResult<bool> {
     let model = profile_follows::ActiveModel {
         follower_id: Set(follower_id),
         followed_id: Set(followed_id),

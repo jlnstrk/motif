@@ -1,11 +1,12 @@
-use crate::gql::util::AuthClaims;
-use crate::rest::auth::util::verify_jwt;
-use crate::rest::util::{ApiError, AuthError};
 use axum::http;
 use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 use sea_orm::DatabaseConnection;
+
+use crate::domain::auth;
+use crate::gql::util::AuthClaims;
+use crate::rest::util::{ApiError, AuthenticationError};
 
 pub async fn verify_jwt_middleware_no_fail<B>(
     req: Request<B>,
@@ -34,9 +35,9 @@ pub async fn verify_jwt_middleware_explicit<B>(
         .headers()
         .get(http::header::AUTHORIZATION)
         .and_then(|header| header.to_str().ok());
-    let token_string = header.and_then(|header| header.matches(" ").last());
+    let token_string = header.and_then(|header| header.split(" ").last());
     let user = if let Some(token) = token_string {
-        Some(verify_jwt(db, token.to_string()).await?)
+        Some(auth::datasource::token::verify_access_jwt(token.to_string()).await?)
     } else {
         None
     };
@@ -45,9 +46,13 @@ pub async fn verify_jwt_middleware_explicit<B>(
         None => {
             if fail_if_no_auth {
                 Err(match (header, token_string, user) {
-                    (None, ..) => ApiError::Auth(AuthError::TokenMissing),
-                    (Some(_), None, ..) => ApiError::Auth(AuthError::TokenMalformed),
-                    (Some(_), Some(_), ..) => ApiError::Auth(AuthError::UserNotFound),
+                    (None, ..) => ApiError::Authentication(AuthenticationError::TokenMissing),
+                    (Some(_), None, ..) => {
+                        ApiError::Authentication(AuthenticationError::TokenMalformed)
+                    }
+                    (Some(_), Some(_), ..) => {
+                        ApiError::Authentication(AuthenticationError::UserNotFound)
+                    }
                 })
             } else {
                 let mut req = req;
@@ -55,9 +60,11 @@ pub async fn verify_jwt_middleware_explicit<B>(
                 Ok(next.run(req).await)
             }
         }
-        Some(claims) => {
+        Some(user_id) => {
             let mut req = req;
-            req.extensions_mut().insert(Some(claims));
+            let extensions = req.extensions_mut();
+            extensions.insert::<Option<AuthClaims>>(Some(AuthClaims { id: user_id }));
+            extensions.insert::<AuthClaims>(AuthClaims { id: user_id });
             Ok(next.run(req).await)
         }
     }

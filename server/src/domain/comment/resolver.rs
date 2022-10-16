@@ -1,18 +1,17 @@
-use std::error::Error;
+#![allow(dead_code)]
 
 use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object};
 use fred::prelude::RedisValue;
 
+use crate::domain::{motif, profile};
 use crate::domain::comment::datasource;
 use crate::domain::comment::pubsub::{topic_comment_created, topic_comment_deleted};
 use crate::domain::comment::typedef::{Comment, CreateComment};
 use crate::domain::motif::typedef::Motif;
 use crate::domain::profile::typedef::Profile;
-use crate::domain::{motif, profile};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
-use sea_orm::DbErr;
 
 #[ComplexObject]
 impl Comment {

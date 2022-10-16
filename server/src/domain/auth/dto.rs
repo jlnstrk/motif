@@ -19,5 +19,5 @@ pub struct ServiceAccountDto {
 
 pub struct ServiceLoginDto {
     pub credentials: ServiceCredentialsDto,
-    pub account: ServiceAccountDto,
+    pub account: Option<ServiceAccountDto>,
 }

@@ -1,16 +1,14 @@
-use async_graphql::futures_util::Stream;
-use async_stream::stream;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::mem::take;
 use std::sync::Arc;
 
+use async_graphql::futures_util::Stream;
+use async_stream::stream;
 use async_trait::async_trait;
 use futures::executor::block_on;
-use log::{log, Level};
-use rspotify::ClientError;
+use log::{info, log};
 use tokio::sync::{mpsc, oneshot, Mutex};
-use tokio::task::block_in_place;
 
 use crate::pubsub::private;
 
@@ -129,6 +127,7 @@ impl<V: Debug> PubSubSubscriptionHandle<V> {
             .await
             .unwrap();
         let (id, receiver) = ans_recv.await.unwrap();
+        info!("PubSub: Obtained handle");
         PubSubSubscriptionHandle {
             id,
             receiver,
@@ -155,7 +154,10 @@ impl<V> Drop for PubSubSubscriptionHandle<V> {
             subscription_id: self.id,
         };
         if let None = self.unregister.try_send(unsubscribe).ok() {
-            log!(Level::Info, "Failed to release pubsub subscription!");
+            info!("PubSub: Failed to release pubsub subscription!");
+        }
+        {
+            info!("PubSub: Released handle");
         }
     }
 }

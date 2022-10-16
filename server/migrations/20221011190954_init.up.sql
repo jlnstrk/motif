@@ -24,10 +24,14 @@ CREATE TABLE service_credentials
 );
 CREATE TABLE refresh_tokens
 (
-    user_id UUID                     NOT NULL,
-    value   VARCHAR                  NOT NULL,
-    expires TIMESTAMP WITH TIME ZONE NOT NULL,
-    PRIMARY KEY (user_id, value)
+    id         SERIAL                   NOT NULL,
+    user_id    UUID                     NOT NULL,
+    value      VARCHAR                  NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );
 CREATE TABLE profiles
 (

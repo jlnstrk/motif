@@ -1,10 +1,8 @@
-use std::error::Error;
-
 use chrono::{FixedOffset, Utc};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, ModelTrait,
-    NotSet, QueryFilter,
+    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, EntityTrait, ModelTrait, NotSet,
+    QueryFilter,
 };
 use uuid::Uuid;
 
@@ -15,7 +13,7 @@ use entity::{collection_motifs, collections};
 
 use crate::domain::collection::typedef::{Collection, CreateCollection};
 use crate::domain::motif::typedef::Motif;
-use anyhow::{anyhow, Context, Result};
+use crate::rest::util::{ApiError, ApiResult, DataError};
 
 impl From<CollectionModel> for Collection {
     fn from(model: CollectionModel) -> Self {
@@ -29,13 +27,16 @@ impl From<CollectionModel> for Collection {
     }
 }
 
-pub async fn get_by_id(db: &DatabaseConnection, collection_id: Uuid) -> Result<Collection> {
+pub async fn get_by_id(db: &DatabaseConnection, collection_id: Uuid) -> ApiResult<Collection> {
     let model = CollectionEntity::find_by_id(collection_id).one(db).await?;
-    let collection = model.context("Collection not found")?;
+    let collection = model.ok_or(DataError::NotFound("Collection not found".to_owned()))?;
     Ok(collection.into())
 }
 
-pub async fn get_by_owner_id(db: &DatabaseConnection, owner_id: Uuid) -> Result<Vec<Collection>> {
+pub async fn get_by_owner_id(
+    db: &DatabaseConnection,
+    owner_id: Uuid,
+) -> ApiResult<Vec<Collection>> {
     let models = CollectionEntity::find()
         .filter(collections::Column::OwnerId.eq(owner_id))
         .all(db)
@@ -44,7 +45,10 @@ pub async fn get_by_owner_id(db: &DatabaseConnection, owner_id: Uuid) -> Result<
     Ok(mapped)
 }
 
-pub async fn get_motifs_by_id(db: &DatabaseConnection, collection_id: Uuid) -> Result<Vec<Motif>> {
+pub async fn get_motifs_by_id(
+    db: &DatabaseConnection,
+    collection_id: Uuid,
+) -> ApiResult<Vec<Motif>> {
     let join_with_motifs = CollectionMotifEntity::find()
         .find_with_related(MotifEntity)
         .filter(collection_motifs::Column::CollectionId.eq(collection_id))
@@ -65,11 +69,13 @@ pub async fn delete_by_id(
     db: &DatabaseConnection,
     owner_id: Uuid,
     collection_id: Uuid,
-) -> Result<bool> {
+) -> ApiResult<bool> {
     let existing = CollectionEntity::find_by_id(collection_id).one(db).await?;
     if let Some(existing) = existing {
         if existing.owner_id != owner_id {
-            Err(anyhow!("Not owner of collection"))
+            Err(ApiError::Authorization(
+                "Must be owner of collection to delete".to_owned(),
+            ))
         } else {
             existing.delete(db).await?;
             Ok(true)
@@ -83,7 +89,7 @@ pub async fn create(
     db: &DatabaseConnection,
     owner_id: Uuid,
     input: CreateCollection,
-) -> Result<Collection> {
+) -> ApiResult<Collection> {
     let model = collections::ActiveModel {
         id: NotSet,
         title: Set(input.title),
@@ -100,7 +106,7 @@ pub async fn is_owner(
     db: &DatabaseConnection,
     owner_id: Uuid,
     collection_id: Uuid,
-) -> Result<bool> {
+) -> ApiResult<bool> {
     Ok(CollectionEntity::find()
         .filter(
             Condition::all()
@@ -116,7 +122,7 @@ async fn find_existing_member(
     db: &DatabaseConnection,
     collection_id: Uuid,
     motif_id: i32,
-) -> Result<Option<CollectionMotifModel>> {
+) -> ApiResult<Option<CollectionMotifModel>> {
     Ok(CollectionMotifEntity::find()
         .filter(
             Condition::all()
@@ -132,9 +138,11 @@ pub async fn add_motif_by_id(
     owner_id: Uuid,
     collection_id: Uuid,
     motif_id: i32,
-) -> Result<bool> {
+) -> ApiResult<bool> {
     if !is_owner(db, owner_id, collection_id).await? {
-        return Err(anyhow!("Not owner of collection"));
+        return Err(ApiError::Authorization(
+            "Mut be owner of collection to add motif".to_owned(),
+        ));
     }
     if find_existing_member(db, collection_id, motif_id)
         .await?
@@ -155,9 +163,11 @@ pub async fn remove_motif_by_id(
     owner_id: Uuid,
     collection_id: Uuid,
     motif_id: i32,
-) -> Result<bool> {
+) -> ApiResult<bool> {
     if !is_owner(db, owner_id, collection_id).await? {
-        return Err(anyhow!("Not owner of collection"));
+        return Err(ApiError::Authorization(
+            "Must be owner of collection to remove motif".to_owned(),
+        ));
     }
     let existing = find_existing_member(db, collection_id, motif_id).await?;
     if let Some(existing) = existing {

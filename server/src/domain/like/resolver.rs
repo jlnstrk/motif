@@ -1,10 +1,11 @@
-use std::error::Error;
+#![allow(dead_code)]
 
-use async_graphql::{ComplexObject, Context, Object, Subscription};
+use async_graphql::{Context, Object, Subscription};
 use async_stream::stream;
 use fred::prelude::RedisValue;
 use futures::Stream;
 use sea_orm::DbErr;
+use uuid::Uuid;
 
 use crate::domain::comment::typedef::Comment;
 use crate::domain::like::datasource;
@@ -14,8 +15,6 @@ use crate::domain::profile;
 use crate::domain::profile::typedef::Profile;
 use crate::gql::util::{AuthClaims, ContextDependencies};
 use crate::PubSubHandle;
-use futures_util::stream::Map;
-use uuid::Uuid;
 
 //#[ComplexObject]
 impl Comment {
