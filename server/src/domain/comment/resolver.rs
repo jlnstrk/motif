@@ -4,12 +4,12 @@ use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object};
 use fred::prelude::RedisValue;
 
-use crate::domain::{motif, profile};
 use crate::domain::comment::datasource;
 use crate::domain::comment::pubsub::{topic_comment_created, topic_comment_deleted};
 use crate::domain::comment::typedef::{Comment, CreateComment};
 use crate::domain::motif::typedef::Motif;
 use crate::domain::profile::typedef::Profile;
+use crate::domain::{like, motif, profile};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -45,6 +45,18 @@ impl Comment {
         } else {
             Ok(None)
         }
+    }
+
+    async fn likes_count(&self, ctx: &Context<'_>) -> Result<i32> {
+        like::datasource::get_comment_likes_count(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn likes(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
+        like::datasource::get_comment_likes(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
     }
 }
 

@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
-use async_graphql::{ComplexObject, Context, Object, Subscription};
-use async_graphql::*;
 use async_graphql::futures_util::Stream;
+use async_graphql::*;
+use async_graphql::{ComplexObject, Context, Object, Subscription};
 use async_stream::stream;
 use fred::prelude::RedisValue;
 use uuid::Uuid;
@@ -12,30 +12,46 @@ use crate::domain::motif::pubsub::{
     topic_motif_created, topic_motif_deleted, topic_motif_listened,
 };
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
-use crate::domain::profile;
 use crate::domain::profile::typedef::Profile;
+use crate::domain::{like, profile};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
 #[ComplexObject]
 impl Motif {
     async fn service_ids(&self, ctx: &Context<'_>) -> Result<Vec<ServiceId>> {
-        datasource::get_service_ids_by_id(ctx.require(), self.id).await
+        datasource::get_service_ids_by_id(ctx.require(), self.id)
+            .await
             .coerce_gql_err()
     }
 
     async fn creator(&self, ctx: &Context<'_>) -> Result<Profile> {
-        profile::datasource::get_by_id(ctx.require(), self.creator_id).await
+        profile::datasource::get_by_id(ctx.require(), self.creator_id)
+            .await
             .coerce_gql_err()
     }
 
     async fn listeners_count(&self, ctx: &Context<'_>) -> Result<i32> {
-        datasource::get_listeners_count_by_id(ctx.require(), self.id).await
+        datasource::get_listeners_count_by_id(ctx.require(), self.id)
+            .await
             .coerce_gql_err()
     }
 
     async fn listeners(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
-        datasource::get_listeners_by_id(ctx.require(), self.id).await
+        datasource::get_listeners_by_id(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn likes_count(&self, ctx: &Context<'_>) -> Result<i32> {
+        like::datasource::get_motif_likes_count(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn likes(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
+        like::datasource::get_motif_likes(ctx.require(), self.id)
+            .await
             .coerce_gql_err()
     }
 }
@@ -46,7 +62,8 @@ pub struct MotifQuery;
 #[Object]
 impl MotifQuery {
     async fn motif_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
-        datasource::get_feed_by_profile_id(ctx.require(), ctx.require::<AuthClaims>().id).await
+        datasource::get_feed_by_profile_id(ctx.require(), ctx.require::<AuthClaims>().id)
+            .await
             .coerce_gql_err()
     }
 }

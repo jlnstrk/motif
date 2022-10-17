@@ -1,7 +1,10 @@
 #![allow(dead_code)]
 
-use async_graphql::*;
+use crate::domain::collection::typedef::Collection;
+use crate::domain::motif::typedef::Motif;
+use crate::domain::{collection, motif};
 use async_graphql::futures_util::Stream;
+use async_graphql::*;
 use fred::prelude::RedisValue;
 use futures::stream::StreamExt;
 use uuid::Uuid;
@@ -34,6 +37,18 @@ impl Profile {
 
     async fn following_count(&self, ctx: &Context<'_>) -> Result<i64> {
         datasource::get_following_count(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn motifs(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
+        motif::datasource::get_by_creator_id(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn collections(&self, ctx: &Context<'_>) -> Result<Vec<Collection>> {
+        collection::datasource::get_by_owner_id(ctx.require(), self.id)
             .await
             .coerce_gql_err()
     }

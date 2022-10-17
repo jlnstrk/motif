@@ -41,13 +41,13 @@ async fn pubsub_main<V>(
                 topics_to_sub_ids: HashMap::<String, HashSet<i64>>::new(),
             };
 
-            info!("pubsub handler: ready to receive commands!");
+            info!("PubSub: Handler ready to receive commands!");
 
             let mut handler_receiver = handler_receiver;
             while let Some(command) = handler_receiver.recv().await {
                 match command {
                     PubSubCommand::Subscribe { topics, ans } => {
-                        println!("PubSub: Subscribe");
+                        info!("PubSub: Subscribe");
                         let subscription_id = sub_id_counter;
                         sub_id_counter += 1;
 
@@ -82,7 +82,7 @@ async fn pubsub_main<V>(
                         }
                     }
                     PubSubCommand::Unsubscribe { subscription_id } => {
-                        println!("PubSub: Unsubscribe");
+                        info!("PubSub: Unsubscribe");
                         subscriber_maps.sub_ids_to_senders.remove(&subscription_id);
                         if let Some(topics) =
                             subscriber_maps.sub_ids_to_topics.remove(&subscription_id)

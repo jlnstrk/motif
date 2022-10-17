@@ -2,7 +2,6 @@ use axum::http;
 use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
-use sea_orm::DatabaseConnection;
 
 use crate::domain::auth;
 use crate::gql::util::AuthClaims;
@@ -27,10 +26,6 @@ pub async fn verify_jwt_middleware_explicit<B>(
     next: Next<B>,
     fail_if_no_auth: bool,
 ) -> Result<Response, impl IntoResponse> {
-    let db = req
-        .extensions()
-        .get::<DatabaseConnection>()
-        .expect("No database");
     let header = req
         .headers()
         .get(http::header::AUTHORIZATION)

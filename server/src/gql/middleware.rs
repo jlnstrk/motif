@@ -67,6 +67,7 @@ pub async fn schema_middleware<B>(
     .data(db)
     .data(pubsub)
     .finish();
+    println!("{}", &builder.sdl());
     let mut req_mut = req;
     req_mut.extensions_mut().insert(builder);
     Ok::<_, ()>(next.run(req_mut).await)

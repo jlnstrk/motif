@@ -7,7 +7,7 @@ use async_graphql::futures_util::Stream;
 use async_stream::stream;
 use async_trait::async_trait;
 use futures::executor::block_on;
-use log::{info, log};
+use log::info;
 use tokio::sync::{mpsc, oneshot, Mutex};
 
 use crate::pubsub::private;

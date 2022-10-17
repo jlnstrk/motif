@@ -1,16 +1,12 @@
 use std::env;
-use std::error::Error;
-use std::future::Future;
 use std::net::SocketAddr;
-use std::ops::Deref;
 use std::time::Duration;
 
-use async_graphql::futures_util::{pin_mut, SinkExt, StreamExt};
+use async_graphql::futures_util::{pin_mut, StreamExt};
 use axum::{Extension, Router, Server};
 use axum_server::tls_rustls::RustlsConfig;
 use dotenvy::dotenv;
 use env_logger::Target;
-use fred::prelude::{ClientLike, PubsubInterface};
 use log::{info, LevelFilter};
 use sea_orm::{DatabaseConnection, SqlxPostgresConnector};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
@@ -66,9 +62,8 @@ async fn main() {
         .layer(Extension(db_connection))
         .layer(Extension(PubSubHandle::from(&redis).await));
 
-    info!("GraphiQL IDE: http://localhost:8080/graphql");
-
     if cfg!(debug_assertions) {
+        info!("GraphiQL IDE: http://localhost:8080/graphql");
         let config = RustlsConfig::from_pem_file("./cert.pem", "./key.pem")
             .await
             .unwrap();

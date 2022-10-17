@@ -7,7 +7,7 @@ use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, RefreshToken,
     Scope, TokenResponse, TokenUrl,
 };
-use reqwest::{header, Method, Response};
+use reqwest::{header, Method};
 use sea_orm::DatabaseConnection;
 use serde::Deserialize;
 use uuid::Uuid;

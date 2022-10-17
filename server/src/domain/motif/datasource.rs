@@ -1,4 +1,4 @@
-use chrono::{FixedOffset, Offset, TimeZone, Utc};
+use chrono::{FixedOffset, Offset, Utc};
 use sea_orm::sea_query::{OnConflict, Query};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
@@ -44,6 +44,15 @@ pub async fn get_by_id(db: &DatabaseConnection, motif_id: i32) -> ApiResult<Moti
     let model = MotifEntity::find_by_id(motif_id).one(db).await?;
     let motif = model.ok_or(DataError::NotFound("Motif not found".to_owned()))?;
     Ok(motif.into())
+}
+
+pub async fn get_by_creator_id(db: &DatabaseConnection, creator_id: Uuid) -> ApiResult<Vec<Motif>> {
+    let models = MotifEntity::find()
+        .filter(motifs::Column::CreatorId.eq(creator_id))
+        .all(db)
+        .await?;
+    let mapped: Vec<Motif> = models.into_iter().map(|model| model.into()).collect();
+    Ok(mapped)
 }
 
 pub async fn get_service_ids_by_id(

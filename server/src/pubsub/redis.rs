@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use fred::clients::{RedisClient, SubscriberClient};
 use fred::prelude::{ClientLike, PubsubInterface, ReconnectPolicy, RedisConfig};
 use fred::types::RedisValue;
-use log::{error, info, log};
+use log::{error, info};
 use tokio::sync::Mutex;
 
 use crate::pubsub::prelude::PubSubCommand::Incoming;
@@ -56,7 +56,7 @@ impl PubSubEngine<RedisValue> for RedisPubSubEngine {
 
             pin_mut!(stream);
             while let Some((channel, message)) = stream.next().await {
-                println!("message!");
+                info!("Redis: Message received");
 
                 command_sender_copy
                     .clone()
@@ -77,11 +77,11 @@ impl PubSubEngine<RedisValue> for RedisPubSubEngine {
         self.subscriber
             .quit()
             .await
-            .expect("Failed to quit subscriber redis");
+            .expect("Redis: Failed to quit subscriber");
         self.publisher
             .quit()
             .await
-            .expect("Failed to quit publisher redis");
+            .expect("Redis: Failed to quit publisher");
     }
 
     async fn subscribe_to_topic(&self, topic: String) {

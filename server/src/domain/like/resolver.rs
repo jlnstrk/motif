@@ -7,36 +7,12 @@ use futures::Stream;
 use sea_orm::DbErr;
 use uuid::Uuid;
 
-use crate::domain::comment::typedef::Comment;
 use crate::domain::like::datasource;
 use crate::domain::like::pubsub::topic_motif_liked;
-use crate::domain::motif::typedef::Motif;
 use crate::domain::profile;
 use crate::domain::profile::typedef::Profile;
 use crate::gql::util::{AuthClaims, ContextDependencies};
 use crate::PubSubHandle;
-
-//#[ComplexObject]
-impl Comment {
-    async fn likes_count(&self, ctx: &Context<'_>) -> Result<i32, DbErr> {
-        datasource::get_comment_likes_count(ctx.require(), self.id).await
-    }
-
-    async fn likes(&self, ctx: &Context<'_>) -> Result<Vec<Profile>, DbErr> {
-        datasource::get_comment_likes(ctx.require(), self.id).await
-    }
-}
-
-//#[ComplexObject]
-impl Motif {
-    async fn likes_count(&self, ctx: &Context<'_>) -> Result<i32, DbErr> {
-        datasource::get_motif_likes_count(ctx.require(), self.id).await
-    }
-
-    async fn likes(&self, ctx: &Context<'_>) -> Result<Vec<Profile>, DbErr> {
-        datasource::get_motif_likes(ctx.require(), self.id).await
-    }
-}
 
 #[derive(Default)]
 pub struct LikeMutation;

@@ -1,11 +1,9 @@
 use std::env;
-use std::str::from_utf8;
 
 use chrono::{Duration, Utc};
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
 use oauth2::{
-    AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, RefreshToken,
-    RequestTokenError, TokenResponse,
+    AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, RefreshToken, TokenResponse,
 };
 use openidconnect::core::{
     CoreAuthenticationFlow, CoreClient, CoreProviderMetadata, CoreResponseMode, CoreTokenResponse,
@@ -133,29 +131,13 @@ pub async fn login_from_code(
         Some(client_secret.clone()),
     )
     .await;
-    println!("{:?}", callback_mode);
-    println!("{}", client_secret);
     let token_response = client
         .exchange_code(AuthorizationCode::new(code))
         .add_extra_param("client_id", env.client_id)
         .add_extra_param("client_secret", client_secret)
-        .request_async(|req| {
-            let _ = 0;
-            println!("{}", from_utf8(&req.body).unwrap());
-            async_http_client(req)
-        })
+        .request_async(async_http_client)
         .await
-        .map_err(|err| {
-            match err {
-                RequestTokenError::ServerResponse(ref resp) => {
-                    println!("{}", resp.clone());
-                }
-                RequestTokenError::Request(_) => {}
-                RequestTokenError::Parse(_, _) => {}
-                RequestTokenError::Other(_) => {}
-            }
-            AuthenticationError::OAuthUnknown(format!("{}", err))
-        })?;
+        .map_err(|err| AuthenticationError::OAuthUnknown(format!("{}", err)))?;
 
     struct IgnoreNonce {}
     impl NonceVerifier for IgnoreNonce {

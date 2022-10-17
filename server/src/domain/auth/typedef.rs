@@ -60,7 +60,9 @@ impl ServiceToken<AuthTokenWithRefresh> {
 
 impl From<ServiceToken<AuthToken>> for ServiceTokenResponse {
     fn from(token: ServiceToken<AuthToken>) -> Self {
-        Self { service_token: token }
+        Self {
+            service_token: token,
+        }
     }
 }
 
@@ -74,7 +76,7 @@ impl From<(AuthTokenWithRefresh, ServiceToken<AuthToken>)> for AuthResponse {
 }
 
 impl From<AuthTokenWithRefresh> for AuthResponse {
-    fn from((auth_token): AuthTokenWithRefresh) -> Self {
+    fn from(auth_token: AuthTokenWithRefresh) -> Self {
         Self {
             app_token: auth_token,
             service_tokens: vec![],

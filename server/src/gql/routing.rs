@@ -1,14 +1,16 @@
 use async_graphql::http::{GraphiQLSource, ALL_WEBSOCKET_PROTOCOLS};
 use async_graphql::{Data, Error};
 use async_graphql_axum::{GraphQLProtocol, GraphQLRequest, GraphQLResponse, GraphQLWebSocket};
-use axum::extract::WebSocketUpgrade;
+use axum::extract::{Host, WebSocketUpgrade};
 use axum::handler::Handler;
 use axum::middleware::from_fn;
 use axum::response::{Html, IntoResponse};
 use axum::routing::{get, post};
 use axum::{Extension, Router};
+use log::info;
 use sea_orm::DatabaseConnection;
 use serde::Deserialize;
+use std::env;
 
 use crate::domain::auth::datasource::token::verify_access_jwt;
 use crate::gql::middleware::{schema_middleware, schema_middleware_auth};
@@ -54,11 +56,17 @@ async fn graphql_handler(schema: Extension<AppSchema>, req: GraphQLRequest) -> G
     schema.execute(req.into_inner()).await.into()
 }
 
-async fn graphiql() -> impl IntoResponse {
+async fn graphiql(Host(host): Host) -> impl IntoResponse {
+    let port = env::var("PORT").ok();
+    let host = if let Some(port) = port {
+        format!("{}:{}", host, port)
+    } else {
+        host
+    };
     Html(
         GraphiQLSource::build()
-            .endpoint("http://localhost:8080/graphql")
-            .subscription_endpoint("ws://localhost:8080/graphql/ws")
+            .endpoint(&format!("https://{}/graphql", host))
+            .subscription_endpoint(&format!("ws://{}/graphql/ws", host))
             .finish(),
     )
 }
