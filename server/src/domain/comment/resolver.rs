@@ -60,21 +60,6 @@ impl Comment {
     }
 }
 
-//#[ComplexObject]
-impl Motif {
-    async fn comments_count(&self, ctx: &Context<'_>) -> Result<i32> {
-        datasource::get_motif_comments_count_by_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
-    }
-
-    async fn comments(&self, ctx: &Context<'_>) -> Result<Vec<Comment>> {
-        datasource::get_motif_comments_by_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
-    }
-}
-
 #[derive(Default)]
 pub struct CommentQuery;
 
@@ -92,7 +77,7 @@ pub struct CommentMutation;
 
 #[Object]
 impl CommentMutation {
-    async fn comment_create_to_motif(
+    async fn motif_comment_create(
         &self,
         ctx: &Context<'_>,
         motif_id: i32,
@@ -108,7 +93,7 @@ impl CommentMutation {
         Ok(comment)
     }
 
-    async fn comment_create_to_comment(
+    async fn motif_comment_create_sub(
         &self,
         ctx: &Context<'_>,
         parent_comment_id: i32,

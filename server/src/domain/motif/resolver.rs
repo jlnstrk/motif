@@ -7,13 +7,14 @@ use async_stream::stream;
 use fred::prelude::RedisValue;
 use uuid::Uuid;
 
+use crate::domain::comment::typedef::Comment;
 use crate::domain::motif::datasource;
 use crate::domain::motif::pubsub::{
     topic_motif_created, topic_motif_deleted, topic_motif_listened,
 };
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
-use crate::domain::{like, profile};
+use crate::domain::{comment, like, profile};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -39,6 +40,18 @@ impl Motif {
 
     async fn listeners(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
         datasource::get_listeners_by_id(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn comments_count(&self, ctx: &Context<'_>) -> Result<i32> {
+        comment::datasource::get_motif_comments_count_by_id(ctx.require(), self.id)
+            .await
+            .coerce_gql_err()
+    }
+
+    async fn comments(&self, ctx: &Context<'_>) -> Result<Vec<Comment>> {
+        comment::datasource::get_motif_comments_by_id(ctx.require(), self.id)
             .await
             .coerce_gql_err()
     }

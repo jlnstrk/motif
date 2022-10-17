@@ -7,7 +7,6 @@ use axum::middleware::from_fn;
 use axum::response::{Html, IntoResponse};
 use axum::routing::{get, post};
 use axum::{Extension, Router};
-use log::info;
 use sea_orm::DatabaseConnection;
 use serde::Deserialize;
 use std::env;
