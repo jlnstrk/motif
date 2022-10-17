@@ -1,6 +1,6 @@
 CREATE TABLE comments
 (
-    id         INTEGER                  NOT NULL,
+    id         SERIAL                   NOT NULL,
     motif_id   INTEGER                  NOT NULL,
     parent_id  INTEGER,
     "offset"   INTEGER,

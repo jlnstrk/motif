@@ -1,6 +1,6 @@
 CREATE TABLE collections
 (
-    id          UUID                     NOT NULL,
+    id          UUID                     NOT NULL DEFAULT gen_random_uuid(),
     title       VARCHAR                  NOT NULL,
     description VARCHAR,
     owner_id    UUID                     NOT NULL,
