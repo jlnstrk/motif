@@ -40,8 +40,9 @@ pub async fn schema_middleware_auth<B>(
     } else {
         builder = builder.introspection_only();
     }
+    let schema = builder.finish();
     let mut req_mut = req;
-    req_mut.extensions_mut().insert(builder.finish());
+    req_mut.extensions_mut().insert(schema);
     Ok::<_, ()>(next.run(req_mut).await)
 }
 
@@ -59,7 +60,7 @@ pub async fn schema_middleware<B>(
         .get::<PubSubHandle<RedisValue>>()
         .unwrap()
         .clone();
-    let builder = Schema::build(
+    let schema = Schema::build(
         Query::default(),
         Mutation::default(),
         Subscription::default(),
@@ -67,8 +68,7 @@ pub async fn schema_middleware<B>(
     .data(db)
     .data(pubsub)
     .finish();
-    println!("{}", &builder.sdl());
     let mut req_mut = req;
-    req_mut.extensions_mut().insert(builder);
+    req_mut.extensions_mut().insert(schema);
     Ok::<_, ()>(next.run(req_mut).await)
 }
