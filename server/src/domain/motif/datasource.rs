@@ -2,9 +2,11 @@ use chrono::{FixedOffset, Offset, Utc};
 use sea_orm::sea_query::{OnConflict, Query};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, ModelTrait,
-    NotSet, Order, PaginatorTrait, QueryFilter, QueryOrder, TransactionTrait,
+    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, DeriveColumn, EntityTrait,
+    EnumIter, ModelTrait, NotSet, Order, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
+    TransactionTrait,
 };
+use std::collections::HashSet;
 use uuid::Uuid;
 
 use entity::motif_listeners::Entity as MotifListenerEntity;
@@ -13,6 +15,7 @@ use entity::motifs::{Entity as MotifEntity, Model as MotifModel};
 use entity::profile_follows::Entity as ProfileFollowEntity;
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
 use entity::{motif_listeners, motif_service_ids, motifs, profile_follows};
+use sea_orm::IdenStatic;
 
 use crate::domain::common::typedef::Service;
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
@@ -124,6 +127,45 @@ pub async fn get_listeners_by_id(
         .collect();
 
     Ok(profiles)
+}
+
+pub async fn has_listened(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    motif_id: i32,
+) -> Result<bool, ApiError> {
+    Ok(MotifListenerEntity::find()
+        .filter(
+            Condition::all()
+                .add(motif_listeners::Column::ListenerId.eq(profile_id))
+                .add(motif_listeners::Column::MotifId.eq(motif_id)),
+        )
+        .one(db)
+        .await?
+        .is_some())
+}
+
+pub async fn has_listened_all(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    motif_ids: &[i32],
+) -> Result<HashSet<i32>, ApiError> {
+    #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
+    enum QueryAs {
+        MotifId,
+    }
+    let ids: Vec<i32> = MotifListenerEntity::find()
+        .select_only()
+        .column_as(motif_listeners::Column::MotifId, QueryAs::MotifId)
+        .filter(
+            Condition::all()
+                .add(motif_listeners::Column::ListenerId.eq(profile_id))
+                .add(motif_listeners::Column::MotifId.is_in(motif_ids.to_vec())),
+        )
+        .into_values::<_, QueryAs>()
+        .all(db)
+        .await?;
+    Ok(ids.into_iter().collect())
 }
 
 pub async fn listen_by_id(

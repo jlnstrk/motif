@@ -2,12 +2,12 @@ use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
 use axum::http::StatusCode;
-use axum::Json;
 use axum::response::{IntoResponse, Response};
+use axum::Json;
 use sea_orm::{DbErr, TransactionError};
 use serde_json::json;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AuthenticationError {
     TokenMissing,
     TokenMalformed,
@@ -22,18 +22,18 @@ pub enum AuthenticationError {
     OAuthRefreshTokenMissing,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum GeneralError {
     Database(DbErr),
     Internal,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DataError {
     NotFound(String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ApiError {
     Authentication(AuthenticationError),
     Authorization(String),

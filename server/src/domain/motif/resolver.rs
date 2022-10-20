@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use async_graphql::dataloader::DataLoader;
 use async_graphql::futures_util::Stream;
 use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object, Subscription};
@@ -15,6 +16,7 @@ use crate::domain::motif::pubsub::{
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{comment, like, profile};
+use crate::gql::dataloader::MotifListenedLoader;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -29,6 +31,15 @@ impl Motif {
     async fn creator(&self, ctx: &Context<'_>) -> Result<Profile> {
         profile::datasource::get_by_id(ctx.require(), self.creator_id)
             .await
+            .coerce_gql_err()
+    }
+
+    async fn listened(&self, ctx: &Context<'_>) -> Result<bool> {
+        let loader: &DataLoader<MotifListenedLoader> = ctx.require();
+        loader
+            .load_one(self.id)
+            .await
+            .map(|opt| opt.unwrap_or(false))
             .coerce_gql_err()
     }
 

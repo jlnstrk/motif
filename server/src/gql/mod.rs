@@ -1,3 +1,4 @@
+pub mod dataloader;
 pub mod middleware;
 pub mod routing;
 pub mod schema;

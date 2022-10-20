@@ -1,4 +1,6 @@
-use async_graphql::Schema;
+use crate::gql::dataloader::MotifListenedLoader;
+use async_graphql::dataloader::DataLoader;
+use async_graphql::{Schema, SchemaBuilder};
 use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
@@ -33,10 +35,11 @@ pub async fn schema_middleware_auth<B>(
         Mutation::default(),
         Subscription::default(),
     )
-    .data(db)
+    .data(db.clone())
     .data(pubsub);
     if let Some(claims) = claims {
-        builder = builder.data(claims);
+        builder = builder.data(claims.clone());
+        builder = add_data_loaders(builder, db, claims);
     } else {
         builder = builder.introspection_only();
     }
@@ -71,4 +74,18 @@ pub async fn schema_middleware<B>(
     let mut req_mut = req;
     req_mut.extensions_mut().insert(schema);
     Ok::<_, ()>(next.run(req_mut).await)
+}
+
+fn add_data_loaders(
+    builder: SchemaBuilder<Query, Mutation, Subscription>,
+    db: DatabaseConnection,
+    claims: AuthClaims,
+) -> SchemaBuilder<Query, Mutation, Subscription> {
+    builder.data(DataLoader::new(
+        MotifListenedLoader {
+            db,
+            profile_id: claims.id,
+        },
+        tokio::spawn,
+    ))
 }
