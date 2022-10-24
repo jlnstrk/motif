@@ -1,7 +1,7 @@
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, ModelTrait,
-    PaginatorTrait, QueryFilter,
+    PaginatorTrait, QueryFilter, QuerySelect,
 };
 use uuid::Uuid;
 
@@ -35,12 +35,19 @@ pub async fn get_comment_likes_count(
 pub async fn get_motif_likes(
     db: &DatabaseConnection,
     motif_id: i32,
+    limit: Option<i32>,
+    offset: Option<i32>,
 ) -> Result<Vec<Profile>, DbErr> {
-    let likes_with_profiles = MotifLikeEntity::find()
+    let mut query = MotifLikeEntity::find()
         .find_with_related(ProfileEntity)
-        .filter(motif_likes::Column::MotifId.eq(motif_id))
-        .all(db)
-        .await?;
+        .filter(motif_likes::Column::MotifId.eq(motif_id));
+    if let Some(limit) = limit {
+        query = query.limit(limit as u64);
+    }
+    if let Some(offset) = offset {
+        query = query.offset(offset as u64);
+    }
+    let likes_with_profiles = query.all(db).await?;
 
     let profiles: Vec<ProfileModel> = likes_with_profiles
         .into_iter()

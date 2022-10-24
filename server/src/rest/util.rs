@@ -10,7 +10,6 @@ use serde_json::json;
 #[derive(Debug, Clone)]
 pub enum AuthenticationError {
     TokenMissing,
-    TokenMalformed,
     TokenInvalid,
     TokenIssueFailed,
     TokenRevoked,
@@ -63,7 +62,6 @@ impl Display for AuthenticationError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             AuthenticationError::TokenMissing => write!(f, "Authorization token missing"),
-            AuthenticationError::TokenMalformed => write!(f, "Authorization token malformed"),
             AuthenticationError::TokenInvalid => write!(f, "Authorization token invalid"),
             AuthenticationError::TokenIssueFailed => write!(f, "Failed to issue auth token"),
             AuthenticationError::TokenRevoked => write!(f, "Refresh token has been revoked"),
@@ -115,9 +113,7 @@ impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = match self {
             ApiError::Authentication(AuthenticationError::TokenMissing) => StatusCode::UNAUTHORIZED,
-            ApiError::Authentication(AuthenticationError::TokenMalformed) => {
-                StatusCode::UNAUTHORIZED
-            }
+
             ApiError::Authentication(AuthenticationError::TokenInvalid) => StatusCode::UNAUTHORIZED,
             ApiError::Authentication(AuthenticationError::TokenIssueFailed) => {
                 StatusCode::INTERNAL_SERVER_ERROR

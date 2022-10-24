@@ -2,6 +2,7 @@
 
 use async_graphql::dataloader::DataLoader;
 use async_graphql::futures_util::Stream;
+use async_graphql::types::connection::*;
 use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object, Subscription};
 use async_stream::stream;
@@ -16,6 +17,7 @@ use crate::domain::motif::pubsub::{
 use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{comment, like, profile};
+use crate::gql::auth::Authenticated;
 use crate::gql::dataloader::MotifListenedLoader;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
@@ -73,10 +75,33 @@ impl Motif {
             .coerce_gql_err()
     }
 
-    async fn likes(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
-        like::datasource::get_motif_likes(ctx.require(), self.id)
+    async fn likes(
+        &self,
+        ctx: &Context<'_>,
+        after: Option<String>,
+        first: Option<i32>,
+    ) -> Result<Connection<i32, Profile, EmptyFields, EmptyFields>> {
+        connection::query(after, None, first, None, |after, _, first, _| async move {
+            let likes = like::datasource::get_motif_likes(
+                ctx.require(),
+                self.id,
+                first.map(|first| first as i32),
+                after.map(|after| after as i32),
+            )
             .await
-            .coerce_gql_err()
+            .coerce_gql_err()?;
+            let nodes: Vec<Edge<i32, Profile, EmptyFields>> = likes
+                .into_iter()
+                .enumerate()
+                .map(|(index, node)| Edge::new(index as i32, node))
+                .collect();
+
+            let has_more = first.map(|first| first > nodes.len()).unwrap_or(false);
+            let mut connection = Connection::new(false, has_more);
+            connection.edges.extend(nodes.into_iter());
+            Ok::<_, Error>(connection)
+        })
+        .await
     }
 }
 
@@ -85,8 +110,23 @@ pub struct MotifQuery;
 
 #[Object]
 impl MotifQuery {
-    async fn motif_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
+    #[graphql(guard = "Authenticated")]
+    async fn motif_my_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
         datasource::get_feed_by_profile_id(ctx.require(), ctx.require::<AuthClaims>().id)
+            .await
+            .coerce_gql_err()
+    }
+
+    #[graphql(guard = "Authenticated")]
+    async fn motif_public_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
+        datasource::get_public_feed(ctx.require())
+            .await
+            .coerce_gql_err()
+    }
+
+    #[graphql(guard = "Authenticated")]
+    async fn motif_by_id(&self, ctx: &Context<'_>, motif_id: i32) -> Result<Motif> {
+        datasource::get_by_id(ctx.require(), motif_id)
             .await
             .coerce_gql_err()
     }
@@ -97,6 +137,7 @@ pub struct MotifMutation;
 
 #[Object]
 impl MotifMutation {
+    #[graphql(guard = "Authenticated")]
     async fn motif_create(&self, ctx: &Context<'_>, args: CreateMotif) -> Result<Motif> {
         let own_id = ctx.require::<AuthClaims>().id;
         let motif = datasource::create(ctx.require(), own_id.clone(), args).await?;
@@ -107,6 +148,7 @@ impl MotifMutation {
         Ok(motif)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn motif_delete_by_id(&self, ctx: &Context<'_>, motif_id: i32) -> Result<bool> {
         let own_id = ctx.require::<AuthClaims>().id;
         let deleted = datasource::delete_by_id(ctx.require(), own_id.clone(), motif_id).await?;
@@ -119,6 +161,7 @@ impl MotifMutation {
         Ok(deleted)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn motif_listen_by_id(&self, ctx: &Context<'_>, motif_id: i32) -> Result<bool> {
         let own_id = ctx.require::<AuthClaims>().id;
         let is_new = datasource::listen_by_id(ctx.require(), own_id.clone(), motif_id).await?;
@@ -137,6 +180,7 @@ pub struct MotifSubscription;
 
 #[Subscription]
 impl MotifSubscription {
+    #[graphql(guard = "Authenticated")]
     async fn motif_created<'a>(&'a self, ctx: &'a Context<'_>) -> impl Stream<Item = Motif> + 'a {
         let following_ids =
             profile::datasource::get_following_ids(ctx.require(), ctx.require::<AuthClaims>().id)
@@ -161,6 +205,7 @@ impl MotifSubscription {
         }
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn motif_deleted<'a>(&'a self, ctx: &'a Context<'_>) -> impl Stream<Item = i32> + 'a {
         let following_ids =
             profile::datasource::get_following_ids(ctx.require(), ctx.require::<AuthClaims>().id)
@@ -183,6 +228,7 @@ impl MotifSubscription {
         }
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn motif_listened<'a>(
         &'a self,
         ctx: &'a Context<'_>,

@@ -10,6 +10,7 @@ use crate::domain::comment::typedef::{Comment, CreateComment};
 use crate::domain::motif::typedef::Motif;
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{like, motif, profile};
+use crate::gql::auth::Authenticated;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -65,6 +66,7 @@ pub struct CommentQuery;
 
 #[Object]
 impl CommentQuery {
+    #[graphql(guard = "Authenticated")]
     async fn comment_by_id(&self, ctx: &Context<'_>, comment_id: i32) -> Result<Comment> {
         datasource::get_by_id(ctx.require(), comment_id)
             .await
@@ -77,6 +79,7 @@ pub struct CommentMutation;
 
 #[Object]
 impl CommentMutation {
+    #[graphql(guard = "Authenticated")]
     async fn motif_comment_create(
         &self,
         ctx: &Context<'_>,
@@ -93,6 +96,7 @@ impl CommentMutation {
         Ok(comment)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn motif_comment_create_sub(
         &self,
         ctx: &Context<'_>,
@@ -111,6 +115,7 @@ impl CommentMutation {
         Ok(comment)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn comment_delete_by_id(&self, ctx: &Context<'_>, comment_id: i32) -> Result<bool> {
         let own_id = ctx.require::<AuthClaims>().id;
         let comment = datasource::get_by_id(ctx.require(), comment_id).await?;

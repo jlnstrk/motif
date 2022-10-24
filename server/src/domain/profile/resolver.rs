@@ -1,17 +1,18 @@
 #![allow(dead_code)]
 
-use crate::domain::collection::typedef::Collection;
-use crate::domain::motif::typedef::Motif;
-use crate::domain::{collection, motif};
 use async_graphql::futures_util::Stream;
 use async_graphql::*;
 use fred::prelude::RedisValue;
 use futures::stream::StreamExt;
 use uuid::Uuid;
 
+use crate::domain::collection::typedef::Collection;
+use crate::domain::motif::typedef::Motif;
 use crate::domain::profile::datasource;
 use crate::domain::profile::pubsub::{topic_profile_followed, topic_profile_updated};
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
+use crate::domain::{collection, motif};
+use crate::gql::auth::Authenticated;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -59,16 +60,19 @@ pub struct ProfileQuery;
 
 #[Object]
 impl ProfileQuery {
+    #[graphql(guard = "Authenticated")]
     async fn profile_me(&self, ctx: &Context<'_>) -> Result<Profile> {
         datasource::get_by_id(ctx.require(), ctx.require::<AuthClaims>().id)
             .await
             .coerce_gql_err()
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn profile_by_id(&self, ctx: &Context<'_>, profile_id: Uuid) -> Result<Option<Profile>> {
         Ok(datasource::get_by_id(ctx.require(), profile_id).await.ok())
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn profile_by_username(
         &self,
         ctx: &Context<'_>,
@@ -79,6 +83,7 @@ impl ProfileQuery {
             .ok())
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn profile_search(&self, ctx: &Context<'_>, query: String) -> Result<Vec<Profile>> {
         datasource::search(ctx.require(), query)
             .await
@@ -91,6 +96,7 @@ pub struct ProfileMutation;
 
 #[Object]
 impl ProfileMutation {
+    #[graphql(guard = "Authenticated")]
     async fn profile_me_update(&self, ctx: &Context<'_>, update: ProfileUpdate) -> Result<Profile> {
         let profile_id = ctx.require::<AuthClaims>().id;
         let updated = datasource::update_by_id(ctx.require(), profile_id.clone(), update).await?;
@@ -101,6 +107,7 @@ impl ProfileMutation {
         Ok(updated)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn profile_follow_by_id(&self, ctx: &Context<'_>, profile_id: Uuid) -> Result<bool> {
         let own_id = ctx.require::<AuthClaims>().id;
         let new = datasource::follow(ctx.require(), own_id.clone(), profile_id)
@@ -115,6 +122,7 @@ impl ProfileMutation {
         Ok(new)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn profile_unfollow_by_id(&self, ctx: &Context<'_>, profile_id: Uuid) -> Result<bool> {
         datasource::unfollow(ctx.require(), ctx.require::<AuthClaims>().id, profile_id)
             .await
@@ -127,6 +135,7 @@ pub struct ProfileSubscription;
 
 #[Subscription]
 impl ProfileSubscription {
+    #[graphql(guard = "Authenticated")]
     async fn profile_me<'a>(&self, ctx: &'a Context<'_>) -> impl Stream<Item = Profile> + 'a {
         let profile_id: Uuid = ctx.require::<AuthClaims>().id;
         let topic = topic_profile_updated(profile_id.clone());
@@ -141,6 +150,7 @@ impl ProfileSubscription {
         })
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn profile_me_new_follower<'a>(
         &self,
         ctx: &'a Context<'_>,

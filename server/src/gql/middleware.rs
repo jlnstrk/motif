@@ -41,7 +41,7 @@ pub async fn schema_middleware_auth<B>(
         builder = builder.data(claims.clone());
         builder = add_data_loaders(builder, db, claims);
     } else {
-        builder = builder.introspection_only();
+        builder = builder.introspection_only()
     }
     let schema = builder.finish();
     let mut req_mut = req;

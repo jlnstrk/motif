@@ -24,12 +24,15 @@ pub async fn verify_jwt_middleware<B>(
 pub async fn verify_jwt_middleware_explicit<B>(
     req: Request<B>,
     next: Next<B>,
-    fail_if_no_auth: bool,
-) -> Result<Response, impl IntoResponse> {
+    fail_if_missing: bool,
+) -> Result<Response, ApiError> {
     let header = req
         .headers()
         .get(http::header::AUTHORIZATION)
         .and_then(|header| header.to_str().ok());
+    if fail_if_missing && header.is_none() {
+        Err(ApiError::Authentication(AuthenticationError::TokenMissing))?;
+    }
     let token_string = header.and_then(|header| header.split(" ").last());
     let user = if let Some(token) = token_string {
         Some(auth::datasource::token::verify_access_jwt(token.to_string()).await?)
@@ -39,21 +42,9 @@ pub async fn verify_jwt_middleware_explicit<B>(
 
     match user {
         None => {
-            if fail_if_no_auth {
-                Err(match (header, token_string, user) {
-                    (None, ..) => ApiError::Authentication(AuthenticationError::TokenMissing),
-                    (Some(_), None, ..) => {
-                        ApiError::Authentication(AuthenticationError::TokenMalformed)
-                    }
-                    (Some(_), Some(_), ..) => {
-                        ApiError::Authentication(AuthenticationError::UserNotFound)
-                    }
-                })
-            } else {
-                let mut req = req;
-                req.extensions_mut().insert::<Option<AuthClaims>>(None);
-                Ok(next.run(req).await)
-            }
+            let mut req = req;
+            req.extensions_mut().insert::<Option<AuthClaims>>(None);
+            Ok(next.run(req).await)
         }
         Some(user_id) => {
             let mut req = req;

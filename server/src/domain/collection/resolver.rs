@@ -7,6 +7,7 @@ use uuid::Uuid;
 use crate::domain::collection::datasource;
 use crate::domain::collection::typedef::{Collection, CreateCollection};
 use crate::domain::motif::typedef::Motif;
+use crate::gql::auth::Authenticated;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 
 #[ComplexObject]
@@ -23,6 +24,7 @@ pub struct CollectionQuery;
 
 #[Object]
 impl CollectionQuery {
+    #[graphql(guard = "Authenticated")]
     async fn collection_by_id(&self, ctx: &Context<'_>, collection_id: Uuid) -> Result<Collection> {
         datasource::get_by_id(ctx.require(), collection_id)
             .await
@@ -35,6 +37,7 @@ pub struct CollectionMutation;
 
 #[Object]
 impl CollectionMutation {
+    #[graphql(guard = "Authenticated")]
     async fn collection_create(
         &self,
         ctx: &Context<'_>,
@@ -47,6 +50,7 @@ impl CollectionMutation {
         Ok(collection)
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn collection_delete_by_id(
         &self,
         ctx: &Context<'_>,
@@ -58,6 +62,7 @@ impl CollectionMutation {
             .coerce_gql_err()
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn collection_add_motif(
         &self,
         ctx: &Context<'_>,
@@ -70,6 +75,7 @@ impl CollectionMutation {
             .coerce_gql_err()
     }
 
+    #[graphql(guard = "Authenticated")]
     async fn collection_remove_motif(
         &self,
         ctx: &Context<'_>,

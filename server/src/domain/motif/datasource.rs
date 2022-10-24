@@ -70,6 +70,15 @@ pub async fn get_service_ids_by_id(
     Ok(mapped)
 }
 
+pub async fn get_public_feed(db: &DatabaseConnection) -> ApiResult<Vec<Motif>> {
+    let models = MotifEntity::find()
+        .order_by(motifs::Column::CreatedAt, Order::Desc)
+        .all(db)
+        .await?;
+    let mapped: Vec<Motif> = models.into_iter().map(|model| model.into()).collect();
+    Ok(mapped)
+}
+
 pub async fn get_feed_by_profile_id(
     db: &DatabaseConnection,
     profile_id: Uuid,
