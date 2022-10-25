@@ -23,7 +23,7 @@ import coil.compose.AsyncImage
 import com.google.accompanist.pager.rememberPagerState
 import de.julianostarek.motif.feed.FeedState
 import de.julianostarek.motif.ui.Keyline1
-import de.julianostarek.motif.feed.domain.FeedMotifGroup
+import de.julianostarek.motif.feed.domain.ProfileWithMotifs
 
 @Composable
 fun Feed(
@@ -72,7 +72,7 @@ fun FeedAppBar(
 @OptIn(ExperimentalPagerApi::class) // HorizontalPager is experimental
 @Composable
 fun FeedContent(
-    motifs: List<FeedMotifGroup>
+    motifs: List<ProfileWithMotifs>
 ) {
     Column(
         modifier = Modifier.windowInsetsPadding(
@@ -119,11 +119,11 @@ fun FeedContent(
 }
 
 @Composable
-fun MotifGroups(motifGroups: List<FeedMotifGroup>, modifier: Modifier = Modifier) {
+fun MotifGroups(motifGroups: List<ProfileWithMotifs>, modifier: Modifier = Modifier) {
     LazyRow(modifier = modifier) {
         itemsIndexed(motifGroups) { index, item ->
             AsyncImage(
-                item.creator.photoUrl,
+                item.profile.photoUrl,
                 contentDescription = null,
                 modifier = Modifier.clip(CircleShape)
                     .padding(16.dp)

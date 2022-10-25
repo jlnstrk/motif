@@ -44,7 +44,7 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation(project(":backend"))
+    implementation(project(":client"))
     implementation(project(":player:player-spotify"))
 
     implementation("com.google.code.gson:gson:2.8.6")

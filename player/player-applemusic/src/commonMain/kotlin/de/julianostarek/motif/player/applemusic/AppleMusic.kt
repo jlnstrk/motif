@@ -1,11 +1,16 @@
 package de.julianostarek.motif.player.applemusic
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 
 public expect class MusicPlayerController {
+    public suspend fun setQueue(storeIds: List<String>, playWhenReady: Boolean)
     public suspend fun play()
     public suspend fun pause()
     public suspend fun stop()
+    public suspend fun release()
+
+    public fun playbackStateChanged(): Flow<PlaybackState>
 
     public val currentItem: MusicPlayerMediaItem?
     public val playbackState: PlaybackState

@@ -1,6 +1,6 @@
 package de.julianostarek.motif.login.datasource
 
-import de.julianostarek.motif.backend.model.BackendAuth
+import de.julianostarek.motif.client.auth.BackendAuth
 import kotlinx.coroutines.flow.Flow
 
 interface LoginSettingsDataSource {

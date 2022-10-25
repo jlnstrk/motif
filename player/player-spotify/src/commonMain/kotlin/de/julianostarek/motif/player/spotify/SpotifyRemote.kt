@@ -13,10 +13,19 @@ public expect class SpotifyRemoteConnector(
     connectionParams: SpotifyRemoteConnectionParams,
     externalScope: CoroutineScope
 ) {
-    public val remote: StateFlow<SpotifyRemote?>
+    public val state: StateFlow<SpotifyRemoteConnectionState>
 
     public fun disconnect()
 }
+
+public sealed interface SpotifyRemoteConnectionState {
+    public data class FailedToConnect(public val error: Any? = null) : SpotifyRemoteConnectionState
+    public data class Disconnected(public val error: Any? = null) : SpotifyRemoteConnectionState
+    public data class Connected(public val remote: SpotifyRemote) : SpotifyRemoteConnectionState
+}
+
+public fun SpotifyRemoteConnector.remoteOrNull(): SpotifyRemote? =
+    (state.value as? SpotifyRemoteConnectionState.Connected)?.remote
 
 public expect class SpotifyRemote {
     public val isConnected: Boolean

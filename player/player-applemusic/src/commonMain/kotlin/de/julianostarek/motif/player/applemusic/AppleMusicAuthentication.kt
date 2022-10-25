@@ -5,6 +5,8 @@ import kotlin.jvm.JvmInline
 
 public expect class AppleMusicAuthentication {
     public val result: StateFlow<AppleMusicAuthenticationResult>
+
+    public fun invalidate()
 }
 
 @JvmInline

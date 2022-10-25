@@ -4,4 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 
 expect abstract class SharedViewModel() {
     protected val viewModelScope: CoroutineScope
+
+    open fun clear()
 }

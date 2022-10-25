@@ -9,11 +9,19 @@ buildscript {
         classpath(libs.kotlin.serialization)
         classpath(libs.android.gradlePlugin)
         classpath(libs.google.gradlePlugin)
-        // classpath(libs.sqldelight.gradlePlugin)
     }
 }
 
 allprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.jetbrains.kotlinx"
+                && requested.name == "kotlinx-coroutines-core"
+            ) {
+                useVersion("1.6.4")
+            }
+        }
+    }
     repositories {
         google()
         mavenLocal()

@@ -12,6 +12,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+public fun isAppleMusicInstalled(context: Context): Boolean {
+    val dummyIntent = AuthenticationFactory.createAuthenticationManager(context)
+        .createIntentBuilder("")
+        .build()
+    return context.packageManager.resolveActivity(dummyIntent, 0) != null
+}
+
 public actual class AppleMusicAuthentication(
     private val context: Context,
     private val developerToken: AppleMusicDeveloperToken,
@@ -20,6 +27,7 @@ public actual class AppleMusicAuthentication(
     private val manager: AuthenticationManager = AuthenticationFactory.createAuthenticationManager(context)
 
     public fun createIntent(): Intent = manager.createIntentBuilder(developerToken.token)
+        .setHideStartScreen(true)
         .build()
 
     public fun handleIntent(intent: Intent) {
@@ -31,7 +39,7 @@ public actual class AppleMusicAuthentication(
                 TokenError.SUBSCRIPTION_EXPIRED -> AppleMusicAuthenticationError.NO_SUBSCRIPTION
 
                 TokenError.TOKEN_FETCH_ERROR -> AppleMusicAuthenticationError.DEVELOPER_TOKEN
-                TokenError.UNKNOWN -> AppleMusicAuthenticationError.UNKNOWN
+                TokenError.UNKNOWN, null -> AppleMusicAuthenticationError.UNKNOWN
             }
             _result.value = AppleMusicAuthenticationResult.Error(error)
         } else {
@@ -48,4 +56,8 @@ public actual class AppleMusicAuthentication(
     private val _result: MutableStateFlow<AppleMusicAuthenticationResult> =
         MutableStateFlow(AppleMusicAuthenticationResult.NotDetermined)
     public actual val result: StateFlow<AppleMusicAuthenticationResult> get() = _result
+
+    public actual fun invalidate() {
+        _result.value = AppleMusicAuthenticationResult.NotDetermined
+    }
 }

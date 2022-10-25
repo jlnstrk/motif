@@ -1,8 +1,9 @@
 package de.julianostarek.motif.login
 
-import de.julianostarek.motif.backend.auth.BackendAuthClient
-import de.julianostarek.motif.backend.auth.BackendAuthStore
-import de.julianostarek.motif.backend.model.BackendAuth
+import de.julianostarek.motif.client.auth.AuthTokenWithRefresh
+import de.julianostarek.motif.client.auth.BackendAuth
+import de.julianostarek.motif.client.auth.BackendAuthClient
+import de.julianostarek.motif.client.auth.BackendAuthStore
 import de.julianostarek.motif.login.datasource.LoginSettingsDataSource
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Single

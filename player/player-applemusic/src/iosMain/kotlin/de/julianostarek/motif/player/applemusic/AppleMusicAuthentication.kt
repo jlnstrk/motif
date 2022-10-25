@@ -58,4 +58,8 @@ public actual class AppleMusicAuthentication(
             else -> throw IllegalStateException()
         }
     }
+
+    public actual fun invalidate() {
+        _result.value = AppleMusicAuthenticationResult.NotDetermined
+    }
 }

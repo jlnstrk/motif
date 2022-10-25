@@ -22,28 +22,25 @@ kotlin {
             version = "1.2.2"
             source = path(project.file("./pod"))
         }
+
+        // Suppress warning
+        framework {
+            isStatic = true
+        }
     }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.spotify.mp.core)
             }
         }
-        val commonTest by getting
         val androidMain by getting {
             dependencies {
                 implementation(libs.spotify.android.auth)
                 api(files("./src/androidMain/libs/spotify-app-remote-release-0.7.2.aar"))
             }
         }
-        val androidTest by getting
-    }
-}
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     }
 }
 

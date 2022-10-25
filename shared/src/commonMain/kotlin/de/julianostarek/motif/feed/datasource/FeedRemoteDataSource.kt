@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface FeedRemoteDataSource : FeedDataSource {
     val motifCreated: Flow<FeedMotifDto>
-    val motifDeleted: Flow<Long>
+    val motifDeleted: Flow<Int>
 }

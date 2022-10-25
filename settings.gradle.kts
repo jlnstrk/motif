@@ -11,7 +11,7 @@ pluginManagement {
 rootProject.name = "motif"
 include(":android")
 include(":shared")
-include(":backend")
+include(":client")
 include(":player")
 include(":player:player-spotify")
 include(":player:player-applemusic")

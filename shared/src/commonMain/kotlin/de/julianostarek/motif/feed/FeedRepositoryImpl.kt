@@ -2,9 +2,9 @@ package de.julianostarek.motif.feed
 
 import de.julianostarek.motif.feed.datasource.FeedLocalDataSource
 import de.julianostarek.motif.feed.datasource.FeedRemoteDataSource
-import de.julianostarek.motif.feed.domain.FeedCreator
-import de.julianostarek.motif.feed.domain.FeedMotif
-import de.julianostarek.motif.feed.domain.FeedMotifGroup
+import de.julianostarek.motif.feed.domain.Profile
+import de.julianostarek.motif.feed.domain.Motif
+import de.julianostarek.motif.feed.domain.ProfileWithMotifs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -50,7 +50,7 @@ class FeedRepositoryImpl(
 
     private fun removeListener() = listeners.getAndUpdate { it - 1 }
 
-    override fun motifsFeed(): Flow<List<FeedMotifGroup>> {
+    override fun motifsFeed(): Flow<List<ProfileWithMotifs>> {
         return local.motifsFeed()
             .onStart {
                 clientScope.launch {
@@ -65,20 +65,22 @@ class FeedRepositoryImpl(
                 dtos.groupBy { it.creatorId }
                     .map { group ->
                         val first = group.value.first()
-                        FeedMotifGroup(
-                            creator = FeedCreator(
-                                id = first.creatorId,
-                                username = first.creatorUsername,
-                                displayName = first.creatorDisplayName,
-                                photoUrl = first.creatorPhotoUrl
-                            ),
+                        val creator = Profile.Simple(
+                            id = first.creatorId,
+                            username = first.creatorUsername,
+                            displayName = first.creatorDisplayName,
+                            photoUrl = first.creatorPhotoUrl
+                        )
+                        ProfileWithMotifs(
+                            profile = creator,
                             motifs = group.value.map {
-                                FeedMotif(
+                                Motif.Simple(
                                     id = it.id,
-                                    spotifyTrackId = it.spotifyTrackId,
+                                    isrc = it.isrc,
                                     offset = it.offset,
                                     listened = it.listened,
-                                    createdAt = it.createdAt
+                                    createdAt = it.createdAt,
+                                    creator = creator
                                 )
                             }
                         )

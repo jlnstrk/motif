@@ -1,6 +1,6 @@
 package de.julianostarek.motif.player
 
-public interface PlayerRestrictions {
+public sealed interface PlayerRestrictions {
     public val canSkipNext: Boolean
     public val canSkipPrev: Boolean
     public val canRepeatTrack: Boolean

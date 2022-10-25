@@ -1,6 +1,6 @@
 package de.julianostarek.motif.player
 
-public interface PlayerState {
+public sealed interface PlayerState {
     public val track: PlayerTrack?
     public val state: PlaybackState
     public val position: Long

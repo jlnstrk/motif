@@ -2,11 +2,15 @@ package de.julianostarek.motif.player.applemusic
 
 
 import com.apple.android.music.playback.controller.MediaPlayerController
+import com.apple.android.music.playback.model.MediaItemType
 import com.apple.android.music.playback.model.MediaPlayerException
 import com.apple.android.music.playback.model.PlaybackRepeatMode
 import com.apple.android.music.playback.model.PlaybackShuffleMode
 import com.apple.android.music.playback.model.PlayerMediaItem
 import com.apple.android.music.playback.model.PlayerQueueItem
+import com.apple.android.music.playback.queue.CatalogPlaybackQueueItemProvider
+import com.apple.android.music.playback.queue.PlaybackQueueInsertionType
+import com.apple.android.music.playback.queue.PlaybackQueueItemProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -71,7 +75,6 @@ public actual class MusicPlayerController(
     }
     private val _playbackStateChanged: MutableSharedFlow<PlaybackState> =
         MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
-    public val playbackStateChanged: SharedFlow<PlaybackState> get() = _playbackStateChanged
     private val _currentItemChanged: MutableSharedFlow<MusicPlayerMediaItem?> =
         MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
     public val currentItemChanged: SharedFlow<MusicPlayerMediaItem?> get() = _currentItemChanged
@@ -91,6 +94,16 @@ public actual class MusicPlayerController(
         }
     }
 
+    public actual suspend fun setQueue(storeIds: List<String>, playWhenReady: Boolean) {
+        controller.prepare(
+            CatalogPlaybackQueueItemProvider.Builder()
+                .items(MediaItemType.SONG, *storeIds.toTypedArray())
+                .build(),
+            PlaybackQueueInsertionType.INSERTION_TYPE_REPLACE,
+            playWhenReady
+        )
+    }
+
     public actual suspend fun play() {
         controller.play()
     }
@@ -102,6 +115,12 @@ public actual class MusicPlayerController(
     public actual suspend fun stop() {
         controller.stop()
     }
+
+    public actual suspend fun release() {
+        controller.release()
+    }
+
+    public actual fun playbackStateChanged(): Flow<PlaybackState> = _playbackStateChanged
 
     public actual var playbackRate: Float
         get() = controller.playbackRate

@@ -12,6 +12,8 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.native.internal.ObjCErrorException
 
+public fun isSpotifyInstalled(): Boolean = SPTSessionManager().isSpotifyAppInstalled()
+
 public actual class SpotifyRemote(
     public val ios: SPTAppRemote,
     externalScope: CoroutineScope
@@ -32,31 +34,32 @@ public actual class SpotifyRemoteConnector actual constructor(
     connectionParams: SpotifyRemoteConnectionParams,
     externalScope: CoroutineScope
 ) {
-    private val _remote: MutableStateFlow<SpotifyRemote?> = MutableStateFlow(null)
-    public actual val remote: StateFlow<SpotifyRemote?> get() = _remote
+    private val _state: MutableStateFlow<SpotifyRemoteConnectionState> =
+        MutableStateFlow(SpotifyRemoteConnectionState.Disconnected())
+    public actual val state: StateFlow<SpotifyRemoteConnectionState> get() = _state
 
-    private val sessionManager: SPTSessionManager = SPTSessionManager()
     private val appRemote: SPTAppRemote = SPTAppRemote(connectionParams.configuration, SPTAppRemoteLogLevelDebug)
 
     private val delegate = object : NSObject(), SPTAppRemoteDelegateProtocol {
+        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun appRemote(appRemote: SPTAppRemote, didDisconnectWithError: NSError?) {
-            _remote.value = null
+            _state.value = SpotifyRemoteConnectionState.Disconnected(didDisconnectWithError)
         }
 
+        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun appRemote(appRemote: SPTAppRemote, didFailConnectionAttemptWithError: NSError?) {
-            _remote.value = null
+            _state.value = SpotifyRemoteConnectionState.FailedToConnect(didFailConnectionAttemptWithError)
         }
 
         override fun appRemoteDidEstablishConnection(appRemote: SPTAppRemote) {
-            _remote.value = SpotifyRemote(appRemote, externalScope)
+            val remote = SpotifyRemote(appRemote, externalScope)
+            _state.value = SpotifyRemoteConnectionState.Connected(remote)
         }
     }
 
     init {
         appRemote.setDelegate(delegate)
     }
-
-    public fun isSpotifyInstalled(): Boolean = sessionManager.isSpotifyAppInstalled()
 
     public fun connect() {
         appRemote.authorizeAndPlayURI("")

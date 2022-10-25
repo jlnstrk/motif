@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import de.julianostarek.motif.R
 
 @Composable
-fun OscillyTheme(
+fun MotifTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

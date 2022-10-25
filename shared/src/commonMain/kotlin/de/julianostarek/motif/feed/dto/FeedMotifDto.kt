@@ -3,9 +3,9 @@ package de.julianostarek.motif.feed.dto
 import kotlinx.datetime.Instant
 
 data class FeedMotifDto(
-    val id: Long,
+    val id: Int,
     val listened: Boolean,
-    val spotifyTrackId: String,
+    val isrc: String,
     val offset: Int,
     val createdAt: Instant,
     val creatorId: String,

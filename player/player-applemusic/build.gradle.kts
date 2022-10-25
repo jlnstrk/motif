@@ -17,20 +17,12 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
             }
         }
-        val commonTest by getting
         val androidMain by getting {
             dependencies {
                 implementation(files("./src/androidMain/libs/mediaplayback-release-1.1.1.aar"))
                 implementation(files("./src/androidMain/libs/musickitauth-release-1.1.2.aar"))
             }
         }
-        val androidTest by getting
-    }
-}
-
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     }
 }
 

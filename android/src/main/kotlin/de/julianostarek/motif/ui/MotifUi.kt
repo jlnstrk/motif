@@ -16,14 +16,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import de.julianostarek.motif.login.LoginState
 import de.julianostarek.motif.ui.feed.Feed
-import de.julianostarek.motif.ui.listen.Listen
+import de.julianostarek.motif.ui.player.Player
 import de.julianostarek.motif.ui.login.Login
 import de.julianostarek.motif.ui.login.AndroidLoginViewModel
+import de.julianostarek.motif.ui.player.AndroidPlayerViewModel
 
 @Composable
 fun MotifUi(
     uiState: MotifUiState = rememberMotifUiState(),
-    loginViewModel: AndroidLoginViewModel = viewModel()
+    loginViewModel: AndroidLoginViewModel = viewModel(),
+    playerViewModel: AndroidPlayerViewModel = viewModel()
 ) {
     val loginState = loginViewModel.state.collectAsState()
     if (loginState.value == LoginState.LoggedIn) {
@@ -52,7 +54,7 @@ fun MotifUi(
                     Feed()
                 }
                 composable(Screen.Player.route) {
-                    Listen()
+                    Player(playerViewModel)
                 }
             }
         }

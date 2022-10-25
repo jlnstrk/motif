@@ -1,0 +1,22 @@
+{
+  "name": "Untitled GraphQL Schema",
+  "schemaPath": "schema.graphqls",
+  "extensions": {
+    "endpoints": {
+      "Local": {
+        "url": "https://localhost:8080/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      },
+      "Remote": {
+        "url": "https://motif.julianostarek.de/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      }
+    }
+  }
+}

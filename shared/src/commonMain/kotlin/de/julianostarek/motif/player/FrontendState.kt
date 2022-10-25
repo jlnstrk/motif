@@ -1,13 +1,17 @@
 package de.julianostarek.motif.player
 
-import de.julianostarek.motif.player.spotify.Track
-
 sealed class FrontendState {
     object Disconnected : FrontendState()
     sealed class Connected : FrontendState() {
-        object NoPlayback : Connected()
+        abstract val service: PlayerService
+
+        data class NoPlayback(
+            override val service: PlayerService
+        ) : Connected()
+
         data class Playback(
-            val track: Track,
+            override val service: PlayerService,
+            val track: PlayerTrack,
             val isPaused: Boolean,
             val position: Int,
             val isMotif: Boolean

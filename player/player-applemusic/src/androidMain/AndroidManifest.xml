@@ -1,2 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="de.julianostarek.motif.player.spotify" />
+<manifest package="de.julianostarek.motif.player.applemusic" xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.apple.android.music" />
+    </queries>
+
+    <application
+            android:allowBackup="true"
+            android:supportsRtl="true">
+        <activity
+                android:name="com.apple.android.sdk.authentication.SDKUriHandlerActivity"
+                android:launchMode="singleTask"
+                android:exported="true"
+                android:screenOrientation="portrait"
+                android:theme="@style/MusicKitAuthTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:host="de.julianostarek.motif"
+                        android:pathPattern="/authenticateresult.*"
+                        android:scheme="musicsdk"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

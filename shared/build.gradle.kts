@@ -45,25 +45,31 @@ kotlin {
                 implementation(libs.settings.core)
                 implementation(libs.settings.serialization)
                 implementation(libs.settings.coroutines)
-                implementation(project(":backend"))
-                api(project(":player:player-spotify"))
-                api(project(":player:player-applemusic"))
+                implementation(project(":client"))
+                api(project(":player"))
             }
         }
-        val commonTest by getting
         val androidMain by getting {
             dependencies {
+                implementation(libs.koin.test.core)
+                implementation(libs.koin.test.junit4)
                 implementation(libs.androidx.lifecycle.viewmodel.ktx)
                 implementation(libs.sqldelight.driver.android)
             }
         }
-        val androidTest by getting
+        val androidAndroidTest by getting {
+            dependencies {
+                implementation(libs.androidx.test.core)
+                implementation(libs.androidx.test.runner)
+                implementation(libs.androidx.test.rules)
+                implementation(libs.androidx.test.ext.junit)
+            }
+        }
         val iosMain by getting {
             dependencies {
                 implementation(libs.sqldelight.driver.native)
             }
         }
-        val iosTest by getting
     }
 
     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
@@ -73,18 +79,12 @@ kotlin {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    }
-}
-
 buildkonfig {
     packageName = "de.julianostarek.motif.shared"
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.STRING, "SPOTIFY_CLIENT_ID", rootProject.extra["spotify.client.id"] as String)
-        buildConfigField(FieldSpec.Type.STRING, "SPOTIFY_CALLBACK_URI", "motif://spotify-auth-callback")
+        buildConfigField(FieldSpec.Type.STRING, "SPOTIFY_CALLBACK_URI", "motif://auth-callback/spotify")
         buildConfigField(FieldSpec.Type.STRING, "APPLE_DEVELOPER_TOKEN", rootProject.extra["apple.developer.token"] as String)
     }
 }

@@ -5,25 +5,27 @@ import app.cash.sqldelight.coroutines.mapToList
 import de.julianostarek.motif.feed.dto.FeedMotifDto
 import de.julianostarek.motif.persist.MotifDatabase
 import de.julianostarek.motif.persist.entity.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
 
 @Single
 class FeedLocalDataSourceImpl(
-    private val database: MotifDatabase
+    private val database: MotifDatabase,
+    private val externalScope: CoroutineScope
 ) : FeedLocalDataSource {
 
     override fun motifsFeed(): Flow<List<FeedMotifDto>> {
         return database.motifQueries
             .selectUnlistened()
             .asFlow()
-            .mapToList()
+            .mapToList(externalScope.coroutineContext)
             .map { selectUnlisteneds -> selectUnlisteneds.map { it.toDto() } }
     }
 
     override suspend fun dumpMotifsFeed(motifsFeed: List<FeedMotifDto>) {
-        val ids = motifsFeed.map(FeedMotifDto::id)
+        val ids = motifsFeed.map { it.id.toLong() }
         database.transaction {
             database.motifQueries.deleteExceptIds(ids)
             motifsFeed.forEach { motif ->
@@ -40,15 +42,15 @@ class FeedLocalDataSourceImpl(
         }
     }
 
-    override suspend fun deleteMotif(motifId: Long) {
-        database.motifQueries.deleteById(motifId)
+    override suspend fun deleteMotif(motifId: Int) {
+        database.motifQueries.deleteById(motifId.toLong())
     }
 
     private fun SelectUnlistened.toDto(): FeedMotifDto {
         return FeedMotifDto(
-            id = id,
+            id = id.toInt(),
             listened = listened,
-            spotifyTrackId = spotifyTrackId,
+            isrc = spotifyTrackId,
             offset = offset,
             createdAt = createdAt,
             creatorId = creatorId,
@@ -60,8 +62,8 @@ class FeedLocalDataSourceImpl(
 
     private fun FeedMotifDto.toMotifEntity(): MotifEntity {
         return MotifEntity(
-            id = id,
-            spotifyTrackId = spotifyTrackId,
+            id = id.toLong(),
+            spotifyTrackId = isrc,
             offset = offset,
             createdAt = createdAt,
             listened = listened,

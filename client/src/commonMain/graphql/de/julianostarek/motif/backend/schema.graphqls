@@ -1,0 +1,293 @@
+type Collection {
+  id: UUID!
+
+  title: String!
+
+  createdAt: DateTime!
+
+  updatedAt: DateTime!
+
+  ownerId: UUID!
+
+  motifs: [Motif!]!
+}
+
+type Comment {
+  id: Int!
+
+  text: String!
+
+  offset: Int
+
+  createdAt: DateTime!
+
+  authorId: UUID!
+
+  childCommentsCount: Int!
+
+  childComments: [Comment!]!
+
+  author: Profile!
+
+  motif: Motif!
+
+  parentComment: Comment
+
+  likesCount: Int!
+
+  likes: [Profile!]!
+}
+
+input CreateCollection {
+  title: String!
+
+  description: String
+}
+
+input CreateComment {
+  text: String!
+
+  offset: Int
+}
+
+input CreateMotif {
+  isrc: String!
+
+  serviceIds: [ServiceIdInput!]!
+
+  offset: Int!
+}
+
+"""
+Implement the DateTime<Utc> scalar
+
+The input/output is a string in RFC3339 format.
+"""
+scalar DateTime
+
+type Motif {
+  id: Int!
+
+  isrc: String!
+
+  offset: Int!
+
+  createdAt: DateTime!
+
+  creatorId: UUID!
+
+  serviceIds: [ServiceId!]!
+
+  creator: Profile!
+
+  listened: Boolean!
+
+  listenersCount: Int!
+
+  listeners: [Profile!]!
+
+  commentsCount: Int!
+
+  comments: [Comment!]!
+
+  likesCount: Int!
+
+  likes(after: String, first: Int): ProfileConnection!
+}
+
+type Mutation {
+  profileMeUpdate(update: ProfileUpdate!): Profile!
+
+  profileFollowById(profileId: UUID!): Boolean!
+
+  profileUnfollowById(profileId: UUID!): Boolean!
+
+  motifCreate(args: CreateMotif!): Motif!
+
+  motifDeleteById(motifId: Int!): Boolean!
+
+  motifListenById(motifId: Int!): Boolean!
+
+  motifCommentCreate(motifId: Int!, args: CreateComment!): Comment!
+
+  motifCommentCreateSub(parentCommentId: Int!, args: CreateComment!): Comment!
+
+  commentDeleteById(commentId: Int!): Boolean!
+
+  collectionCreate(args: CreateCollection!): Collection!
+
+  collectionDeleteById(collectionId: UUID!): Boolean!
+
+  collectionAddMotif(collectionId: UUID!, motifId: Int!): Boolean!
+
+  collectionRemoveMotif(collectionId: UUID!, motifId: Int!): Boolean!
+
+  motifLikeById(motifId: Int!): Boolean!
+
+  commentLikeById(commentId: Int!): Boolean!
+
+  motifUnlikeById(motifId: Int!): Boolean!
+
+  commentUnlikeById(commentId: Int!): Boolean!
+}
+
+"""
+Information about pagination in a connection
+"""
+type PageInfo {
+  """
+  When paginating backwards, are there more items?
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  When paginating forwards, are there more items?
+  """
+  hasNextPage: Boolean!
+
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  startCursor: String
+
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  endCursor: String
+}
+
+type Profile {
+  id: UUID!
+
+  displayName: String!
+
+  username: String!
+
+  photoUrl: String
+
+  biography: String
+
+  followers: [Profile!]!
+
+  followersCount: Int!
+
+  following: [Profile!]!
+
+  followingCount: Int!
+
+  motifs: [Motif!]!
+
+  collections: [Collection!]!
+}
+
+type ProfileConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [ProfileEdge!]!
+
+  """
+  A list of nodes.
+  """
+  nodes: [Profile!]!
+}
+
+"""
+An edge in a connection.
+"""
+type ProfileEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge
+  """
+  node: Profile!
+}
+
+input ProfileUpdate {
+  displayName: String
+
+  username: String
+
+  photoUrl: String
+
+  biography: String
+}
+
+type Query {
+  profileMe: Profile!
+
+  profileById(profileId: UUID!): Profile
+
+  profileByUsername(username: String!): Profile
+
+  profileSearch(query: String!): [Profile!]!
+
+  motifMyFeed: [Motif!]!
+
+  motifPublicFeed: [Motif!]!
+
+  motifById(motifId: Int!): Motif!
+
+  commentById(commentId: Int!): Comment!
+
+  collectionById(collectionId: UUID!): Collection!
+}
+
+enum Service {
+  SPOTIFY
+
+  APPLE_MUSIC
+}
+
+type ServiceId {
+  service: Service!
+
+  id: String!
+}
+
+input ServiceIdInput {
+  service: Service!
+
+  id: String!
+}
+
+type Subscription {
+  profileMe: Profile!
+
+  profileMeNewFollower: Profile!
+
+  motifCreated: Motif!
+
+  motifDeleted: Int!
+
+  motifListened(motifId: Int!): Profile!
+
+  motifLiked(motifId: Int!): Profile!
+}
+
+"""
+A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
+Strings within GraphQL. UUIDs are used to assign unique identifiers to
+entities without requiring a central allocating authority.
+
+# References
+
+* [Wikipedia: Universally Unique Identifier](http://en.wikipedia.org/wiki/Universally_unique_identifier)
+* [RFC4122: A Universally Unique IDentifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
+"""
+scalar UUID
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}

@@ -8,6 +8,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toKotlinInstant
 import kotlinx.datetime.toLocalDateTime
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSNotificationCenter
 import platform.MediaPlayer.*
@@ -15,52 +16,10 @@ import platform.StoreKit.*
 import platform.UIKit.UIImage
 import platform.darwin.NSObjectProtocol
 
-public fun abc(listener: (UIImage?) -> Unit) {
-    SKCloudServiceController.requestAuthorization { status ->
-        when (status) {
-            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusAuthorized -> {
-                println("authorized")
-                SKCloudServiceController().requestCapabilitiesWithCompletionHandler { capabilities, nsError ->
-                    println(capabilities)
-                    println(SKCloudServiceCapabilityMusicCatalogPlayback)
-                    when {
-                        capabilities and SKCloudServiceCapabilityMusicCatalogPlayback == SKCloudServiceCapabilityMusicCatalogPlayback -> {
-                            println("MusicCatalogPlayback")
-                        }
-
-                        else -> {
-                            println("other/no capabilities")
-                        }
-                    }
-                }
-            }
-
-            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusNotDetermined -> {
-                println("notDetermined")
-            }
-
-            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusRestricted -> {
-                println("restricted")
-            }
-
-            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusDenied -> {
-                println("denied")
-            }
-
-            else -> {}
-        }
-    }
-
-    MPMusicPlayerController.systemMusicPlayer.setQueueWithStoreIDs(listOf("1405193725"))
-    MPMusicPlayerController.systemMusicPlayer.play()
-    MPMusicPlayerController.systemMusicPlayer.currentPlaybackTime = 120.0
-}
-
 public actual class MusicPlayerController(externalScope: CoroutineScope) {
     private val musicPlayer: MPMusicPlayerController get() = MPMusicPlayerController.systemMusicPlayer
     private val _playbackStateChanged: MutableSharedFlow<PlaybackState> =
         MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
-    public val playbackStateChanged: SharedFlow<PlaybackState> get() = _playbackStateChanged
     private val _currentItemChanged: MutableSharedFlow<MusicPlayerMediaItem?> =
         MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
     public val currentItemChanged: SharedFlow<MusicPlayerMediaItem?> get() = _currentItemChanged
@@ -84,7 +43,6 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
     }
 
     private fun subscribeToUpdates() {
-        println("subscribe")
         playbackStateObserver = NSNotificationCenter.defaultCenter.addObserverForName(
             MPMusicPlayerControllerPlaybackStateDidChangeNotification,
             MPMusicPlayerController.systemMusicPlayer,
@@ -103,13 +61,19 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
     }
 
     private fun unsubscribeFromUpdates() {
-        println("unsubscribe")
         musicPlayer.endGeneratingPlaybackNotifications()
         playbackStateObserver?.let {
             NSNotificationCenter.defaultCenter.removeObserver(it)
         }
         currentItemObserver?.let {
             NSNotificationCenter.defaultCenter.removeObserver(it)
+        }
+    }
+
+    public actual suspend fun setQueue(storeIds: List<String>, playWhenReady: Boolean) {
+        musicPlayer.setQueueWithStoreIDs(storeIds)
+        if (playWhenReady) {
+            musicPlayer.play()
         }
     }
 
@@ -124,6 +88,12 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
     public actual suspend fun stop() {
         musicPlayer.stop()
     }
+
+    public actual suspend fun release() {
+        // nop
+    }
+
+    public actual fun playbackStateChanged(): Flow<PlaybackState> = _playbackStateChanged
 
     public actual var playbackRate: Float
         get() = musicPlayer.currentPlaybackRate
@@ -239,7 +209,8 @@ public actual class MusicPlayerMediaItem(public val ios: MPMediaItem) {
 
     public fun artwork(): UIImage? {
         return ios.artwork?.let { artwork ->
-            artwork.imageWithSize(artwork.bounds.useContents { size }.readValue())
+            val size = artwork.bounds.useContents(CGRect::size).readValue()
+            artwork.imageWithSize(size)
         }
     }
 }

@@ -1,47 +1,92 @@
 package de.julianostarek.motif.player
 
 import de.julianostarek.motif.SharedViewModel
-import de.julianostarek.motif.player.spotify.PlayerState
-import de.julianostarek.motif.player.spotify.SpotifyRemote
-import de.julianostarek.motif.player.spotify.SpotifyRemoteConnector
+import de.julianostarek.motif.feed.domain.Motif
+import de.julianostarek.motif.player.applemusic.AppleMusicAuthentication
+import de.julianostarek.motif.player.matching.MatchingCredentialsProvider
+import de.julianostarek.motif.player.matching.playFromIsrc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.*
+import org.koin.core.parameter.parametersOf
+import org.koin.core.scope.Scope
 
-open class PlayerViewModel : SharedViewModel(), KoinComponent {
-    val spotifyConnector: SpotifyRemoteConnector by inject()
-    val spotifyRemote: SpotifyRemote? get() = spotifyConnector.remote.value
+class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
+    override val scope: Scope by lazy {
+        val scope = createScope(this)
+        scope.declare(viewModelScope)
+        scope
+    }
+    private val serviceAvailabilityInfo: PlayerServiceAvailabilityInfo by inject()
+    private val credentialsProvider: MatchingCredentialsProvider by inject()
 
+    val playerNegotiation: PlayerNegotiation by inject()
+    private var negotiationState: PlayerNegotiation.State = PlayerNegotiation.State.NotConnected
     private val _frontendState: MutableStateFlow<FrontendState> = MutableStateFlow(FrontendState.Disconnected)
+
+    val availableServices: List<PlayerServiceAvailabilityInfo.ServiceStatus> get() = serviceAvailabilityInfo.availableServices()
     val frontendState: StateFlow<FrontendState> get() = _frontendState
 
     init {
         viewModelScope.launch {
-            spotifyConnector.remote.collectLatest { remote ->
-                if (remote == null || !remote.isConnected) {
-                    _frontendState.value = FrontendState.Disconnected
-                } else {
-                    remote.playerApi.playerState()
-                        .onStart { updateFrontendState(remote.playerApi.getPlayerState()) }
-                        .collectLatest(::updateFrontendState)
+            playerNegotiation.state
+                .flatMapLatest { state ->
+                    this@PlayerViewModel.negotiationState = state
+                    println(state)
+                    (state as? PlayerNegotiation.State.Connected)?.player?.playerState() ?: flowOf(null)
                 }
-            }
+                .collectLatest(::updateFrontendState)
         }
+    }
+
+    fun isConnected(): Boolean = negotiationState is PlayerNegotiation.State.Connected
+
+    fun playerOrNull(): Player? = (negotiationState as? PlayerNegotiation.State.Connected)?.player
+
+    fun selectPlayer(service: PlayerService) {
+        playerNegotiation.setService(service)
+    }
+
+    fun play(motif: Motif) = viewModelScope.launch {
+        if (!isConnected()) return@launch
+        playerNegotiation.playerOrNull()?.playFromIsrc(credentialsProvider, motif.isrc)
+    }
+
+    fun resume() = viewModelScope.launch {
+        playerOrNull()?.resume()
+    }
+
+    fun pause() = viewModelScope.launch {
+        playerOrNull()?.pause()
+    }
+
+    fun seekTo(position: Long) = viewModelScope.launch {
+        playerOrNull()?.seekTo(position)
     }
 
     private fun updateFrontendState(playerState: PlayerState?) {
         println("playerState: $playerState")
-        val track = playerState?.track
-        if (playerState == null || track == null) {
-            _frontendState.value = FrontendState.Connected.NoPlayback
-        } else {
-            _frontendState.value = FrontendState.Connected.Playback(
-                track = track,
-                isPaused = playerState.isPaused,
-                position = playerState.playbackPosition.toInt(),
-                isMotif = false
+        _frontendState.value = if (playerState != null) {
+            val connectorState = negotiationState as PlayerNegotiation.State.Connected
+            playerState.track?.let { track ->
+                FrontendState.Connected.Playback(
+                    connectorState.service,
+                    track = track,
+                    playerState.state != PlayerState.PlaybackState.PLAYING,
+                    playerState.position.toInt(),
+                    isMotif = true
+                )
+            } ?: FrontendState.Connected.NoPlayback(
+                connectorState.service
             )
+        } else {
+            FrontendState.Disconnected
         }
+    }
+
+    override fun clear() {
+        super.clear()
+        playerNegotiation.disconnect()
+        scope.close()
     }
 }
