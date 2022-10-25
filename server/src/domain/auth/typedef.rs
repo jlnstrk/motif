@@ -4,18 +4,21 @@ use serde::Serialize;
 use crate::domain::common::typedef::Service;
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct AuthResponse {
     pub app_token: AuthTokenWithRefresh,
     pub service_tokens: Vec<ServiceToken<AuthToken>>,
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct AuthToken {
     pub access_token: String,
     pub access_token_expires: Option<DateTime<Utc>>,
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct AuthTokenWithRefresh {
     pub access_token: String,
     pub access_token_expires: Option<DateTime<Utc>>,
@@ -23,16 +26,19 @@ pub struct AuthTokenWithRefresh {
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ServiceTokenResponse {
     pub service_token: ServiceToken<AuthToken>,
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ErrorResponse {
     pub message: String,
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ServiceToken<T> {
     pub service: Service,
     pub service_id: String,

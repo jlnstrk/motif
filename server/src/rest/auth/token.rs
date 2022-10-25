@@ -21,6 +21,7 @@ pub fn token_router() -> Router {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct TokenPayload {
     token: String,
 }
