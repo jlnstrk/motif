@@ -84,6 +84,7 @@ buildkonfig {
 
     defaultConfigs {
         buildConfigField(FieldSpec.Type.STRING, "SPOTIFY_CLIENT_ID", rootProject.extra["spotify.client.id"] as String)
+        buildConfigField(FieldSpec.Type.STRING, "SPOTIFY_CLIENT_SECRET", rootProject.extra["spotify.client.secret"] as String)
         buildConfigField(FieldSpec.Type.STRING, "SPOTIFY_CALLBACK_URI", "motif://auth-callback/spotify")
         buildConfigField(FieldSpec.Type.STRING, "APPLE_DEVELOPER_TOKEN", rootProject.extra["apple.developer.token"] as String)
     }

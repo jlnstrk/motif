@@ -14,6 +14,8 @@ public sealed interface MatchingCredentials {
     ) : MatchingCredentials
 
     public data class SpotifyCredentials(
+        public val clientId: String,
+        // public val clientSecret: String,
         public val accessToken: String,
         public val expires: Instant
     )

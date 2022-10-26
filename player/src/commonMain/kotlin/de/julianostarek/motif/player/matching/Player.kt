@@ -1,6 +1,7 @@
 package de.julianostarek.motif.player.matching
 
 import com.adamratzman.spotify.models.Token
+import com.adamratzman.spotify.spotifyClientApi
 import com.adamratzman.spotify.spotifyImplicitGrantApi
 import de.julianostarek.motif.player.AppleMusicPlayer
 import de.julianostarek.motif.player.Player
@@ -63,7 +64,8 @@ private suspend fun SpotifyRemote.playFromIsrc(
 ): Boolean {
     val credentials = credentialsProvider.spotifyCredentials() ?: return false
     val spotifyApi = spotifyImplicitGrantApi(
-        null, Token.from(
+        credentials.clientId,
+        Token.from(
             accessToken = credentials.accessToken,
             refreshToken = null,
             scopes = emptyList(),

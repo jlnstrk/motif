@@ -23,6 +23,8 @@ class BackendMatchingCredentialsProvider(
     override suspend fun spotifyCredentials(): MatchingCredentials.SpotifyCredentials? {
         return authRepository.getServiceAuthOptionalRefresh(Service.Spotify)?.let { token ->
             MatchingCredentials.SpotifyCredentials(
+                clientId = BuildKonfig.SPOTIFY_CLIENT_ID,
+                // clientSecret = BuildKonfig.SPOTIFY_CLIENT_SECRET,
                 accessToken = token.accessToken,
                 expires = token.accessTokenExpires!!
             )

@@ -103,6 +103,7 @@ fn apple_client_secret(apple_env: AppleEnv) -> String {
 
 pub async fn auth_url(callback_mode: CallbackMode) -> String {
     let env = get_env();
+    println!("{}", apple_client_secret(env.clone()));
     let client = make_oidc_client(env, callback_mode, None).await;
     let (auth_url, ..) = client
         .authorize_url(

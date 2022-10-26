@@ -18,6 +18,9 @@ android {
         targetSdk = 32
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["redirectSchemeName"] = "motif"
+        manifestPlaceholders["redirectHostName"] = "auth-callback"
     }
 
     buildFeatures {
