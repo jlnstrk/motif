@@ -1,6 +1,7 @@
 package de.julianostarek.motif.login
 
 import de.julianostarek.motif.SharedViewModel
+import de.julianostarek.motif.client.auth.Service
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ open class LoginViewModel : SharedViewModel(), KoinComponent {
         }
     }
 
-    fun loginUrl(): String = loginRepository.loginUrl()
+    fun loginUrl(service: Service): String = loginRepository.loginUrl(service)
 
     fun loginFromCallback(callbackUrl: String) = viewModelScope.launch {
         loginRepository.loginFromCallback(callbackUrl)

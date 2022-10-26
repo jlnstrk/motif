@@ -30,19 +30,24 @@ fun Player(
             FeedAppBar(Color.Black)
             Image(viewModel)
             Spacer(Modifier.height(16.dp))
-            TextButton(onClick = { /*viewModel.connectAndPlay(context) */}) {
-                Text("Play!")
+            TextButton(onClick = { viewModel.shared.disconnect() }) {
+                Text("Disconnect")
             }
             TextButton(onClick = { viewModel.shared.selectPlayer(PlayerService.APPLE_MUSIC) }) {
-                Text("Connect!")
+                Text("Connect to Apple Music")
+            }
+            TextButton(onClick = { viewModel.shared.selectPlayer(PlayerService.SPOTIFY) }) {
+                Text("Connect to Spotify")
             }
 
             val frontendState = viewModel.shared.frontendState.collectAsState()
-            Text(when (val state = frontendState.value) {
-                is FrontendState.Connected.NoPlayback -> "Connected: No Playback"
-                is FrontendState.Connected.Playback -> "Connected: Playback: ${state.track.title}"
-                FrontendState.Disconnected -> "Disconnected"
-            })
+            Text(
+                when (val state = frontendState.value) {
+                    is FrontendState.Connected.NoPlayback -> "Connected: ${state.service}. (No Playback)"
+                    is FrontendState.Connected.Playback -> "Connected: ${state.service}. (${state.track.title})"
+                    FrontendState.Disconnected -> "Disconnected"
+                }
+            )
         }
     }
 }
@@ -78,7 +83,11 @@ fun Image(viewModel: AndroidPlayerViewModel) {
     val image = viewModel.trackImage.collectAsState()
     AsyncImage(
         ImageRequest.Builder(LocalContext.current)
-        .data(image.value)
-        .crossfade(true)
-        .build(), contentDescription = null, modifier = Modifier.size(256.dp).clip(RoundedCornerShape(8.dp)))
+            .data(image.value)
+            .crossfade(true)
+            .build(),
+        contentDescription = null,
+        modifier = Modifier.size(256.dp)
+            .clip(RoundedCornerShape(8.dp))
+    )
 }

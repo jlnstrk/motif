@@ -51,7 +51,7 @@ fun MotifUi(
                 modifier = Modifier.padding(it)
             ) {
                 composable(Screen.Feed.route) {
-                    Feed()
+                    Feed(playerViewModel)
                 }
                 composable(Screen.Player.route) {
                     Player(playerViewModel)

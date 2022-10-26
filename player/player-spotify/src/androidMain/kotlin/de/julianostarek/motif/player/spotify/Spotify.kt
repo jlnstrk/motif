@@ -64,7 +64,10 @@ public actual typealias Artist = com.spotify.protocol.types.Artist
 
 public actual class PlayerState(public val android: com.spotify.protocol.types.PlayerState) {
     public actual val track: Track?
-        get() = android.track?.let(::Track)
+        get() = android.track?.let { androidTrack ->
+            // Track properties may be null
+            if (androidTrack.name != null) Track(androidTrack) else null
+        }
     public actual val isPaused: Boolean
         get() = android.isPaused
     public actual val playbackSpeed: Float

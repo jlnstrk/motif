@@ -1,6 +1,7 @@
 package de.julianostarek.motif.ui.feed
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -24,19 +25,24 @@ import com.google.accompanist.pager.rememberPagerState
 import de.julianostarek.motif.feed.FeedState
 import de.julianostarek.motif.ui.Keyline1
 import de.julianostarek.motif.feed.domain.ProfileWithMotifs
+import de.julianostarek.motif.ui.player.AndroidPlayerViewModel
 
 @Composable
 fun Feed(
-    viewModel: AndroidFeedViewModel = viewModel()
+    playerViewModel: AndroidPlayerViewModel,
+    feedViewModel: AndroidFeedViewModel = viewModel()
 ) {
-    val viewState by viewModel.state.collectAsState()
+    val viewState by feedViewModel.state.collectAsState()
     Surface(Modifier.fillMaxSize()) {
         when (val cast = viewState) {
             FeedState.Loading -> {
                 CircularProgressIndicator()
             }
 
-            is FeedState.Data -> FeedContent(cast.motifGroups)
+            is FeedState.Data -> FeedContent(cast.motifGroups,
+            onClicked = { profileWithMotifs ->
+                playerViewModel.shared.play(profileWithMotifs.motifs.first())
+            })
             else -> {}
         }
 
@@ -72,7 +78,8 @@ fun FeedAppBar(
 @OptIn(ExperimentalPagerApi::class) // HorizontalPager is experimental
 @Composable
 fun FeedContent(
-    motifs: List<ProfileWithMotifs>
+    motifs: List<ProfileWithMotifs>,
+    onClicked: (ProfileWithMotifs) -> Unit
 ) {
     Column(
         modifier = Modifier.windowInsetsPadding(
@@ -109,7 +116,8 @@ fun FeedContent(
                     modifier = Modifier
                         .padding(start = Keyline1, top = 16.dp, end = Keyline1)
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(200.dp),
+                    onClicked
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -119,7 +127,7 @@ fun FeedContent(
 }
 
 @Composable
-fun MotifGroups(motifGroups: List<ProfileWithMotifs>, modifier: Modifier = Modifier) {
+fun MotifGroups(motifGroups: List<ProfileWithMotifs>, modifier: Modifier = Modifier, onClicked: (ProfileWithMotifs) -> Unit) {
     LazyRow(modifier = modifier) {
         itemsIndexed(motifGroups) { index, item ->
             AsyncImage(
@@ -127,6 +135,7 @@ fun MotifGroups(motifGroups: List<ProfileWithMotifs>, modifier: Modifier = Modif
                 contentDescription = null,
                 modifier = Modifier.clip(CircleShape)
                     .padding(16.dp)
+                    .clickable { onClicked(item) },
             )
         }
     }

@@ -58,27 +58,17 @@ class BackendAuthClient(
         }
     }
 
-    suspend fun spotifyCallback(callbackUrl: String): BackendAuth? {
-        val query = callbackUrl.substringAfter('?')
-        return when (val result = call<Unit, BackendAuth>(HttpMethod.Get, "/auth/spotify/callback?$query")) {
-            is Response.Success -> result.data
-            is Response.Error -> {
-                println("Failed to redeem spotify callback: Status ${result.statusCode}")
-                null
-            }
+    suspend fun serviceCallback(callbackUrl: String): BackendAuth? {
+        val path = when (callbackUrl.substringAfterLast('/').substringBefore('?')) {
+            "apple" -> "/auth/apple/callback/mobile"
+            "spotify" -> "/auth/spotify/callback"
+            else -> throw IllegalArgumentException()
         }
-    }
-
-    fun spotifyAuthUrl(): String {
-        return config.restServerUrl + "/auth/spotify?callbackMode=mobile"
-    }
-
-    suspend fun appleCallback(callbackUrl: String): BackendAuth? {
         val query = callbackUrl.substringAfter('?')
-        return when (val result = call<Unit, BackendAuth>(HttpMethod.Get, "/auth/apple/callback/mobile?$query")) {
+        return when (val result = call<Unit, BackendAuth>(HttpMethod.Get, "$path?$query")) {
             is Response.Success -> result.data
             is Response.Error -> {
-                println("Failed to redeem apple callback: Status ${result.statusCode}")
+                println("Failed to redeem service callback: Status ${result.statusCode}")
                 null
             }
         }
@@ -86,6 +76,10 @@ class BackendAuthClient(
 
     fun appleAuthUrl(): String {
         return config.restServerUrl + "/auth/apple?callbackMode=mobile"
+    }
+
+    fun spotifyAuthUrl(): String {
+        return config.restServerUrl + "/auth/spotify?callbackMode=mobile"
     }
 
     private suspend inline fun <reified Req, reified Res> call(

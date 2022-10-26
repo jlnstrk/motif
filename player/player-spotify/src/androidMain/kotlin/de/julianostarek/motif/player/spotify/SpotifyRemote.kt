@@ -65,5 +65,6 @@ public actual class SpotifyRemoteConnector actual constructor(
         if (state is SpotifyRemoteConnectionState.Connected) {
             state.remote.android.let(SpotifyAppRemote::disconnect)
         }
+        _state.value = SpotifyRemoteConnectionState.Disconnected()
     }
 }

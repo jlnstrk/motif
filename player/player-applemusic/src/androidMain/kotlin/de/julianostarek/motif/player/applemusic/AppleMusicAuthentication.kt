@@ -2,7 +2,6 @@ package de.julianostarek.motif.player.applemusic
 
 import android.content.Context
 import android.content.Intent
-import com.apple.android.music.playback.controller.MediaPlayerController
 import com.apple.android.music.playback.controller.MediaPlayerControllerFactory
 import com.apple.android.sdk.authentication.AuthenticationFactory
 import com.apple.android.sdk.authentication.AuthenticationManager
@@ -59,5 +58,14 @@ public actual class AppleMusicAuthentication(
 
     public actual fun invalidate() {
         _result.value = AppleMusicAuthenticationResult.NotDetermined
+    }
+
+    private companion object {
+        init {
+            System.setProperty("org.bytedeco.javacpp.maxphysicalbytes", "0")
+            System.setProperty("org.bytedeco.javacpp.maxbytes", "0")
+            System.loadLibrary("c++_shared")
+            System.loadLibrary("appleMusicSDK")
+        }
     }
 }

@@ -1,10 +1,12 @@
 package de.julianostarek.motif.login.datasource
 
+import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import com.russhwolf.settings.set
 import de.julianostarek.motif.client.auth.BackendAuth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -14,6 +16,7 @@ import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 
+@OptIn(ExperimentalSettingsApi::class, ExperimentalCoroutinesApi::class)
 @Single
 class LoginSettingsDataSourceImpl(
     @Named("LoginSettings")

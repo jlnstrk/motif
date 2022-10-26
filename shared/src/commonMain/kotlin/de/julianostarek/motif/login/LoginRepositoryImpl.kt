@@ -1,9 +1,6 @@
 package de.julianostarek.motif.login
 
-import de.julianostarek.motif.client.auth.AuthTokenWithRefresh
-import de.julianostarek.motif.client.auth.BackendAuth
-import de.julianostarek.motif.client.auth.BackendAuthClient
-import de.julianostarek.motif.client.auth.BackendAuthStore
+import de.julianostarek.motif.client.auth.*
 import de.julianostarek.motif.login.datasource.LoginSettingsDataSource
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Single
@@ -16,10 +13,13 @@ class LoginRepositoryImpl(
     override val auth: Flow<BackendAuth?>
         get() = settings.authChanged
 
-    override fun loginUrl(): String = backendAuthClient.spotifyAuthUrl()
+    override fun loginUrl(service: Service): String = when (service) {
+        Service.AppleMusic -> backendAuthClient.appleAuthUrl()
+        Service.Spotify -> backendAuthClient.spotifyAuthUrl()
+    }
 
     override suspend fun loginFromCallback(callbackUrl: String) {
-        val auth = backendAuthClient.spotifyCallback(callbackUrl)
+        val auth = backendAuthClient.serviceCallback(callbackUrl)
         auth?.let { settings.persistAuth(it) }
     }
 

@@ -81,6 +81,7 @@ public actual class SpotifyRemoteConnector actual constructor(
 
     public actual fun disconnect() {
         appRemote.disconnect()
+        _state.value = SpotifyRemoteConnectionState.Disconnected()
     }
 }
 

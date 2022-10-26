@@ -2,13 +2,11 @@ package de.julianostarek.motif.player
 
 import de.julianostarek.motif.SharedViewModel
 import de.julianostarek.motif.feed.domain.Motif
-import de.julianostarek.motif.player.applemusic.AppleMusicAuthentication
 import de.julianostarek.motif.player.matching.MatchingCredentialsProvider
 import de.julianostarek.motif.player.matching.playFromIsrc
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.*
-import org.koin.core.parameter.parametersOf
 import org.koin.core.scope.Scope
 
 class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
@@ -33,9 +31,15 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
                 .flatMapLatest { state ->
                     this@PlayerViewModel.negotiationState = state
                     println(state)
-                    (state as? PlayerNegotiation.State.Connected)?.player?.playerState() ?: flowOf(null)
+
+                    flow {
+                        emit(state to null)
+                        (state as? PlayerNegotiation.State.Connected)?.player?.playerState()?.let { playerStateFlow ->
+                            emitAll(playerStateFlow.map { state to it })
+                        }
+                    }
                 }
-                .collectLatest(::updateFrontendState)
+                .collectLatest { (state, playerState) -> updateFrontendState(state, playerState) }
         }
     }
 
@@ -64,23 +68,32 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
         playerOrNull()?.seekTo(position)
     }
 
-    private fun updateFrontendState(playerState: PlayerState?) {
-        println("playerState: $playerState")
-        _frontendState.value = if (playerState != null) {
-            val connectorState = negotiationState as PlayerNegotiation.State.Connected
-            playerState.track?.let { track ->
-                FrontendState.Connected.Playback(
-                    connectorState.service,
-                    track = track,
-                    playerState.state != PlayerState.PlaybackState.PLAYING,
-                    playerState.position.toInt(),
-                    isMotif = true
+    fun disconnect() {
+        playerNegotiation.disconnect()
+    }
+
+    private fun updateFrontendState(negotiationState: PlayerNegotiation.State, playerStateOrNull: PlayerState?) {
+        println("playerState: $playerStateOrNull")
+        _frontendState.value = when (negotiationState) {
+            is PlayerNegotiation.State.Connected -> {
+                playerStateOrNull?.let { playerState ->
+                    playerState.track?.let { track ->
+                        FrontendState.Connected.Playback(
+                            negotiationState.service,
+                            track = track,
+                            playerState.state != PlayerState.PlaybackState.PLAYING,
+                            playerState.position.toInt(),
+                            isMotif = true
+                        )
+                    }
+                } ?: FrontendState.Connected.NoPlayback(
+                    negotiationState.service
                 )
-            } ?: FrontendState.Connected.NoPlayback(
-                connectorState.service
-            )
-        } else {
-            FrontendState.Disconnected
+            }
+
+            is PlayerNegotiation.State.Connecting,
+            is PlayerNegotiation.State.Error,
+            PlayerNegotiation.State.NotConnected -> FrontendState.Disconnected
         }
     }
 

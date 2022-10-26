@@ -46,7 +46,7 @@ private suspend fun MusicPlayerController.playFromIsrc(
             .build()
     ) {
         bearerAuth(credentials.developerToken)
-        header("Music-User-Token", credentials.musicUserToken)
+        // header("Music-User-Token", credentials.musicUserToken)
         parameter("filter[isrc]", isrc)
     }
 
