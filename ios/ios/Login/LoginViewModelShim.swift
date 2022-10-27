@@ -14,7 +14,7 @@ import KMPNativeCoroutinesCombine
 class LoginViewModelShim: ObservableObject {
     let shared: Shared.LoginViewModel = Shared.LoginViewModel()
 
-    @Published var loginState: Shared.LoginState = Shared.LoginStateLoggedOut()
+    @Published var loginState: Shared.LoginState = .NotDetermined()
 
     private var cancellables: [AnyCancellable] = []
 

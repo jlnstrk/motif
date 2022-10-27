@@ -26,7 +26,7 @@ class AndroidPlayerViewModel : ViewModel() {
             shared.frontendState
                 .map { (it as? FrontendState.Connected.Playback)?.track }
                 .distinctUntilChanged()
-                .mapLatest { track -> track?.let { shared.playerOrNull()?.trackImage(track, 500) } }
+                .mapLatest { track -> track?.let { shared.playerOrNull()?.platform?.trackImage(track, 500) } }
                 .collectLatest { image ->
                     val drawable: Drawable? = when (image) {
                         is AndroidTrackImage.Bitmap -> BitmapDrawable(image.bitmap)

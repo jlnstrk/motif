@@ -1,6 +1,6 @@
 package de.julianostarek.motif.feed.datasource
 
-import de.julianostarek.motif.feed.dto.FeedMotifDto
+import de.julianostarek.motif.dto.FeedMotifDto
 
 interface FeedLocalDataSource : FeedDataSource {
     suspend fun dumpMotifsFeed(motifsFeed: List<FeedMotifDto>)

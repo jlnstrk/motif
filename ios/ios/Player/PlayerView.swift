@@ -9,18 +9,20 @@
 import Foundation
 import SwiftUI
 import Shared
+import Introspect
 
 struct PlayerView: View {
-    @StateObject var viewModel: PlayerViewModelShim = PlayerViewModelShim()
-
+    @ObservedObject var viewModel: PlayerViewModelShim
+    @State var isSelectingPlayer: Bool = false
+    
     var body: some View {
         ZStack {
             if let trackImage = viewModel.trackImage {
                 Image(uiImage: trackImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    ///.frame(width: proxy.size.width, height: proxy.size.height)
-                    // .clipped()
+                ///.frame(width: proxy.size.width, height: proxy.size.height)
+                // .clipped()
                     .edgesIgnoringSafeArea(.all)
                     .transition(.opacity.animation(.easeInOut))
                     .id(trackImage)
@@ -36,17 +38,32 @@ struct PlayerView: View {
                 switch viewModel.frontendState {
                 case is FrontendState.Disconnected:
                     Text("Disconnected")
-                case is FrontendState.ConnectedNoPlayback:
-                    Text("Connected")
+                case let connecting as FrontendState.Connecting:
+                    Text("Connecting (\(connecting.service))")
+                case let connectedNoPlayback as FrontendState.ConnectedNoPlayback:
+                    Text("Connected (\(connectedNoPlayback.service))")
                 case let playback as FrontendState.ConnectedPlayback:
-                    Text("Connected: Track: \(playback.track.name ?? "<None>"), paused: \(playback.isPaused.description), position: \(playback.position)")
+                    Text("Connected (\(playback.service)): Track: \(playback.track.title ?? "<None>"), paused: \(playback.isPaused.description), position: \(playback.position)")
                 default:
                     Text("Other state")
                 }
-                Button("Connecct & Play") {
-                    viewModel.connect()
+                Button("Connect") {
+                    isSelectingPlayer = true
                 }
                 Spacer()
+            }
+        }
+        .sheet(isPresented: $isSelectingPlayer) {
+            PlayerChooser(playerViewModel: viewModel)
+                .introspectViewController { controller in
+                    let pc = controller.presentationController as? UISheetPresentationController
+                    pc?.detents = [.medium(), .large()]
+                }
+        }
+        .onChange(of: viewModel.frontendState) { frontendState in
+            if let _ = frontendState as? FrontendState.Connected,
+               isSelectingPlayer {
+                isSelectingPlayer = false
             }
         }
         .navigationTitle("Player")

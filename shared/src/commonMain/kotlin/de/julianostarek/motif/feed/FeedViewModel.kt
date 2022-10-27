@@ -25,7 +25,7 @@ open class FeedViewModel : SharedViewModel(), KoinComponent {
     fun refreshFeed() {
         feedJob?.cancel()
         feedJob = viewModelScope.launch {
-            repository.motifsFeed()
+            repository.myFeed()
                 .onStart { _state.value = FeedState.Loading }
                 .collect {
                     _state.value = FeedState.Data(it)

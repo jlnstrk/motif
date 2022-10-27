@@ -39,6 +39,15 @@ query GetMotifDetail($motifId: Int!) {
     }
 }
 
+query GetProfileSearch($query: String!) {
+    profileSearch(query: $query) {
+        displayName
+        id
+        photoUrl
+        username
+    }
+}
+
 subscription OnMotifCreated {
     motifCreated {
         createdAt

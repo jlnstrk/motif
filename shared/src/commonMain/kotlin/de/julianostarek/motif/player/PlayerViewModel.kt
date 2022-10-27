@@ -91,7 +91,7 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
                 )
             }
 
-            is PlayerNegotiation.State.Connecting,
+            is PlayerNegotiation.State.Connecting -> FrontendState.Connecting(negotiationState.service)
             is PlayerNegotiation.State.Error,
             PlayerNegotiation.State.NotConnected -> FrontendState.Disconnected
         }

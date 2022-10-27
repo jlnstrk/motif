@@ -10,6 +10,8 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 public value class SpotifyPlayer(internal val backing: SpotifyRemote) : Player {
+    override val platform: PlatformControls get() = SpotifyPlatformControls(backing)
+
     override suspend fun resume() {
         backing.playerApi.resume()
     }
@@ -50,6 +52,8 @@ public value class SpotifyPlayer(internal val backing: SpotifyRemote) : Player {
     }
 }
 
+public expect class SpotifyPlatformControls(backing: SpotifyRemote) : PlatformControls
+
 @JvmInline
 public value class SpotifyPlayerState(internal val backing: de.julianostarek.motif.player.spotify.PlayerState) :
     PlayerState {
@@ -80,4 +84,6 @@ public value class SpotifyPlayerTrack(internal val backing: Track) : PlayerTrack
         get() = backing.artists.map(Artist::name)
     override val duration: Long
         get() = backing.duration
+    override val url: String
+        get() = backing.uri
 }

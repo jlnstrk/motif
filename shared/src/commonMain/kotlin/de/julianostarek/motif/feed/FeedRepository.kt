@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface FeedRepository {
     val isFeedRefreshing: StateFlow<Boolean>
-    fun motifsFeed(): Flow<List<ProfileWithMotifs>>
+    fun myFeed(): Flow<List<ProfileWithMotifs>>
 }

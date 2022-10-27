@@ -2,7 +2,9 @@ package de.julianostarek.motif.player
 
 import kotlinx.coroutines.flow.Flow
 
+@Suppress("LeakingThis")
 public sealed interface Player {
+    public val platform: PlatformControls
     public suspend fun resume()
     public suspend fun pause()
     public suspend fun stop()

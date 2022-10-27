@@ -50,7 +50,7 @@ class FeedRepositoryImpl(
 
     private fun removeListener() = listeners.getAndUpdate { it - 1 }
 
-    override fun motifsFeed(): Flow<List<ProfileWithMotifs>> {
+    override fun myFeed(): Flow<List<ProfileWithMotifs>> {
         return local.motifsFeed()
             .onStart {
                 clientScope.launch {

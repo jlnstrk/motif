@@ -6,13 +6,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.native.internal.ObjCErrorException
 
-public fun isSpotifyInstalled(): Boolean = SPTSessionManager().isSpotifyAppInstalled()
+public fun isSpotifyInstalled(): Boolean {
+    val url = NSURL(string = "spotify://spotify")
+    return UIApplication.sharedApplication.canOpenURL(url)
+    // TODO: Doesn't work. Why?
+    // return SPTSessionManager().isSpotifyAppInstalled()
+}
 
 public actual class SpotifyRemote(
     public val ios: SPTAppRemote,

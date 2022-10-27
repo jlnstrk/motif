@@ -5,10 +5,11 @@ struct ContentView: View {
     @StateObject var loginViewModel: LoginViewModelShim = LoginViewModelShim()
 
     var body: some View {
+        // LoginView(viewModel: loginViewModel)
         switch loginViewModel.loginState {
-        case is Shared.LoginStateLoggedIn:
+        case is Shared.LoginState.LoggedIn:
             MainView()
-        case is Shared.LoginStateLoggedOut:
+        case is Shared.LoginState.LoggedOut:
             LoginView(viewModel: loginViewModel)
         default:
             EmptyView()

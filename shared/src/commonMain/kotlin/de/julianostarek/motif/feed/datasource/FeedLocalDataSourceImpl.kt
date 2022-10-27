@@ -2,7 +2,7 @@ package de.julianostarek.motif.feed.datasource
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import de.julianostarek.motif.feed.dto.FeedMotifDto
+import de.julianostarek.motif.dto.FeedMotifDto
 import de.julianostarek.motif.persist.MotifDatabase
 import de.julianostarek.motif.persist.entity.*
 import kotlinx.coroutines.CoroutineScope

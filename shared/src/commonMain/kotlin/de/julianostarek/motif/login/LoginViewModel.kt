@@ -11,7 +11,7 @@ import org.koin.core.component.inject
 open class LoginViewModel : SharedViewModel(), KoinComponent {
     private val loginRepository: LoginRepository by inject()
 
-    private val _state: MutableStateFlow<LoginState> = MutableStateFlow(LoginState.LoggedOut)
+    private val _state: MutableStateFlow<LoginState> = MutableStateFlow(LoginState.NotDetermined)
     val state: StateFlow<LoginState> get() = _state
 
     init {

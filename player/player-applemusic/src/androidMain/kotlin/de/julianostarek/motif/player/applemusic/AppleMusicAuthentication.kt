@@ -2,6 +2,7 @@ package de.julianostarek.motif.player.applemusic
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager.NameNotFoundException
 import com.apple.android.music.playback.controller.MediaPlayerControllerFactory
 import com.apple.android.sdk.authentication.AuthenticationFactory
 import com.apple.android.sdk.authentication.AuthenticationManager
@@ -12,10 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 public fun isAppleMusicInstalled(context: Context): Boolean {
-    val dummyIntent = AuthenticationFactory.createAuthenticationManager(context)
-        .createIntentBuilder("")
-        .build()
-    return context.packageManager.resolveActivity(dummyIntent, 0) != null
+    return try {
+        context.packageManager.getPackageInfo("com.apple.android.music", 0)
+        true
+    } catch (_: NameNotFoundException) {
+        false
+    }
 }
 
 public actual class AppleMusicAuthentication(

@@ -1,4 +1,4 @@
-package de.julianostarek.motif.feed.dto
+package de.julianostarek.motif.dto
 
 import kotlinx.datetime.Instant
 

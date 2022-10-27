@@ -1,19 +1,11 @@
 package de.julianostarek.motif.player.spotify
 
 import cocoapods.SpotifyiOS.*
-import io.ktor.utils.io.*
 import kotlinx.cinterop.CValue
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 import platform.CoreGraphics.CGSizeMake
-import platform.Foundation.NSLog
 import platform.UIKit.UIImage
 import platform.darwin.NSObject
 

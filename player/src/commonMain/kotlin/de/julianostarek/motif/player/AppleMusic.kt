@@ -7,6 +7,8 @@ import kotlin.jvm.JvmInline
 
 @JvmInline
 public value class AppleMusicPlayer(internal val backing: MusicPlayerController) : Player {
+    override val platform: PlatformControls get() = AppleMusicPlatformControls()
+
     override suspend fun resume() {
         backing.play()
     }
@@ -47,6 +49,8 @@ public value class AppleMusicPlayer(internal val backing: MusicPlayerController)
         }
     }
 }
+
+public expect class AppleMusicPlatformControls() : PlatformControls
 
 @JvmInline
 public value class AppleMusicPlayerState(internal val backing: MusicPlayerController) : PlayerState {
@@ -91,4 +95,6 @@ public value class AppleMusicPlayerTrack(internal val backing: MusicPlayerMediaI
         get() = listOf(backing.artistName ?: "<Unknown>")
     override val duration: Long
         get() = backing.duration
+    override val url: String?
+        get() = backing.url
 }

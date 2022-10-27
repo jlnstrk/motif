@@ -25,7 +25,7 @@ class IosModule {
     @Scope(PlayerViewModel::class)
     @Scoped
     fun appleMusicAuthentication(
-        @InjectedParam externalScope: CoroutineScope
+        externalScope: CoroutineScope
     ): AppleMusicAuthentication {
         return AppleMusicAuthentication(externalScope)
     }

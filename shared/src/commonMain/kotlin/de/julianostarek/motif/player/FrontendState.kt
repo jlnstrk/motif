@@ -2,6 +2,7 @@ package de.julianostarek.motif.player
 
 sealed class FrontendState {
     object Disconnected : FrontendState()
+    data class Connecting(val service: PlayerService) : FrontendState()
     sealed class Connected : FrontendState() {
         abstract val service: PlayerService
 

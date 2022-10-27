@@ -25,6 +25,4 @@ class FeedViewModelShim: ObservableObject {
             .assign(to: \.feedState, on: self)
             .store(in: &cancellables)
     }
-
-
 }
