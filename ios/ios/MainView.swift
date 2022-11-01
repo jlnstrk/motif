@@ -16,22 +16,24 @@ struct MainView: View {
     var body: some View {
         TabView {
             NavigationView {
-                FeedOrProfileSearchView(
-                    playerViewModel: playerViewModel,
-                    profileSearchViewModel: profileSearchViewModel
-                )
+                WithinThemeGradient {
+                    FeedOrProfileSearchView(
+                        playerViewModel: playerViewModel,
+                        profileSearchViewModel: profileSearchViewModel
+                    )
+                }
             }
             .searchable(text: $profileSearchViewModel.query, prompt: "Search people")
             .tabItem {
-                Image(systemName: "person.3.fill")
+                Image(systemName: "music.note.list")
                 Text("Feed")
             }
             NavigationView {
-                EmptyView() // PlayerView(viewModel: playerViewModel)
+                ProfileView(viewModel: ProfileViewModelShim(for: nil))
             }
             .tabItem {
-                Image(systemName: "music.note")
-                Text("Player")
+                Image(systemName: "person.fill")
+                Text("Profile")
             }
         }
     }

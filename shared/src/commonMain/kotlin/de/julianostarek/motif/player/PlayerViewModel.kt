@@ -1,7 +1,7 @@
 package de.julianostarek.motif.player
 
 import de.julianostarek.motif.SharedViewModel
-import de.julianostarek.motif.feed.domain.Motif
+import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.player.matching.MatchingCredentialsProvider
 import de.julianostarek.motif.player.matching.playFromIsrc
 import kotlinx.coroutines.flow.*

@@ -1,7 +1,7 @@
 package de.julianostarek.motif.feed
 
 import de.julianostarek.motif.SharedViewModel
-import de.julianostarek.motif.feed.domain.ProfileWithMotifs
+import de.julianostarek.motif.domain.ProfileWithMotifs
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

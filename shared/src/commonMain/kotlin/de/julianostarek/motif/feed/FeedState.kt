@@ -1,6 +1,6 @@
 package de.julianostarek.motif.feed
 
-import de.julianostarek.motif.feed.domain.ProfileWithMotifs
+import de.julianostarek.motif.domain.ProfileWithMotifs
 
 sealed class FeedState {
     object NotLoading : FeedState()

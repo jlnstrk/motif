@@ -36,7 +36,7 @@ struct FeedView: View {
                             )) {
                                 FeedProfile(profileWithMotifs: profile)
                             }
-                                .offset(x: (index / gridSize) % 2 == 0 ? 40 : 0)
+                            .offset(x: (index / gridSize) % 2 == 0 ? 40 : 0)
                         } else {
                             EmptyView()
                         }
@@ -48,14 +48,13 @@ struct FeedView: View {
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Motif")
-                    .font(.custom("Poppins-Bold", size: 24))
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(.vertical, 10)
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            viewModel.setup()
-        }
+        .navigationTitle("Motif")
     }
 }
 

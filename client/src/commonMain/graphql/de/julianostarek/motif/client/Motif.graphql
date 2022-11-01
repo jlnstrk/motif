@@ -1,0 +1,130 @@
+query MotifMyFeed {
+    motifMyFeed {
+        createdAt
+        creator {
+            displayName
+            id
+            photoUrl
+            username
+        }
+        id
+        isrc
+        liked
+        listened
+        offset
+    }
+}
+
+query MotifDetail($motifId: Int!) {
+    motifById(motifId: $motifId) {
+        createdAt
+        creator {
+            displayName
+            id
+            photoUrl
+            username
+        }
+        id
+        isrc
+        listened
+        offset
+        commentsCount
+        liked
+        likesCount
+        likes(first: 3) {
+            edges {
+                node {
+                    photoUrl
+                }
+            }
+        }
+    }
+}
+
+query ProfileSearch($query: String!) {
+    profileSearch(query: $query) {
+        displayName
+        id
+        photoUrl
+        username
+    }
+}
+
+query ProfileMe {
+    profileMe {
+        biography
+        displayName
+        followersCount
+        followingCount
+        id
+        photoUrl
+        username
+    }
+}
+
+query ProfileById($profileId: UUID!) {
+    profileById(profileId: $profileId) {
+        biography
+        displayName
+        follows
+        followersCount
+        followingCount
+        id
+        photoUrl
+        username
+    }
+}
+
+query IsUsernameAvailable($username: String!) {
+    profileIsUsernameAvailable(username: $username)
+}
+
+mutation ProfileMeUpdate($update: ProfileUpdate!) {
+    profileMeUpdate(update: $update) {
+        biography
+        displayName
+        photoUrl
+        username
+    }
+}
+
+subscription ProfileMeUpdated {
+    profileMe {
+        biography
+        displayName
+        followersCount
+        followingCount
+        id
+        photoUrl
+        username
+    }
+}
+
+mutation ProfileFollowById($profileId: UUID!) {
+    profileFollowById(profileId: $profileId)
+}
+
+mutation ProfileUnfollowById($profileId: UUID!) {
+    profileUnfollowById(profileId: $profileId)
+}
+
+subscription MotifCreated {
+    motifCreated {
+        createdAt
+        creator {
+            displayName
+            id
+            photoUrl
+            username
+        }
+        id
+        isrc
+        liked
+        listened
+        offset
+    }
+}
+
+subscription MotifDeleted {
+    motifDeleted
+}

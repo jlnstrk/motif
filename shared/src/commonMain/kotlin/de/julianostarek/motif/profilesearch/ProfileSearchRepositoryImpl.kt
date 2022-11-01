@@ -1,7 +1,7 @@
 package de.julianostarek.motif.profilesearch
 
 import de.julianostarek.motif.dto.ProfileDto
-import de.julianostarek.motif.feed.domain.Profile
+import de.julianostarek.motif.domain.Profile
 import org.koin.core.annotation.Single
 
 @Single

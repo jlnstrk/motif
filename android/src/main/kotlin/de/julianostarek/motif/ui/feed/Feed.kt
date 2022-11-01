@@ -35,7 +35,7 @@ import com.google.accompanist.pager.rememberPagerState
 import de.julianostarek.motif.feed.FeedState
 import de.julianostarek.motif.feed.SquareGrid
 import de.julianostarek.motif.ui.Keyline1
-import de.julianostarek.motif.feed.domain.ProfileWithMotifs
+import de.julianostarek.motif.domain.ProfileWithMotifs
 import de.julianostarek.motif.ui.player.AndroidPlayerViewModel
 
 @Composable

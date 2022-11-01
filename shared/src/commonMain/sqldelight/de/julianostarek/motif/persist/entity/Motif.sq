@@ -7,6 +7,7 @@ CREATE TABLE motifEntity (
     spotifyTrackId TEXT NOT NULL,
     createdAt INTEGER AS Instant NOT NULL,
     offset INTEGER AS Int NOT NULL,
+    liked INTEGER AS Boolean NOT NULL DEFAULT 0,
     listened INTEGER AS Boolean NOT NULL DEFAULT 0,
     creatorId TEXT NOT NULL,
     FOREIGN KEY (creatorId) REFERENCES profileEntity (id)

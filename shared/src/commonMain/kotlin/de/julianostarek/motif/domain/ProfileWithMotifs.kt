@@ -1,4 +1,4 @@
-package de.julianostarek.motif.feed.domain
+package de.julianostarek.motif.domain
 
 data class ProfileWithMotifs(
     val profile: Profile,

@@ -1,4 +1,4 @@
-package de.julianostarek.motif.feed.domain
+package de.julianostarek.motif.domain
 
 sealed interface Profile {
     val displayName: String
@@ -19,6 +19,7 @@ sealed interface Profile {
         override val photoUrl: String?,
         override val username: String,
         val biography: String?,
+        val follows: Boolean,
         val followersCount: Int,
         val followingCount: Int,
     ) : Profile

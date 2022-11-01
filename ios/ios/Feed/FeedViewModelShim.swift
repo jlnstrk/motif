@@ -18,7 +18,7 @@ class FeedViewModelShim: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    func setup() {
+    init() {
         createPublisher(for: shared.stateNative)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)

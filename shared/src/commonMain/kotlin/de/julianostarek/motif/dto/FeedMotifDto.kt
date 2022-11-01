@@ -4,6 +4,7 @@ import kotlinx.datetime.Instant
 
 data class FeedMotifDto(
     val id: Int,
+    val liked: Boolean,
     val listened: Boolean,
     val isrc: String,
     val offset: Int,

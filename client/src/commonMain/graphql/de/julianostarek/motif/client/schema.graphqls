@@ -33,6 +33,8 @@ type Comment {
 
   parentComment: Comment
 
+  liked: Boolean!
+
   likesCount: Int!
 
   likes: [Profile!]!
@@ -89,6 +91,8 @@ type Motif {
   commentsCount: Int!
 
   comments: [Comment!]!
+
+  liked: Boolean!
 
   likesCount: Int!
 
@@ -171,6 +175,8 @@ type Profile {
 
   followersCount: Int!
 
+  follows: Boolean!
+
   following: [Profile!]!
 
   followingCount: Int!
@@ -230,6 +236,8 @@ type Query {
   profileByUsername(username: String!): Profile
 
   profileSearch(query: String!): [Profile!]!
+
+  profileIsUsernameAvailable(username: String!): Boolean!
 
   motifMyFeed: [Motif!]!
 

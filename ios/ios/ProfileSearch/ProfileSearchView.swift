@@ -26,7 +26,9 @@ struct ProfileSearchView: View {
         case let results as Shared.ProfileSearchState.Results:
             List {
                 ForEach(results.results, id: \.id_) { profile in
-                    ProfileSearchProfile(profile: profile)
+                    NavigationLink(destination: ProfileView(viewModel: ProfileViewModelShim(for: ProfileReference.Simple(simple: profile as! ProfileSimple)))) {
+                        ProfileSearchProfile(profile: profile)
+                    }
                 }
             }
             .listStyle(.grouped)

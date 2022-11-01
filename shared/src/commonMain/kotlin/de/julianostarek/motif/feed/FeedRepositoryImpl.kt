@@ -2,9 +2,9 @@ package de.julianostarek.motif.feed
 
 import de.julianostarek.motif.feed.datasource.FeedLocalDataSource
 import de.julianostarek.motif.feed.datasource.FeedRemoteDataSource
-import de.julianostarek.motif.feed.domain.Profile
-import de.julianostarek.motif.feed.domain.Motif
-import de.julianostarek.motif.feed.domain.ProfileWithMotifs
+import de.julianostarek.motif.domain.Profile
+import de.julianostarek.motif.domain.Motif
+import de.julianostarek.motif.domain.ProfileWithMotifs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*

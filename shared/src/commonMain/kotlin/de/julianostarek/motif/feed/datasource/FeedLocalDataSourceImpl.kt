@@ -49,6 +49,7 @@ class FeedLocalDataSourceImpl(
     private fun SelectUnlistened.toDto(): FeedMotifDto {
         return FeedMotifDto(
             id = id.toInt(),
+            liked = liked,
             listened = listened,
             isrc = spotifyTrackId,
             offset = offset,
@@ -66,6 +67,7 @@ class FeedLocalDataSourceImpl(
             spotifyTrackId = isrc,
             offset = offset,
             createdAt = createdAt,
+            liked = liked,
             listened = listened,
             creatorId = creatorId
         )

@@ -48,8 +48,8 @@ dependencies {
 
 /*
 Update schema:
-./gradlew backend:downloadApolloSchema --endpoint='http://localhost:8080/graphql' --schema=backend/src/commonMain/graphql/de.julianostarek.motif.client/schema.graphqls
-./gradlew backend:generateApolloSources
+./gradlew client:downloadApolloSchema --endpoint='https://motif.julianostarek.de/graphql' --schema=client/src/commonMain/graphql/de/julianostarek/motif/client/schema.graphqls
+./gradlew client:generateApolloSources
  */
 
 apollo {

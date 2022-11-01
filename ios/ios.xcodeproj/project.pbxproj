@@ -18,6 +18,12 @@
 		B91623F328E9AD7D00CD5D4A /* LoginViewModelShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91623F228E9AD7D00CD5D4A /* LoginViewModelShim.swift */; };
 		B91623F528E9ADB300CD5D4A /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91623F428E9ADB300CD5D4A /* LoginView.swift */; };
 		B91623F728E9AE4500CD5D4A /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91623F628E9AE4500CD5D4A /* MainView.swift */; };
+		B9172E5729113B22007E433D /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9172E5629113B22007E433D /* ProfileView.swift */; };
+		B9172E5929113CCF007E433D /* ProfileViewModelShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9172E5829113CCF007E433D /* ProfileViewModelShim.swift */; };
+		B9172E5B2911796B007E433D /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9172E5A2911796B007E433D /* ProfileEditView.swift */; };
+		B9172E5D29117980007E433D /* ProfileEditViewModelShim.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9172E5C29117980007E433D /* ProfileEditViewModelShim.swift */; };
+		B9172E6029118F8A007E433D /* SwiftUIPullToRefresh in Frameworks */ = {isa = PBXBuildFile; productRef = B9172E5F29118F8A007E433D /* SwiftUIPullToRefresh */; };
+		B9172E622911AB8A007E433D /* WithinThemeGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9172E612911AB8A007E433D /* WithinThemeGradient.swift */; };
 		B91761D528E9026C00731A4D /* KMPNativeCoroutinesAsync in Frameworks */ = {isa = PBXBuildFile; productRef = B91761D428E9026C00731A4D /* KMPNativeCoroutinesAsync */; };
 		B91761D728E9026C00731A4D /* KMPNativeCoroutinesCombine in Frameworks */ = {isa = PBXBuildFile; productRef = B91761D628E9026C00731A4D /* KMPNativeCoroutinesCombine */; };
 		B91761D928E9026C00731A4D /* KMPNativeCoroutinesCore in Frameworks */ = {isa = PBXBuildFile; productRef = B91761D828E9026C00731A4D /* KMPNativeCoroutinesCore */; };
@@ -48,6 +54,11 @@
 		B91623F228E9AD7D00CD5D4A /* LoginViewModelShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModelShim.swift; sourceTree = "<group>"; };
 		B91623F428E9ADB300CD5D4A /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		B91623F628E9AE4500CD5D4A /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		B9172E5629113B22007E433D /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		B9172E5829113CCF007E433D /* ProfileViewModelShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModelShim.swift; sourceTree = "<group>"; };
+		B9172E5A2911796B007E433D /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
+		B9172E5C29117980007E433D /* ProfileEditViewModelShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModelShim.swift; sourceTree = "<group>"; };
+		B9172E612911AB8A007E433D /* WithinThemeGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithinThemeGradient.swift; sourceTree = "<group>"; };
 		B91761DA28E9028900731A4D /* PlayerViewModelShim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModelShim.swift; sourceTree = "<group>"; };
 		B941005B28E92CC8000E0372 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		B97E745F289FF35F008D88C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,6 +82,7 @@
 				B91761D528E9026C00731A4D /* KMPNativeCoroutinesAsync in Frameworks */,
 				B91761D928E9026C00731A4D /* KMPNativeCoroutinesCore in Frameworks */,
 				2D247014317E9F0C62A97608 /* Pods_ios.framework in Frameworks */,
+				B9172E6029118F8A007E433D /* SwiftUIPullToRefresh in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +127,7 @@
 		7555FF7D242A565900829871 /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				B9172E5529113B13007E433D /* Profile */,
 				B9F2F9062909E8E900D2C223 /* ProfileSearch */,
 				B91623F128E9AD7000CD5D4A /* Login */,
 				B91623EA28E99FC100CD5D4A /* Feed */,
@@ -127,6 +140,7 @@
 				B97E745F289FF35F008D88C2 /* AppDelegate.swift */,
 				B91623F628E9AE4500CD5D4A /* MainView.swift */,
 				B9F2F9042909E86400D2C223 /* FeedOrProfileSearchView.swift */,
+				B9172E612911AB8A007E433D /* WithinThemeGradient.swift */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -169,6 +183,17 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
+		B9172E5529113B13007E433D /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				B9172E5629113B22007E433D /* ProfileView.swift */,
+				B9172E5829113CCF007E433D /* ProfileViewModelShim.swift */,
+				B9172E5A2911796B007E433D /* ProfileEditView.swift */,
+				B9172E5C29117980007E433D /* ProfileEditViewModelShim.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		B9F2F9062909E8E900D2C223 /* ProfileSearch */ = {
 			isa = PBXGroup;
 			children = (
@@ -201,6 +226,7 @@
 				B91761D628E9026C00731A4D /* KMPNativeCoroutinesCombine */,
 				B91761D828E9026C00731A4D /* KMPNativeCoroutinesCore */,
 				B9F2F8FC2909BE7A00D2C223 /* Introspect */,
+				B9172E5F29118F8A007E433D /* SwiftUIPullToRefresh */,
 			);
 			productName = ios;
 			productReference = 7555FF7B242A565900829871 /* ios.app */;
@@ -233,6 +259,7 @@
 			packageReferences = (
 				B91761D328E9026C00731A4D /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */,
 				B9F2F8FB2909BE7A00D2C223 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				B9172E5E29118F8A007E433D /* XCRemoteSwiftPackageReference "swiftui-pull-to-refresh" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -285,18 +312,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B9172E622911AB8A007E433D /* WithinThemeGradient.swift in Sources */,
 				B97E7460289FF35F008D88C2 /* AppDelegate.swift in Sources */,
+				B9172E5D29117980007E433D /* ProfileEditViewModelShim.swift in Sources */,
 				B9F2F9052909E86400D2C223 /* FeedOrProfileSearchView.swift in Sources */,
 				B91623F328E9AD7D00CD5D4A /* LoginViewModelShim.swift in Sources */,
 				B91623EE28E9A24200CD5D4A /* FeedView.swift in Sources */,
 				B91623F728E9AE4500CD5D4A /* MainView.swift in Sources */,
 				B91623F528E9ADB300CD5D4A /* LoginView.swift in Sources */,
 				B9F2F9012909E5D000D2C223 /* FeedProfile.swift in Sources */,
+				B9172E5929113CCF007E433D /* ProfileViewModelShim.swift in Sources */,
 				B9F2F9032909E60C00D2C223 /* ProfileSearchViewModelShim.swift in Sources */,
 				B9F2F90A2909F12A00D2C223 /* ProfileSearchProfile.swift in Sources */,
+				B9172E5729113B22007E433D /* ProfileView.swift in Sources */,
 				B91623F028E9A24E00CD5D4A /* PlayerView.swift in Sources */,
 				B9F2F8FF2909D97300D2C223 /* PlayerChooser.swift in Sources */,
 				B91623EC28E99FEC00CD5D4A /* FeedViewModelShim.swift in Sources */,
+				B9172E5B2911796B007E433D /* ProfileEditView.swift in Sources */,
 				B9F2F9082909E8FA00D2C223 /* ProfileSearchView.swift in Sources */,
 				B91761DB28E9028900731A4D /* PlayerViewModelShim.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
@@ -430,6 +462,7 @@
 			baseConfigurationReference = E2D5CFA5C15AA5B324F25A6D /* Pods-ios.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"ios/Preview Content\"";
@@ -446,6 +479,7 @@
 					"\"${PODS_ROOT}/../../pod\"",
 				);
 				INFOPLIST_FILE = ios/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -471,6 +505,7 @@
 			baseConfigurationReference = A176F8F676196AEACABC79D0 /* Pods-ios.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"ios/Preview Content\"";
@@ -487,6 +522,7 @@
 					"\"${PODS_ROOT}/../../pod\"",
 				);
 				INFOPLIST_FILE = ios/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -531,6 +567,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B9172E5E29118F8A007E433D /* XCRemoteSwiftPackageReference "swiftui-pull-to-refresh" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/globulus/swiftui-pull-to-refresh";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		B91761D328E9026C00731A4D /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rickclephas/KMP-NativeCoroutines";
@@ -550,6 +594,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B9172E5F29118F8A007E433D /* SwiftUIPullToRefresh */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B9172E5E29118F8A007E433D /* XCRemoteSwiftPackageReference "swiftui-pull-to-refresh" */;
+			productName = SwiftUIPullToRefresh;
+		};
 		B91761D428E9026C00731A4D /* KMPNativeCoroutinesAsync */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B91761D328E9026C00731A4D /* XCRemoteSwiftPackageReference "KMP-NativeCoroutines" */;
