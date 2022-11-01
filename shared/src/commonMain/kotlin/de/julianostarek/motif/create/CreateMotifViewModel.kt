@@ -1,4 +1,4 @@
-package de.julianostarek.motif.createmotif
+package de.julianostarek.motif.create
 
 import de.julianostarek.motif.SharedViewModel
 import org.koin.core.component.KoinComponent

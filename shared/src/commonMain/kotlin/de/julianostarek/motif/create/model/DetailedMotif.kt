@@ -1,4 +1,4 @@
-package de.julianostarek.motif.createmotif.model
+package de.julianostarek.motif.create.model
 
 data class DetailedMotif(
     val id: Long,

@@ -18,24 +18,28 @@ struct FeedView: View {
     @ObservedObject var playerViewModel: PlayerViewModelShim
     @StateObject var viewModel: FeedViewModelShim = FeedViewModelShim()
 
-    private let columns: [GridItem] = [
-        .init(.flexible(minimum: 72, maximum: .infinity), spacing: 8, alignment: .trailing),
-        .init(.fixed(72), spacing: 8),
-        .init(.fixed(72), spacing: 8),
-        .init(.fixed(72), spacing: 8),
-        .init(.flexible(minimum: 72, maximum: .infinity), spacing: 8, alignment: .leading),
-    ]
-
     var body: some View {
         ScrollView([.horizontal, .vertical]) {
             if let data = viewModel.feedState as? Shared.FeedState.Data {
+                let grid = data.profilesGrid
+                let gridSize = Int(grid.size)
+                let columns = [GridItem](
+                    repeating: GridItem(.fixed(72), spacing: 8),
+                    count: gridSize
+                )
                 LazyVGrid(columns: columns, alignment: .center) {
-                    ForEach(Array(viewModel.feedState.motifGroupsOrEmpty.enumerated()), id: \.element.profile.id_) { index, element in
-                        FeedProfile(profileWithMotifs: element)
-                            .onTapGesture {
-                                playerViewModel.shared.play(motif: element.motifs[0])
+                    ForEach(Array(viewModel.feedState.gridOrEmpty.enumerated()), id: \.element?.profile.id_) { index, element in
+                        if let profile = element {
+                            NavigationLink(destination: PlayerView(
+                                viewModel: playerViewModel,
+                                profile: profile
+                            )) {
+                                FeedProfile(profileWithMotifs: profile)
                             }
-                            .offset(x: index / 5 % 2 == 0 ? -18 : 18)
+                                .offset(x: (index / gridSize) % 2 == 0 ? 40 : 0)
+                        } else {
+                            EmptyView()
+                        }
                     }
                 }
             } else {
@@ -56,10 +60,10 @@ struct FeedView: View {
 }
 
 extension Shared.FeedState {
-    var motifGroupsOrEmpty: [Shared.ProfileWithMotifs] {
+    var gridOrEmpty: [Shared.ProfileWithMotifs?] {
         get {
             if let data = self as? Shared.FeedState.Data {
-                return data.motifGroups
+                return data.profilesGrid.grid as! [Shared.ProfileWithMotifs?]
             }
             return []
         }

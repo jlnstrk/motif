@@ -24,14 +24,14 @@ class PlayerViewModelShim: ObservableObject {
     func authorizeFromUrl(url: URL) {
         shared.playerNegotiation.spotifyConnector.authorizeFromUrl(url: url)
     }
-
-    func dump() {
+    
+    init() {
         createPublisher(for: shared.frontendStateNative)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)
             .assign(to: \.frontendState, on: self)
             .store(in: &cancellables)
-
+        
         createPublisher(for: shared.frontendStateNative)
             .assertNoFailure()
             .map { ($0 as? Shared.FrontendState.ConnectedPlayback)?.track }
@@ -39,10 +39,9 @@ class PlayerViewModelShim: ObservableObject {
             .debounce(for: 0.25, scheduler: RunLoop.main, options: nil)
             .sink { [weak self] track in
                 if let track = track {
-
-                    /*self?.shared.playerOrNull().platform.trackImage(track: track, size: 256) { [weak self] (image, error) in
+                    self?.shared.playerOrNull()?.platform.trackImage(track: track, size: 256) { [weak self] (image, error) in
                         self?.trackImage = image
-                    }*/
+                    }
                 }
             }
             .store(in: &cancellables)

@@ -1,4 +1,4 @@
-package de.julianostarek.motif.createmotif
+package de.julianostarek.motif.create
 
 import org.koin.core.annotation.Single
 

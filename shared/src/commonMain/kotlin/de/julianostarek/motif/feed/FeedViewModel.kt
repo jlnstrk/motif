@@ -1,6 +1,7 @@
 package de.julianostarek.motif.feed
 
 import de.julianostarek.motif.SharedViewModel
+import de.julianostarek.motif.feed.domain.ProfileWithMotifs
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,8 +28,11 @@ open class FeedViewModel : SharedViewModel(), KoinComponent {
         feedJob = viewModelScope.launch {
             repository.myFeed()
                 .onStart { _state.value = FeedState.Loading }
-                .collect {
-                    _state.value = FeedState.Data(it)
+                .collect { profiles ->
+                    _state.value = FeedState.Data(
+                        profilesGrid = profiles.sortedByDescending { it.motifs.first().createdAt }
+                            .toSpiralHexagon()
+                    )
                 }
         }
     }

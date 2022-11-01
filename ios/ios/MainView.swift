@@ -27,7 +27,7 @@ struct MainView: View {
                 Text("Feed")
             }
             NavigationView {
-                PlayerView(viewModel: playerViewModel)
+                EmptyView() // PlayerView(viewModel: playerViewModel)
             }
             .tabItem {
                 Image(systemName: "music.note")

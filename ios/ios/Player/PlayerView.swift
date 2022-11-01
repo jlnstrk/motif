@@ -14,6 +14,7 @@ import Introspect
 struct PlayerView: View {
     @ObservedObject var viewModel: PlayerViewModelShim
     @State var isSelectingPlayer: Bool = false
+    let profile: ProfileWithMotifs
     
     var body: some View {
         ZStack {
@@ -28,6 +29,8 @@ struct PlayerView: View {
                     .id(trackImage)
                     .overlay(Color.black.opacity(0.5))
                     .blur(radius: 20)
+                    .padding(.horizontal)
+                    .frame(maxWidth: .infinity)
             }
             VStack(alignment: HorizontalAlignment.center) {
                 if let trackImage = viewModel.trackImage {
@@ -71,7 +74,7 @@ struct PlayerView: View {
             viewModel.authorizeFromUrl(url: $0)
         })
         .onAppear {
-            viewModel.dump()
+            viewModel.shared.play(motif: profile.motifs[0])
         }
     }
 }
