@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use async_graphql::dataloader::DataLoader;
 use async_graphql::futures_util::Stream;
 use async_graphql::*;
 use fred::prelude::RedisValue;
@@ -13,6 +14,7 @@ use crate::domain::profile::pubsub::{topic_profile_followed, topic_profile_updat
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
 use crate::domain::{collection, motif};
 use crate::gql::auth::Authenticated;
+use crate::gql::dataloader::ProfileFollowingLoader;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -27,6 +29,15 @@ impl Profile {
     async fn followers_count(&self, ctx: &Context<'_>) -> Result<i64> {
         datasource::get_followers_count(ctx.require(), self.id)
             .await
+            .coerce_gql_err()
+    }
+
+    async fn follows(&self, ctx: &Context<'_>) -> Result<bool> {
+        let loader: &DataLoader<ProfileFollowingLoader> = ctx.require();
+        loader
+            .load_one(self.id)
+            .await
+            .map(|opt| opt.unwrap_or(false))
             .coerce_gql_err()
     }
 

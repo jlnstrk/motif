@@ -1,4 +1,6 @@
-use crate::gql::dataloader::MotifListenedLoader;
+use crate::gql::dataloader::{
+    CommentLikedLoader, MotifLikedLoader, MotifListenedLoader, ProfileFollowingLoader,
+};
 use async_graphql::dataloader::DataLoader;
 use async_graphql::{Schema, SchemaBuilder};
 use axum::http::Request;
@@ -81,11 +83,33 @@ fn add_data_loaders(
     db: DatabaseConnection,
     claims: AuthClaims,
 ) -> SchemaBuilder<Query, Mutation, Subscription> {
-    builder.data(DataLoader::new(
-        MotifListenedLoader {
-            db,
-            profile_id: claims.id,
-        },
-        tokio::spawn,
-    ))
+    builder
+        .data(DataLoader::new(
+            MotifListenedLoader {
+                db: db.clone(),
+                profile_id: claims.id,
+            },
+            tokio::spawn,
+        ))
+        .data(DataLoader::new(
+            MotifLikedLoader {
+                db: db.clone(),
+                profile_id: claims.id,
+            },
+            tokio::spawn,
+        ))
+        .data(DataLoader::new(
+            CommentLikedLoader {
+                db: db.clone(),
+                profile_id: claims.id,
+            },
+            tokio::spawn,
+        ))
+        .data(DataLoader::new(
+            ProfileFollowingLoader {
+                db,
+                profile_id: claims.id,
+            },
+            tokio::spawn,
+        ))
 }

@@ -2,6 +2,7 @@
 
 use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object};
+use async_graphql::dataloader::DataLoader;
 use fred::prelude::RedisValue;
 
 use crate::domain::comment::datasource;
@@ -11,6 +12,7 @@ use crate::domain::motif::typedef::Motif;
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{like, motif, profile};
 use crate::gql::auth::Authenticated;
+use crate::gql::dataloader::{CommentLikedLoader};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -46,6 +48,15 @@ impl Comment {
         } else {
             Ok(None)
         }
+    }
+
+    async fn liked(&self, ctx: &Context<'_>) -> Result<bool> {
+        let loader: &DataLoader<CommentLikedLoader> = ctx.require();
+        loader
+            .load_one(self.id)
+            .await
+            .map(|opt| opt.unwrap_or(false))
+            .coerce_gql_err()
     }
 
     async fn likes_count(&self, ctx: &Context<'_>) -> Result<i32> {

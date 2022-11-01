@@ -18,7 +18,7 @@ use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{comment, like, profile};
 use crate::gql::auth::Authenticated;
-use crate::gql::dataloader::MotifListenedLoader;
+use crate::gql::dataloader::{MotifLikedLoader, MotifListenedLoader};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -66,6 +66,15 @@ impl Motif {
     async fn comments(&self, ctx: &Context<'_>) -> Result<Vec<Comment>> {
         comment::datasource::get_motif_comments_by_id(ctx.require(), self.id)
             .await
+            .coerce_gql_err()
+    }
+
+    async fn liked(&self, ctx: &Context<'_>) -> Result<bool> {
+        let loader: &DataLoader<MotifLikedLoader> = ctx.require();
+        loader
+            .load_one(self.id)
+            .await
+            .map(|opt| opt.unwrap_or(false))
             .coerce_gql_err()
     }
 

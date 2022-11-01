@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use sea_orm::sea_query::{OnConflict, SimpleExpr};
 use sea_orm::ActiveValue::{Set, Unchanged};
 use sea_orm::IdenStatic;
@@ -6,7 +5,7 @@ use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DeriveColumn, EntityTrait,
     EnumIter, IntoActiveValue, Linked, NotSet, PaginatorTrait, QueryFilter, QuerySelect,
 };
-use std::arch::asm;
+use std::collections::HashSet;
 use uuid::Uuid;
 
 use entity::profile_follows::Entity as ProfileFollowEntity;
@@ -15,7 +14,7 @@ use entity::profiles_links::{ProfileFollowToFollower, ProfileFollowToFollowing};
 use entity::{profile_follows, profiles};
 
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
-use crate::rest::util::{ApiResult, DataError};
+use crate::rest::util::{ApiError, ApiResult, DataError};
 
 impl From<ProfileModel> for Profile {
     fn from(model: ProfileModel) -> Self {
@@ -195,4 +194,27 @@ pub async fn is_username_available(db: &DatabaseConnection, username: String) ->
         .count(db)
         .await?;
     Ok(count == 0)
+}
+
+pub async fn is_following_all(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    other_profile_ids: &[Uuid],
+) -> Result<HashSet<Uuid>, ApiError> {
+    #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
+    enum QueryAs {
+        FollowedId,
+    }
+    let ids: Vec<Uuid> = ProfileFollowEntity::find()
+        .select_only()
+        .column_as(profile_follows::Column::FollowedId, QueryAs::FollowedId)
+        .filter(
+            Condition::all()
+                .add(profile_follows::Column::FollowerId.eq(profile_id))
+                .add(profile_follows::Column::FollowedId.is_in(other_profile_ids.to_vec())),
+        )
+        .into_values::<_, QueryAs>()
+        .all(db)
+        .await?;
+    Ok(ids.into_iter().collect())
 }

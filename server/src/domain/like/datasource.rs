@@ -1,8 +1,9 @@
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, ModelTrait,
-    PaginatorTrait, QueryFilter, QuerySelect,
+    ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, DeriveColumn, EntityTrait,
+    EnumIter, ModelTrait, PaginatorTrait, QueryFilter, QuerySelect,
 };
+use std::collections::HashSet;
 use uuid::Uuid;
 
 use entity::comment_likes;
@@ -12,6 +13,8 @@ use entity::motif_likes::{Entity as MotifLikeEntity, Model as MotifLikeModel};
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
 
 use crate::domain::profile::typedef::Profile;
+use crate::rest::util::ApiError;
+use sea_orm::IdenStatic;
 
 pub async fn get_motif_likes_count(db: &DatabaseConnection, motif_id: i32) -> Result<i32, DbErr> {
     MotifLikeEntity::find()
@@ -173,4 +176,50 @@ pub async fn unlike_comment(
     } else {
         Ok(false)
     }
+}
+
+pub async fn has_liked_motif_all(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    motif_ids: &[i32],
+) -> Result<HashSet<i32>, ApiError> {
+    #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
+    enum QueryAs {
+        MotifId,
+    }
+    let ids: Vec<i32> = MotifLikeEntity::find()
+        .select_only()
+        .column_as(motif_likes::Column::MotifId, QueryAs::MotifId)
+        .filter(
+            Condition::all()
+                .add(motif_likes::Column::LikerId.eq(profile_id))
+                .add(motif_likes::Column::MotifId.is_in(motif_ids.to_vec())),
+        )
+        .into_values::<_, QueryAs>()
+        .all(db)
+        .await?;
+    Ok(ids.into_iter().collect())
+}
+
+pub async fn has_liked_comment_all(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    comment_ids: &[i32],
+) -> Result<HashSet<i32>, ApiError> {
+    #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
+    enum QueryAs {
+        CommentId,
+    }
+    let ids: Vec<i32> = CommentLikeEntity::find()
+        .select_only()
+        .column_as(comment_likes::Column::CommentId, QueryAs::CommentId)
+        .filter(
+            Condition::all()
+                .add(comment_likes::Column::LikerId.eq(profile_id))
+                .add(comment_likes::Column::CommentId.is_in(comment_ids.to_vec())),
+        )
+        .into_values::<_, QueryAs>()
+        .all(db)
+        .await?;
+    Ok(ids.into_iter().collect())
 }
