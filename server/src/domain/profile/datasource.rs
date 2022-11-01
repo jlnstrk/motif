@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use sea_orm::sea_query::{OnConflict, SimpleExpr};
 use sea_orm::ActiveValue::{Set, Unchanged};
 use sea_orm::IdenStatic;
@@ -5,6 +6,7 @@ use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DeriveColumn, EntityTrait,
     EnumIter, IntoActiveValue, Linked, NotSet, PaginatorTrait, QueryFilter, QuerySelect,
 };
+use std::arch::asm;
 use uuid::Uuid;
 
 use entity::profile_follows::Entity as ProfileFollowEntity;
@@ -185,4 +187,12 @@ pub async fn unfollow(
     };
     model.delete(db).await?;
     Ok(true)
+}
+
+pub async fn is_username_available(db: &DatabaseConnection, username: String) -> ApiResult<bool> {
+    let count = ProfileEntity::find()
+        .filter(profiles::Column::Username.eq(username))
+        .count(db)
+        .await?;
+    Ok(count == 0)
 }

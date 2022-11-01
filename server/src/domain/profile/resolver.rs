@@ -89,6 +89,16 @@ impl ProfileQuery {
             .await
             .coerce_gql_err()
     }
+
+    async fn profile_is_username_available(
+        &self,
+        ctx: &Context<'_>,
+        username: String,
+    ) -> Result<bool> {
+        datasource::is_username_available(ctx.require(), username)
+            .await
+            .coerce_gql_err()
+    }
 }
 
 #[derive(Default)]
