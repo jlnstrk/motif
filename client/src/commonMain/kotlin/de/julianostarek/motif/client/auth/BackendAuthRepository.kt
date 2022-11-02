@@ -72,10 +72,8 @@ class BackendAuthRepository(
 
     suspend fun refreshAuth() {
         auth?.let {
-            if (it.appToken.isValid()) {
-                auth = authClient.refreshAppAuth(it.appToken)
-                auth?.let { newAuth -> authStore.persistAuth(newAuth) }
-            }
+            auth = authClient.refreshAppAuth(it.appToken)
+            auth?.let { newAuth -> authStore.persistAuth(newAuth) }
         }
     }
 }
