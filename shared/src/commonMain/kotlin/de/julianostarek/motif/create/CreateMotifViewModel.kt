@@ -18,7 +18,10 @@ package de.julianostarek.motif.create
 
 import de.julianostarek.motif.SharedViewModel
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class CreateMotifViewModel : SharedViewModel(), KoinComponent {
+    private val repository: CreateMotifRepository by inject()
+
 
 }

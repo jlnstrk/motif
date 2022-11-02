@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.profile
+package de.julianostarek.motif.datasource
 
-import com.apollographql.apollo3.api.Optional
 import de.julianostarek.motif.client.*
-import de.julianostarek.motif.client.type.ProfileUpdate
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.profileedit.ProfileEdit
+import de.julianostarek.motif.util.toDetail
+import de.julianostarek.motif.util.toSimple
+import de.julianostarek.motif.util.toUpdate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -34,12 +35,12 @@ class ProfileRemoteDataSourceImpl(
     override fun myProfile(): Flow<Profile.Detail> {
         return flow {
             val initial = backendClient.apollo.query(ProfileMeQuery())
-                .execute().dataAssertNoErrors.profileMe.toProfile()
+                .execute().dataAssertNoErrors.profileMe.toDetail()
             emit(initial)
 
             val updates = backendClient.apollo.subscription(ProfileMeUpdatedSubscription())
                 .toFlow()
-                .map { response -> response.dataAssertNoErrors.profileMe.toProfile() }
+                .map { response -> response.dataAssertNoErrors.profileMe.toDetail() }
             emitAll(updates)
         }
     }
@@ -47,11 +48,11 @@ class ProfileRemoteDataSourceImpl(
     override fun profile(id: String): Flow<Profile.Detail?> {
         return backendClient.apollo.query(ProfileByIdQuery(id))
             .toFlow()
-            .map { response -> response.dataAssertNoErrors.profileById?.toProfile() }
+            .map { response -> response.dataAssertNoErrors.profileById?.toDetail() }
     }
 
     override suspend fun isUsernameAvailable(username: String): Boolean {
-        return backendClient.apollo.query(IsUsernameAvailableQuery(username))
+        return backendClient.apollo.query(ProfileIsUsernameAvailableQuery(username))
             .execute().dataAssertNoErrors.profileIsUsernameAvailable
     }
 
@@ -71,51 +72,11 @@ class ProfileRemoteDataSourceImpl(
             .execute().dataAssertNoErrors.profileUnfollowById
     }
 
-    private fun ProfileMeUpdatedSubscription.ProfileMe.toProfile(): Profile.Detail {
-        return Profile.Detail(
-            displayName = displayName,
-            id = id,
-            username = username,
-            photoUrl = photoUrl,
-            biography = biography,
-            follows = false,
-            followersCount = followersCount,
-            followingCount = followingCount
-        )
-    }
-
-    private fun ProfileMeQuery.ProfileMe.toProfile(): Profile.Detail {
-        return Profile.Detail(
-            displayName = displayName,
-            id = id,
-            username = username,
-            photoUrl = photoUrl,
-            biography = biography,
-            follows = false,
-            followersCount = followersCount,
-            followingCount = followingCount
-        )
-    }
-
-    private fun ProfileByIdQuery.ProfileById.toProfile(): Profile.Detail {
-        return Profile.Detail(
-            displayName = displayName,
-            id = id,
-            username = username,
-            photoUrl = photoUrl,
-            biography = biography,
-            follows = follows,
-            followersCount = followersCount,
-            followingCount = followingCount
-        )
-    }
-
-    private fun ProfileEdit.toUpdate(): ProfileUpdate {
-        return ProfileUpdate(
-            displayName = Optional.presentIfNotNull(displayName),
-            username = Optional.presentIfNotNull(username),
-            photoUrl = Optional.absent(),
-            biography = Optional.presentIfNotNull(biography)
-        )
+    override suspend fun searchProfiles(query: String): List<Profile> {
+        return backendClient.apollo.query(ProfileSearchQuery(query))
+            .execute()
+            .dataAssertNoErrors
+            .profileSearch
+            .map { profile -> profile.toSimple() }
     }
 }

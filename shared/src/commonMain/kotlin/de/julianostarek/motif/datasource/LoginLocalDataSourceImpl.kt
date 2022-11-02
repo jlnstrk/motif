@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.login.datasource
+package de.julianostarek.motif.datasource
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
@@ -34,10 +34,10 @@ import org.koin.core.annotation.Single
 
 @OptIn(ExperimentalSettingsApi::class, ExperimentalCoroutinesApi::class)
 @Single
-class LoginSettingsDataSourceImpl(
+class LoginLocalDataSourceImpl(
     @Named("LoginSettings")
     private val loginSettings: ObservableSettings,
-) : LoginSettingsDataSource {
+) : LoginLocalDataSource {
     override val authChanged: Flow<BackendAuth?> = loginSettings.serializableFlow(SETTINGS_KEY_AUTH)
 
     override suspend fun getAuth(): BackendAuth? {

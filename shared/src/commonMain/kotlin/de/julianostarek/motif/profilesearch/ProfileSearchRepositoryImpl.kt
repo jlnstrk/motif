@@ -16,25 +16,32 @@
 
 package de.julianostarek.motif.profilesearch
 
-import de.julianostarek.motif.dto.ProfileDto
+import de.julianostarek.motif.datasource.ProfileLocalDataSource
+import de.julianostarek.motif.datasource.ProfileRemoteDataSource
 import de.julianostarek.motif.domain.Profile
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import org.koin.core.annotation.Single
 
 @Single
 class ProfileSearchRepositoryImpl(
-    private val remoteDataSource: ProfileSearchRemoteDataSource
+    private val remote: ProfileRemoteDataSource,
+    private val local: ProfileLocalDataSource,
 ) : ProfileSearchRepository {
-    override suspend fun searchProfiles(query: String): List<Profile> {
-        return remoteDataSource.searchProfiles(query)
-            .map { dto -> dto.toDomain() }
-    }
-
-    private fun ProfileDto.toDomain(): Profile.Simple {
-        return Profile.Simple(
-            displayName = displayName,
-            id = id,
-            photoUrl = photoUrl,
-            username = username,
-        )
+    override suspend fun searchProfiles(query: String): Flow<List<Profile>> {
+        val localFetch = flow {
+            emit(emptyList())
+            emit(local.searchProfiles(query))
+        }
+        val remoteFetch = flow {
+            emit(emptyList())
+            emit(remote.searchProfiles(query))
+        }
+        return combine(localFetch, remoteFetch) { local, remote ->
+            (remote + local)
+                .distinctBy { it.id }
+                .sortedBy { it.displayName }
+        }
     }
 }

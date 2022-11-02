@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.dto
+package de.julianostarek.motif.datasource
 
-import kotlinx.datetime.Instant
+import de.julianostarek.motif.dto.MotifCreateDto
+import de.julianostarek.motif.domain.Motif
+import kotlinx.coroutines.flow.Flow
 
-data class FeedMotifDto(
-    val id: Int,
-    val liked: Boolean,
-    val listened: Boolean,
-    val isrc: String,
-    val offset: Int,
-    val createdAt: Instant,
-    val creatorId: String,
-    val creatorUsername: String,
-    val creatorDisplayName: String,
-    val creatorPhotoUrl: String?
-)
+interface MotifRemoteDataSource : MotifDataSource {
+    fun motifCreated(): Flow<Motif.Simple>
+    fun motifDeleted(): Flow<Int>
+
+    suspend fun createMotif(dto: MotifCreateDto): Motif.Detail
+}

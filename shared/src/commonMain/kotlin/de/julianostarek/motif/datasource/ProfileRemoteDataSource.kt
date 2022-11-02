@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.profilesearch
+package de.julianostarek.motif.datasource
 
-import de.julianostarek.motif.dto.ProfileDto
+import de.julianostarek.motif.domain.Profile
+import de.julianostarek.motif.profileedit.ProfileEdit
+import kotlinx.coroutines.flow.Flow
 
+interface ProfileRemoteDataSource {
+    fun myProfile(): Flow<Profile.Detail>
 
-interface ProfileSearchRemoteDataSource {
-    suspend fun searchProfiles(query: String): List<ProfileDto>
+    fun profile(id: String): Flow<Profile.Detail?>
+
+    suspend fun isUsernameAvailable(username: String): Boolean
+
+    suspend fun updateMyProfile(edit: ProfileEdit): Boolean
+
+    suspend fun followProfile(id: String): Boolean
+
+    suspend fun unfollowProfile(id: String): Boolean
+
+    suspend fun searchProfiles(query: String): List<Profile>
 }

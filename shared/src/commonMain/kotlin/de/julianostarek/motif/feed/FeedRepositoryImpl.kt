@@ -16,10 +16,8 @@
 
 package de.julianostarek.motif.feed
 
-import de.julianostarek.motif.feed.datasource.FeedLocalDataSource
-import de.julianostarek.motif.feed.datasource.FeedRemoteDataSource
-import de.julianostarek.motif.domain.Profile
-import de.julianostarek.motif.domain.Motif
+import de.julianostarek.motif.datasource.MotifLocalDataSource
+import de.julianostarek.motif.datasource.MotifRemoteDataSource
 import de.julianostarek.motif.domain.ProfileWithMotifs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -30,8 +28,8 @@ import org.koin.core.annotation.Single
 
 @Single
 class FeedRepositoryImpl(
-    private val local: FeedLocalDataSource,
-    private val remote: FeedRemoteDataSource,
+    private val local: MotifLocalDataSource,
+    private val remote: MotifRemoteDataSource,
     @InjectedParam private val clientScope: CoroutineScope
 ) : FeedRepository {
     private val listeners = MutableStateFlow(0)
@@ -45,12 +43,12 @@ class FeedRepositoryImpl(
                 if (listeners >= 1 && currentJob?.isActive != true) {
                     currentJob = launch {
                         launch {
-                            remote.motifCreated.collect { data ->
-                                local.insertMotif(data)
+                            remote.motifCreated().collect { data ->
+                                local.saveMotif(data)
                             }
                         }
                         launch {
-                            remote.motifDeleted.collect { data ->
+                            remote.motifDeleted().collect { data ->
                                 local.deleteMotif(data)
                             }
                         }
@@ -71,34 +69,20 @@ class FeedRepositoryImpl(
             .onStart {
                 clientScope.launch {
                     remote.motifsFeed().collect {
-                        local.dumpMotifsFeed(it)
+                        local.saveMyFeed(it)
                     }
                 }
                 addListener()
             }
             .onCompletion { removeListener() }
-            .map { dtos ->
-                dtos.groupBy { it.creatorId }
+            .map { motifs ->
+                motifs.groupBy { it.creator.id }
                     .map { group ->
                         val first = group.value.first()
-                        val creator = Profile.Simple(
-                            id = first.creatorId,
-                            username = first.creatorUsername,
-                            displayName = first.creatorDisplayName,
-                            photoUrl = first.creatorPhotoUrl
-                        )
+                        val creator = first.creator
                         ProfileWithMotifs(
                             profile = creator,
-                            motifs = group.value.map {
-                                Motif.Simple(
-                                    id = it.id,
-                                    isrc = it.isrc,
-                                    offset = it.offset,
-                                    listened = it.listened,
-                                    createdAt = it.createdAt,
-                                    creator = creator
-                                )
-                            }
+                            motifs = group.value
                         )
                     }
             }

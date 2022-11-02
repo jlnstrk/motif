@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.create.datasource
+package de.julianostarek.motif.domain
 
-import de.julianostarek.motif.client.BackendClient
-import org.koin.core.annotation.Single
+import de.julianostarek.motif.domain.Motif
+import de.julianostarek.motif.domain.Profile
+import kotlinx.datetime.Instant
 
-@Single
-class RemoteMotifDataSource(
-    private val backend: BackendClient
-) {
-
-
-}
+data class MotifWithProfile(
+    val simple: Motif.Simple,
+    val profile: Profile.Simple,
+)

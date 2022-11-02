@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.login.datasource
+package de.julianostarek.motif.datasource
 
-import de.julianostarek.motif.client.auth.BackendAuth
-import kotlinx.coroutines.flow.Flow
+import de.julianostarek.motif.domain.Profile
 
-interface LoginSettingsDataSource {
-    val authChanged: Flow<BackendAuth?>
-    suspend fun getAuth(): BackendAuth?
-    suspend fun persistAuth(auth: BackendAuth?)
+interface ProfileLocalDataSource {
+    suspend fun searchProfiles(query: String): List<Profile.Simple>
+    suspend fun saveProfiles(profiles: List<Profile>)
 }

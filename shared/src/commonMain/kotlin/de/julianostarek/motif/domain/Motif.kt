@@ -22,6 +22,7 @@ sealed interface Motif {
     val id: Int
     val isrc: String
     val offset: Int
+    val liked: Boolean
     val listened: Boolean
     val createdAt: Instant
     val creator: Profile
@@ -30,6 +31,7 @@ sealed interface Motif {
         override val id: Int,
         override val isrc: String,
         override val offset: Int,
+        override val liked: Boolean,
         override val listened: Boolean,
         override val createdAt: Instant,
         override val creator: Profile
@@ -39,12 +41,12 @@ sealed interface Motif {
         override val id: Int,
         override val isrc: String,
         override val offset: Int,
+        override val liked: Boolean,
         override val listened: Boolean,
         override val createdAt: Instant,
         override val creator: Profile,
         val listenersCount: Int,
         val listeners: List<Profile>,
-        val liked: Boolean,
         val likesCount: Int,
         val likedBy: List<Profile>,
         val commentsCount: Int,

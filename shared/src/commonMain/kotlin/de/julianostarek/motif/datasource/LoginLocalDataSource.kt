@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.feed.datasource
+package de.julianostarek.motif.datasource
 
-import de.julianostarek.motif.dto.FeedMotifDto
+import de.julianostarek.motif.client.auth.BackendAuth
 import kotlinx.coroutines.flow.Flow
 
-interface FeedDataSource {
-    fun motifsFeed(): Flow<List<FeedMotifDto>>
+interface LoginLocalDataSource {
+    val authChanged: Flow<BackendAuth?>
+    suspend fun getAuth(): BackendAuth?
+    suspend fun persistAuth(auth: BackendAuth?)
 }

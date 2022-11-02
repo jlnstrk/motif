@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.profile
+package de.julianostarek.motif.datasource
 
-import de.julianostarek.motif.domain.Profile
-import de.julianostarek.motif.profileedit.ProfileEdit
-import kotlinx.coroutines.flow.Flow
+import de.julianostarek.motif.domain.Motif
 
-interface ProfileRemoteDataSource {
-    fun myProfile(): Flow<Profile.Detail>
-
-    fun profile(id: String): Flow<Profile.Detail?>
-
-    suspend fun isUsernameAvailable(username: String): Boolean
-
-    suspend fun updateMyProfile(edit: ProfileEdit): Boolean
-
-    suspend fun followProfile(id: String): Boolean
-
-    suspend fun unfollowProfile(id: String): Boolean
+interface MotifLocalDataSource : MotifDataSource {
+    suspend fun saveMyFeed(motifsFeed: List<Motif>)
+    suspend fun saveMotif(motif: Motif)
+    suspend fun deleteMotif(motifId: Int)
 }

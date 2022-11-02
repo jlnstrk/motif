@@ -17,14 +17,14 @@
 package de.julianostarek.motif.login
 
 import de.julianostarek.motif.client.auth.*
-import de.julianostarek.motif.login.datasource.LoginSettingsDataSource
+import de.julianostarek.motif.datasource.LoginLocalDataSource
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Single
 
 @Single
 class LoginRepositoryImpl(
     private val backendAuthClient: BackendAuthClient,
-    private val settings: LoginSettingsDataSource
+    private val settings: LoginLocalDataSource
 ) : LoginRepository, BackendAuthStore {
     override val auth: Flow<BackendAuth?>
         get() = settings.authChanged

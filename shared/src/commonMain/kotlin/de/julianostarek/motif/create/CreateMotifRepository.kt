@@ -16,10 +16,9 @@
 
 package de.julianostarek.motif.create
 
-import org.koin.core.annotation.Single
+import de.julianostarek.motif.dto.MotifCreateDto
+import de.julianostarek.motif.domain.Motif
 
-@Single
-class CreateMotifRepository(
-
-) {
+interface CreateMotifRepository {
+    suspend fun createMotif(dto: MotifCreateDto): Motif.Detail
 }

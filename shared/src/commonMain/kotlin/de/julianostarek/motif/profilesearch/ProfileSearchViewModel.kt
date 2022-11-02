@@ -32,23 +32,26 @@ class ProfileSearchViewModel : SharedViewModel(), KoinComponent {
 
     init {
         viewModelScope.launch {
-            query
-                .flatMapLatest<_, ProfileSearchState> { query ->
-                    if (!query.isNullOrEmpty()) {
-                        flow {
-                            emit(ProfileSearchState.Loading)
-                            // Debounce (since flatMap*Latest*)
-                            // Not using dedicated operator since we want to emit 'Loading' always
-                            delay(QUERY_DELAY_MS)
-                            val results = repository.searchProfiles(query)
-                            if (results.isEmpty()) {
-                                emit(ProfileSearchState.NoResults)
-                            } else {
-                                emit(ProfileSearchState.Results(results))
+            query.flatMapLatest<_, ProfileSearchState> { query ->
+                if (!query.isNullOrEmpty()) {
+                    flow {
+                        emit(ProfileSearchState.Loading)
+                        // Debounce (since flatMap*Latest*)
+                        // Not using dedicated operator since we want to emit 'Loading' always
+                        delay(QUERY_DELAY_MS)
+
+                        val results = repository.searchProfiles(query)
+                            .mapLatest { results ->
+                                if (results.isEmpty()) {
+                                    ProfileSearchState.NoResults
+                                } else {
+                                    ProfileSearchState.Results(results)
+                                }
                             }
-                        }
-                    } else flowOf(ProfileSearchState.NoQuery)
-                }
+                        emitAll(results)
+                    }
+                } else flowOf(ProfileSearchState.NoQuery)
+            }
                 .collect(_state)
         }
     }

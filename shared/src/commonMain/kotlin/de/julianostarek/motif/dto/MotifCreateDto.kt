@@ -16,9 +16,7 @@
 
 package de.julianostarek.motif.dto
 
-data class ProfileDto(
-    val displayName: String,
-    val id: String,
-    val photoUrl: String?,
-    val username: String,
+data class MotifCreateDto(
+    val isrc: String,
+    val offset: Int
 )

@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.profile
 
+import de.julianostarek.motif.datasource.ProfileRemoteDataSource
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.profileedit.ProfileEdit
 import kotlinx.coroutines.flow.Flow
