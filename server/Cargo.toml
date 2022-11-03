@@ -8,6 +8,7 @@ members = [".", "entity"]
 
 [dependencies]
 entity = { path = "entity" }
+apalis = { version = "0.3.4", features = ["redis", "extensions", "cron", "retry"] }
 async-graphql = { version = "4.0.14", features = ["uuid", "chrono", "dataloader"] }
 async-graphql-axum = "4.0.14"
 async-stream = "0.3.3"
@@ -27,10 +28,12 @@ oauth2 = "4.2.3"
 openidconnect = { git = "https://github.com/ramosbugs/openidconnect-rs", features = ["accept-string-booleans"] }
 rand = "0.8.5"
 reqwest = { version = "0.11.12", features = ["json"] }
-sea-orm = { version = "0.9.3", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+sea-orm = { version = "0.10.1", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 serde = "1.0.145"
 serde_json = "1.0.85"
 serde_with = { version = "2.0.1", features = ["json"] }
+serde-xml-rs = "0.6.0"
 sqlx = { version = "0.6.1", features = ["postgres", "runtime-tokio-rustls", "uuid", "chrono"] }
 tokio = { version = "1.21.2", features = ["full"] }
+tower = "0.4.13"
 uuid = "1.1.2"

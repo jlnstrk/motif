@@ -30,7 +30,7 @@ use crate::domain::profile::pubsub::{topic_profile_followed, topic_profile_updat
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
 use crate::domain::{collection, motif};
 use crate::gql::auth::Authenticated;
-use crate::gql::dataloader::ProfileFollowingLoader;
+use crate::gql::dataloader::ProfileFollowsLoader;
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
 use crate::PubSubHandle;
 
@@ -49,7 +49,7 @@ impl Profile {
     }
 
     async fn follows(&self, ctx: &Context<'_>) -> Result<bool> {
-        let loader: &DataLoader<ProfileFollowingLoader> = ctx.require();
+        let loader: &DataLoader<ProfileFollowsLoader> = ctx.require();
         loader
             .load_one(self.id)
             .await

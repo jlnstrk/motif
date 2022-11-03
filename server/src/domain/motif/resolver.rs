@@ -16,6 +16,8 @@
 
 #![allow(dead_code)]
 
+use apalis::prelude::Storage;
+use apalis::redis::RedisStorage;
 use async_graphql::dataloader::DataLoader;
 use async_graphql::futures_util::Stream;
 use async_graphql::types::connection::*;
@@ -23,6 +25,7 @@ use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object, Subscription};
 use async_stream::stream;
 use fred::prelude::RedisValue;
+use log::error;
 use uuid::Uuid;
 
 use crate::domain::comment::typedef::Comment;
@@ -30,18 +33,28 @@ use crate::domain::motif::datasource;
 use crate::domain::motif::pubsub::{
     topic_motif_created, topic_motif_deleted, topic_motif_listened,
 };
-use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
+use crate::domain::motif::typedef::{CreateMotif, Metadata, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{comment, like, profile};
 use crate::gql::auth::Authenticated;
-use crate::gql::dataloader::{MotifLikedLoader, MotifListenedLoader};
+use crate::gql::dataloader::{MotifLikedLoader, MotifListenedLoader, MotifMetadataLoader};
 use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
+use crate::metadata::FetchMetadata;
 use crate::PubSubHandle;
 
 #[ComplexObject]
 impl Motif {
+    async fn metadata(&self, ctx: &Context<'_>) -> Result<Option<Metadata>> {
+        let loader: &DataLoader<MotifMetadataLoader> = ctx.require();
+        loader
+            .load_one(self.isrc.clone())
+            .await
+            .map(|opt| opt)
+            .coerce_gql_err()
+    }
+
     async fn service_ids(&self, ctx: &Context<'_>) -> Result<Vec<ServiceId>> {
-        datasource::get_service_ids_by_id(ctx.require(), self.id)
+        datasource::get_service_ids_by_isrc(ctx.require(), self.isrc.clone())
             .await
             .coerce_gql_err()
     }
@@ -166,10 +179,23 @@ impl MotifMutation {
     async fn motif_create(&self, ctx: &Context<'_>, args: CreateMotif) -> Result<Motif> {
         let own_id = ctx.require::<AuthClaims>().id;
         let motif = datasource::create(ctx.require(), own_id.clone(), args).await?;
+
+        if let Err(err) = ctx
+            .require::<RedisStorage<FetchMetadata>>()
+            .clone()
+            .push(FetchMetadata {
+                isrc: motif.isrc.clone(),
+            })
+            .await
+        {
+            error!("motif_create: {}", err);
+        }
+
         let topic = topic_motif_created(own_id);
         ctx.require::<PubSubHandle<RedisValue>>()
             .publish(topic, RedisValue::Integer(motif.id.into()))
             .await;
+
         Ok(motif)
     }
 

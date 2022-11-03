@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+use crate::domain::motif::typedef::Metadata;
 use crate::domain::{like, motif, profile};
 use crate::rest::util::ApiError;
 use async_graphql::dataloader::Loader;
@@ -76,20 +77,35 @@ impl Loader<i32> for CommentLikedLoader {
     }
 }
 
-pub struct ProfileFollowingLoader {
+pub struct ProfileFollowsLoader {
     pub db: DatabaseConnection,
     pub profile_id: Uuid,
 }
 
 #[async_trait]
-impl Loader<Uuid> for ProfileFollowingLoader {
+impl Loader<Uuid> for ProfileFollowsLoader {
     type Value = bool;
     type Error = ApiError;
 
     async fn load(&self, keys: &[Uuid]) -> Result<HashMap<Uuid, Self::Value>, Self::Error> {
-        let set = profile::datasource::is_following_all(&self.db, self.profile_id, keys).await?;
+        let set = profile::datasource::follows_all(&self.db, self.profile_id, keys).await?;
         Ok(HashMap::from_iter(
             keys.into_iter().map(|id| (id.clone(), set.contains(id))),
         ))
+    }
+}
+
+pub struct MotifMetadataLoader {
+    pub db: DatabaseConnection,
+}
+
+#[async_trait]
+impl Loader<String> for MotifMetadataLoader {
+    type Value = Metadata;
+    type Error = ApiError;
+
+    async fn load(&self, keys: &[String]) -> Result<HashMap<String, Self::Value>, Self::Error> {
+        let map = motif::datasource::get_metadata_all(&self.db, keys).await?;
+        Ok(map)
     }
 }

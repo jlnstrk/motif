@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sea-orm = { version = "0.9.3" }
+sea-orm = { version = "0.10.1" }

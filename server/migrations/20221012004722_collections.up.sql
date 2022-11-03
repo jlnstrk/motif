@@ -4,8 +4,8 @@ CREATE TABLE collections
     title       VARCHAR                  NOT NULL,
     description VARCHAR,
     owner_id    UUID                     NOT NULL,
-    created_at  TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at  TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES profiles (user_id)
         ON UPDATE CASCADE

@@ -212,7 +212,7 @@ pub async fn is_username_available(db: &DatabaseConnection, username: String) ->
     Ok(count == 0)
 }
 
-pub async fn is_following_all(
+pub async fn follows_all(
     db: &DatabaseConnection,
     profile_id: Uuid,
     other_profile_ids: &[Uuid],

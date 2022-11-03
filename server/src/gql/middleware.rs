@@ -15,8 +15,10 @@
  */
 
 use crate::gql::dataloader::{
-    CommentLikedLoader, MotifLikedLoader, MotifListenedLoader, ProfileFollowingLoader,
+    CommentLikedLoader, MotifLikedLoader, MotifListenedLoader, MotifMetadataLoader,
+    ProfileFollowsLoader,
 };
+use apalis::redis::RedisStorage;
 use async_graphql::dataloader::DataLoader;
 use async_graphql::{Schema, SchemaBuilder};
 use axum::http::Request;
@@ -27,6 +29,7 @@ use sea_orm::DatabaseConnection;
 
 use crate::gql::schema::{Mutation, Query, Subscription};
 use crate::gql::util::AuthClaims;
+use crate::metadata::FetchMetadata;
 use crate::PubSubHandle;
 
 pub async fn schema_middleware_auth<B>(
@@ -43,6 +46,11 @@ pub async fn schema_middleware_auth<B>(
         .get::<PubSubHandle<RedisValue>>()
         .unwrap()
         .clone();
+    let storage: RedisStorage<FetchMetadata> = req
+        .extensions()
+        .get::<RedisStorage<FetchMetadata>>()
+        .unwrap()
+        .clone();
     let claims: Option<AuthClaims> = req
         .extensions()
         .get::<Option<AuthClaims>>()
@@ -54,7 +62,8 @@ pub async fn schema_middleware_auth<B>(
         Subscription::default(),
     )
     .data(db.clone())
-    .data(pubsub);
+    .data(pubsub)
+    .data(storage);
     if let Some(claims) = claims {
         builder = builder.data(claims.clone());
         builder = add_data_loaders(builder, db, claims);
@@ -122,10 +131,14 @@ fn add_data_loaders(
             tokio::spawn,
         ))
         .data(DataLoader::new(
-            ProfileFollowingLoader {
-                db,
+            ProfileFollowsLoader {
+                db: db.clone(),
                 profile_id: claims.id,
             },
+            tokio::spawn,
+        ))
+        .data(DataLoader::new(
+            MotifMetadataLoader { db: db.clone() },
             tokio::spawn,
         ))
 }

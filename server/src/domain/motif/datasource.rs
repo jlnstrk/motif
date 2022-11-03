@@ -22,19 +22,20 @@ use sea_orm::{
     EnumIter, ModelTrait, NotSet, Order, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
     TransactionTrait,
 };
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
+use entity::isrc_metadata::{Entity as MetadataEntity, Model as MetadataModel};
+use entity::isrc_services::{Entity as IsrcServiceEntity, Model as IsrcServiceModel};
 use entity::motif_listeners::Entity as MotifListenerEntity;
-use entity::motif_service_ids::{Entity as MotifServiceIdEntity, Model as MotifServiceIdModel};
 use entity::motifs::{Entity as MotifEntity, Model as MotifModel};
 use entity::profile_follows::Entity as ProfileFollowEntity;
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
-use entity::{motif_listeners, motif_service_ids, motifs, profile_follows};
+use entity::{isrc_metadata, isrc_services, motif_listeners, motifs, profile_follows};
 use sea_orm::IdenStatic;
 
 use crate::domain::common::typedef::Service;
-use crate::domain::motif::typedef::{CreateMotif, Motif, ServiceId};
+use crate::domain::motif::typedef::{CreateMotif, Metadata, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
 use crate::rest::util::{ApiError, ApiResult, DataError};
 
@@ -50,11 +51,21 @@ impl From<MotifModel> for Motif {
     }
 }
 
-impl From<MotifServiceIdModel> for ServiceId {
-    fn from(model: MotifServiceIdModel) -> Self {
+impl From<IsrcServiceModel> for ServiceId {
+    fn from(model: IsrcServiceModel) -> Self {
         Self {
             service: Service::from(model.service),
             id: model.service_id,
+        }
+    }
+}
+
+impl From<MetadataModel> for Metadata {
+    fn from(model: MetadataModel) -> Self {
+        Self {
+            name: model.name,
+            artist: model.artist,
+            cover_art_url: model.cover_art_url,
         }
     }
 }
@@ -74,12 +85,12 @@ pub async fn get_by_creator_id(db: &DatabaseConnection, creator_id: Uuid) -> Api
     Ok(mapped)
 }
 
-pub async fn get_service_ids_by_id(
+pub async fn get_service_ids_by_isrc(
     db: &DatabaseConnection,
-    motif_id: i32,
+    isrc: String,
 ) -> ApiResult<Vec<ServiceId>> {
-    let models = MotifServiceIdEntity::find()
-        .filter(motif_service_ids::Column::MotifId.eq(motif_id))
+    let models = IsrcServiceEntity::find()
+        .filter(isrc_services::Column::Isrc.eq(isrc))
         .all(db)
         .await?;
     let mapped: Vec<ServiceId> = models.into_iter().map(|model| model.into()).collect();
@@ -193,6 +204,21 @@ pub async fn has_listened_all(
     Ok(ids.into_iter().collect())
 }
 
+pub async fn get_metadata_all(
+    db: &DatabaseConnection,
+    isrcs: &[String],
+) -> Result<HashMap<String, Metadata>, ApiError> {
+    let models: Vec<MetadataModel> = MetadataEntity::find()
+        .filter(isrc_metadata::Column::Isrc.is_in(isrcs.to_owned()))
+        .all(db)
+        .await?;
+    let mapped: HashMap<String, Metadata> = models
+        .into_iter()
+        .map(|model| (model.isrc.clone(), model.into()))
+        .collect();
+    Ok(mapped)
+}
+
 pub async fn listen_by_id(
     db: &DatabaseConnection,
     listener_id: Uuid,
@@ -260,18 +286,26 @@ pub async fn create(
             };
             let motif = model.insert(txn).await?;
 
-            let service_id_models: Vec<motif_service_ids::ActiveModel> = input
+            let service_id_models: Vec<isrc_services::ActiveModel> = input
                 .service_ids
                 .into_iter()
-                .map(|id| motif_service_ids::ActiveModel {
+                .map(|id| isrc_services::ActiveModel {
                     id: NotSet,
-                    motif_id: Set(motif.id),
+                    isrc: Set(motif.isrc.clone()),
                     service: Set(id.service.into()),
                     service_id: Set(id.id),
                 })
                 .collect();
             if !service_id_models.is_empty() {
-                MotifServiceIdEntity::insert_many(service_id_models)
+                IsrcServiceEntity::insert_many(service_id_models)
+                    .on_conflict(
+                        OnConflict::columns([
+                            isrc_services::Column::Isrc,
+                            isrc_services::Column::Service,
+                        ])
+                        .do_nothing()
+                        .to_owned(),
+                    )
                     .exec(txn)
                     .await?;
             }

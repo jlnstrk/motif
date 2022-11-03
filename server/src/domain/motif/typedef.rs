@@ -43,6 +43,13 @@ pub struct ServiceId {
     pub id: String,
 }
 
+#[derive(Clone, SimpleObject)]
+pub struct Metadata {
+    pub name: String,
+    pub artist: String,
+    pub cover_art_url: Option<String>,
+}
+
 #[derive(InputObject)]
 pub struct ServiceIdInput {
     pub service: Service,

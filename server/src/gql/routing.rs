@@ -72,15 +72,10 @@ async fn graphql_handler(schema: Extension<AppSchema>, req: GraphQLRequest) -> G
 }
 
 async fn graphiql(Host(host): Host) -> impl IntoResponse {
-    let port = env::var("PORT").ok();
-    let host = if let Some(port) = port {
-        format!("{}:{}", host, port)
-    } else {
-        host
-    };
+    let scheme = env::var("SCHEME").unwrap_or("https".to_owned());
     Html(
         GraphiQLSource::build()
-            .endpoint(&format!("https://{}/graphql", host))
+            .endpoint(&format!("{}://{}/graphql", scheme, host))
             .subscription_endpoint(&format!("ws://{}/graphql/ws", host))
             .finish(),
     )

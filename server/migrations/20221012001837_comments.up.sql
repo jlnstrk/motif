@@ -6,7 +6,7 @@ CREATE TABLE comments
     "offset"   INTEGER,
     content    VARCHAR                  NOT NULL,
     author_id  UUID                     NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     PRIMARY KEY (id),
     FOREIGN KEY (motif_id) REFERENCES motifs (id)
         ON UPDATE CASCADE

@@ -2,8 +2,8 @@ CREATE TABLE users
 (
     id         UUID                     NOT NULL DEFAULT gen_random_uuid(),
     email      VARCHAR                  NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     PRIMARY KEY (id),
     UNIQUE (email)
 );
@@ -63,30 +63,18 @@ CREATE TABLE motifs
     id         SERIAL                   NOT NULL,
     isrc       VARCHAR(12)              NOT NULL,
     "offset"   INTEGER                  NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     creator_id UUID                     NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (creator_id) REFERENCES profiles (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
-CREATE TABLE motif_service_ids
-(
-    id         SERIAL  NOT NULL, -- Can't use (motif_id, service) composite bc/o lacking PG type PK support from SeaORM
-    motif_id   INTEGER NOT NULL,
-    service    service NOT NULL,
-    service_id VARCHAR NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (motif_id) REFERENCES motifs (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    UNIQUE (motif_id, service)
-);
 CREATE TABLE motif_listeners
 (
     motif_id    INTEGER                  NOT NULL,
     listener_id UUID                     NOT NULL,
-    listened_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    listened_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     PRIMARY KEY (motif_id, listener_id),
     FOREIGN KEY (motif_id) REFERENCES motifs (id)
         ON UPDATE CASCADE

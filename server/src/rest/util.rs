@@ -39,7 +39,7 @@ pub enum AuthenticationError {
 
 #[derive(Debug, Clone)]
 pub enum GeneralError {
-    Database(DbErr),
+    Database(String),
     Internal,
 }
 
@@ -165,15 +165,12 @@ pub type ApiResult<R> = Result<R, ApiError>;
 
 impl From<DbErr> for ApiError {
     fn from(err: DbErr) -> Self {
-        ApiError::General(GeneralError::Database(err))
+        ApiError::General(GeneralError::Database(format!("{}", err)))
     }
 }
 
 impl<Inner: Error> From<TransactionError<Inner>> for ApiError {
     fn from(txn: TransactionError<Inner>) -> Self {
-        ApiError::General(GeneralError::Database(match txn {
-            TransactionError::Connection(db_err) => db_err,
-            TransactionError::Transaction(conn) => DbErr::Conn(conn.to_string()),
-        }))
+        ApiError::General(GeneralError::Database(format!("{}", txn)))
     }
 }
