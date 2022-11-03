@@ -5,6 +5,7 @@ RUN USER=root cargo new app
 WORKDIR /usr/src/app
 COPY Cargo.toml Cargo.lock ./
 ADD entity ./entity
+ADD fixtures ./fixtures
 # Needs at least a main.rs file with a main function
 RUN mkdir src && echo "fn main(){}" > src/main.rs
 # Will build all dependent crates in release mode

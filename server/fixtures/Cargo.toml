@@ -1,0 +1,12 @@
+[package]
+name = "fixtures"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dotenvy = "0.15"
+entity = { path = "../entity" }
+lipsum = "0.8.2"
+rand = "0.8.5"
+sea-orm = { version = "0.10.1", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+tokio = { version = "1.21.2", features = ["full"] }
