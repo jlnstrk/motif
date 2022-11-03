@@ -16,7 +16,9 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 # Copy the rest
 COPY . .
 # Build (install) the actual binaries
-RUN cargo install --path .
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/src/app/target \
+    cargo install --path . && cargo install --path fixtures
 
 # Runtime image
 FROM debian:bullseye-slim
@@ -32,6 +34,7 @@ USER app
 WORKDIR /app
 
 # Get compiled binaries from builder's cargo install directory
+COPY --from=builder /usr/local/cargo/bin/fixtures /app/fixtures
 COPY --from=builder /usr/local/cargo/bin/motif-server /app/motif-server
 
 # No CMD or ENTRYPOINT, see fly.toml with `cmd` override.
