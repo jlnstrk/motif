@@ -156,13 +156,6 @@ impl MotifQuery {
     }
 
     #[graphql(guard = "Authenticated")]
-    async fn motif_public_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
-        datasource::get_public_feed(ctx.require())
-            .await
-            .coerce_gql_err()
-    }
-
-    #[graphql(guard = "Authenticated")]
     async fn motif_by_id(&self, ctx: &Context<'_>, motif_id: i32) -> Result<Motif> {
         datasource::get_by_id(ctx.require(), motif_id)
             .await
