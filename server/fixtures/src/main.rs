@@ -59,7 +59,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             let mut motifs: Vec<motifs::Model> = Vec::new();
             let mut comments: Vec<comments::Model> = Vec::new();
 
-            for user_fixture in users {
+            for user_fixture in user::fixtures {
                 let user = make_user(&user_fixture).insert(txn).await?;
                 let profile = make_profile(user.id, &user_fixture).insert(txn).await?;
 
