@@ -60,7 +60,7 @@ const MUSICBRAINZ_BASE_URL: &str = "https://musicbrainz.org/ws/2/";
 const COVER_ART_ARCHIVE_BASE_URL: &str = "https://coverartarchive.org/release/";
 
 pub async fn schedule_fetch_metadata(
-    schedule: ScheduleFetchMetadata,
+    _schedule: ScheduleFetchMetadata,
     ctx: JobContext,
 ) -> Result<JobResult, JobError> {
     info!("Scheduling metadata fetch for ISRCs without status");

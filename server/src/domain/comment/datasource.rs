@@ -15,13 +15,15 @@
  */
 
 use chrono::{FixedOffset, Utc};
+use itertools::Itertools;
+use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, DatabaseConnection, DbErr, EntityTrait, ModelTrait, NotSet,
     PaginatorTrait, QueryFilter,
 };
-use sea_orm::ActiveValue::Set;
 use uuid::Uuid;
 
+use crate::db::util::OptLimitOffset;
 use entity::comments;
 use entity::comments::{Entity as CommentEntity, Model as CommentModel};
 
@@ -64,15 +66,14 @@ pub async fn get_motif_comments_count_by_id(
 pub async fn get_motif_comments_by_id(
     db: &DatabaseConnection,
     motif_id: i32,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> ApiResult<Vec<Comment>> {
-    let models = CommentEntity::find()
+    let query = CommentEntity::find()
         .filter(comments::Column::MotifId.eq(motif_id))
-        .all(db)
-        .await?;
-
-    let mapped: Vec<Comment> = models.into_iter().map(|model| model.into()).collect();
-
-    Ok(mapped)
+        .opt_limit_offset(limit, offset);
+    let comments = query.all(db).await?.into_iter().map_into().collect();
+    Ok(comments)
 }
 
 pub async fn get_child_comments_count_by_id(
@@ -89,15 +90,14 @@ pub async fn get_child_comments_count_by_id(
 pub async fn get_child_comments_by_id(
     db: &DatabaseConnection,
     parent_comment_id: i32,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> Result<Vec<Comment>, DbErr> {
-    let models = CommentEntity::find()
+    let query = CommentEntity::find()
         .filter(comments::Column::ParentId.eq(parent_comment_id))
-        .all(db)
-        .await?;
-
-    let mapped: Vec<Comment> = models.into_iter().map(|model| model.into()).collect();
-
-    Ok(mapped)
+        .opt_limit_offset(limit, offset);
+    let comments = query.all(db).await?.into_iter().map_into().collect();
+    Ok(comments)
 }
 
 pub async fn delete_by_id(

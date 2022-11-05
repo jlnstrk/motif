@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-pub mod auth;
-pub mod connection;
-pub mod middleware;
-pub mod routing;
-pub mod schema;
-pub mod util;
+use sea_orm::QuerySelect;
+
+pub trait OptLimitOffset: Sized {
+    fn opt_limit_offset(self, limit: Option<u64>, offset: Option<u64>) -> Self;
+}
+
+impl<QueryStatement, T: QuerySelect<QueryStatement = QueryStatement>> OptLimitOffset for T {
+    fn opt_limit_offset(mut self, limit: Option<u64>, offset: Option<u64>) -> Self {
+        if let Some(limit) = limit {
+            self = self.limit(limit);
+        }
+        if let Some(offset) = offset {
+            self = self.offset(offset);
+        }
+        self
+    }
+}

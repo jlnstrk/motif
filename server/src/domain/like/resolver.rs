@@ -17,9 +17,9 @@
 #![allow(dead_code)]
 
 use async_graphql::{Context, Object, Subscription};
-use async_stream::stream;
 use fred::prelude::RedisValue;
 use futures::Stream;
+use futures_util::StreamExt;
 use sea_orm::DbErr;
 use uuid::Uuid;
 
@@ -83,18 +83,21 @@ impl LikeSubscription {
         ctx: &'a Context<'_>,
         motif_id: i32,
     ) -> impl Stream<Item = Profile> + 'a {
-        let mut subscription = ctx
+        let subscription = ctx
             .require::<PubSubHandle<RedisValue>>()
             .subscribe(vec![topic_motif_liked(motif_id)])
             .await;
-        stream! {
-            while let Some(value) = subscription.receive().await {
-                if let RedisValue::String(profile_id) = value {
-                    if let Some(profile) = profile::datasource::get_by_id(ctx.require(), Uuid::parse_str(&profile_id.to_string()).unwrap()).await.ok() {
-                        yield profile;
-                    }
-                }
+        subscription.stream().filter_map(move |value| async move {
+            if let RedisValue::String(profile_id) = value {
+                profile::datasource::get_by_id(
+                    ctx.require(),
+                    Uuid::parse_str(&profile_id.to_string()).unwrap(),
+                )
+                .await
+                .ok()
+            } else {
+                None
             }
-        }
+        })
     }
 }

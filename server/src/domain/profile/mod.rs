@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+pub mod dataloader;
 pub mod datasource;
 pub mod pubsub;
 pub mod resolver;

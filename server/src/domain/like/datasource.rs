@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+use itertools::Itertools;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, DeriveColumn, EntityTrait,
@@ -28,6 +29,7 @@ use entity::motif_likes;
 use entity::motif_likes::{Entity as MotifLikeEntity, Model as MotifLikeModel};
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
 
+use crate::db::util::OptLimitOffset;
 use crate::domain::profile::typedef::Profile;
 use crate::rest::util::ApiError;
 use sea_orm::IdenStatic;
@@ -54,47 +56,45 @@ pub async fn get_comment_likes_count(
 pub async fn get_motif_likes(
     db: &DatabaseConnection,
     motif_id: i32,
-    limit: Option<i32>,
-    offset: Option<i32>,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> Result<Vec<Profile>, DbErr> {
-    let mut query = MotifLikeEntity::find()
+    let query = MotifLikeEntity::find()
         .find_with_related(ProfileEntity)
-        .filter(motif_likes::Column::MotifId.eq(motif_id));
-    if let Some(limit) = limit {
-        query = query.limit(limit as u64);
-    }
-    if let Some(offset) = offset {
-        query = query.offset(offset as u64);
-    }
+        .filter(motif_likes::Column::MotifId.eq(motif_id))
+        .opt_limit_offset(limit, offset);
     let likes_with_profiles = query.all(db).await?;
 
     let profiles: Vec<ProfileModel> = likes_with_profiles
         .into_iter()
-        .map(|mut tuple| tuple.1.remove(0))
-        // .flatten()
+        .map(|tuple| tuple.1.into_iter().next())
+        .flatten()
         .collect();
 
-    let mapped: Vec<Profile> = profiles.into_iter().map(|model| model.into()).collect();
+    let mapped: Vec<Profile> = profiles.into_iter().map_into().collect();
     Ok(mapped)
 }
 
 pub async fn get_comment_likes(
     db: &DatabaseConnection,
     comment_id: i32,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> Result<Vec<Profile>, DbErr> {
     let likes_with_profiles = CommentLikeEntity::find()
         .find_with_related(ProfileEntity)
         .filter(comment_likes::Column::CommentId.eq(comment_id))
+        .opt_limit_offset(limit, offset)
         .all(db)
         .await?;
 
     let profiles: Vec<ProfileModel> = likes_with_profiles
         .into_iter()
-        .map(|mut tuple| tuple.1.remove(0))
-        // .flatten()
+        .map(|tuple| tuple.1.into_iter().next())
+        .flatten()
         .collect();
 
-    let mapped: Vec<Profile> = profiles.into_iter().map(|model| model.into()).collect();
+    let mapped: Vec<Profile> = profiles.into_iter().map_into().collect();
     Ok(mapped)
 }
 

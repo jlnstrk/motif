@@ -17,7 +17,7 @@
 use std::fmt::Display;
 use std::sync::Arc;
 
-use async_graphql::{Context, ErrorExtensions, Result};
+use async_graphql::{Context, ErrorExtensions, InputObject, Result};
 use uuid::Uuid;
 
 pub trait ContextDependencies {
@@ -47,4 +47,12 @@ impl<T, E: Display> CoerceGraphqlError<T> for Result<T, E> {
     fn coerce_gql_err(self) -> Result<T> {
         self.map_err(|err| (&err).extend())
     }
+}
+
+#[derive(Default, InputObject)]
+pub struct ConnectionParams {
+    pub after: Option<String>,
+    pub before: Option<String>,
+    pub first: Option<i32>,
+    pub last: Option<i32>,
 }

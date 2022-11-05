@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-use crate::gql::dataloader::{
-    CommentLikedLoader, MotifLikedLoader, MotifListenedLoader, MotifMetadataLoader,
-    ProfileFollowsLoader,
-};
+use crate::domain::motif::dataloader::{MotifLikedLoader, MotifListenedLoader, MotifMetadataLoader, MotifsByProfileLoader};
+use crate::domain::profile::dataloader::ProfileFollowsLoader;
 use apalis::redis::RedisStorage;
 use async_graphql::dataloader::DataLoader;
 use async_graphql::{Schema, SchemaBuilder};
@@ -26,6 +24,7 @@ use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 use fred::prelude::RedisValue;
 use sea_orm::DatabaseConnection;
+use crate::domain::comment::dataloader::CommentLikedLoader;
 
 use crate::gql::schema::{Mutation, Query, Subscription};
 use crate::gql::util::AuthClaims;
@@ -109,6 +108,20 @@ fn add_data_loaders(
     claims: AuthClaims,
 ) -> SchemaBuilder<Query, Mutation, Subscription> {
     builder
+        // Comment
+        .data(DataLoader::new(
+            CommentLikedLoader {
+                db: db.clone(),
+                profile_id: claims.id,
+            },
+            tokio::spawn,
+        ))
+
+        // Motif
+        .data(DataLoader::new(
+            MotifsByProfileLoader { db: db.clone() },
+            tokio::spawn
+        ))
         .data(DataLoader::new(
             MotifListenedLoader {
                 db: db.clone(),
@@ -124,21 +137,16 @@ fn add_data_loaders(
             tokio::spawn,
         ))
         .data(DataLoader::new(
-            CommentLikedLoader {
-                db: db.clone(),
-                profile_id: claims.id,
-            },
+            MotifMetadataLoader { db: db.clone() },
             tokio::spawn,
         ))
+
+        // Profile
         .data(DataLoader::new(
             ProfileFollowsLoader {
                 db: db.clone(),
                 profile_id: claims.id,
             },
-            tokio::spawn,
-        ))
-        .data(DataLoader::new(
-            MotifMetadataLoader { db: db.clone() },
             tokio::spawn,
         ))
 }

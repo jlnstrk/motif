@@ -29,11 +29,14 @@ use crate::pubsub::prelude::{
 };
 
 #[async_trait]
-pub trait PubSubStart<V: Clone + Debug + Sync + Send + 'static> {
+pub trait PubSubStart<V: Clone + Debug + Sized + Send + Sync + 'static> {
     async fn start_handler(
         &self,
         engine_ref: Arc<Box<Mutex<dyn PubSubEngine<V> + Sync + Send>>>,
-    ) -> (PubSubCommandSender<V>, PubSubCancellationSender) {
+    ) -> (PubSubCommandSender<V>, PubSubCancellationSender)
+    where
+        Self: Sized,
+    {
         let (cancel_sender, cancel_receiver) = oneshot::channel();
         let (register_sender, handler_receiver) = mpsc::channel::<PubSubCommand<V>>(32);
         pubsub_main(engine_ref, handler_receiver, cancel_receiver).await;

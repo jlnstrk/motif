@@ -24,14 +24,20 @@ use crate::domain::collection::datasource;
 use crate::domain::collection::typedef::{Collection, CreateCollection};
 use crate::domain::motif::typedef::Motif;
 use crate::gql::auth::Authenticated;
-use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
+use crate::gql::connection::{position_page, PositionConnection};
+use crate::gql::util::{AuthClaims, CoerceGraphqlError, ConnectionParams, ContextDependencies};
 
 #[ComplexObject]
 impl Collection {
-    async fn motifs(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
-        datasource::get_motifs_by_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn motifs(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Motif>> {
+        position_page(page, |limit, offset| {
+            datasource::get_motifs_by_id(ctx.require(), self.id, limit, offset)
+        })
+        .await
     }
 }
 

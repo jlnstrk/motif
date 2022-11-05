@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+extern crate core;
+
 use apalis::cron::{CronWorker, Schedule};
 use apalis::layers::DefaultRetryPolicy;
 use apalis::prelude::{job_fn, Monitor, WorkerBuilder, WorkerFactoryFn};
@@ -44,6 +46,7 @@ use crate::pubsub::prelude::{PubSub, PubSubHandle};
 use crate::pubsub::redis::RedisPubSubEngine;
 use crate::rest::rest_router;
 
+mod db;
 mod domain;
 mod gql;
 mod metadata;
@@ -54,7 +57,7 @@ async fn make_db_connection() -> DatabaseConnection {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     let mut options = database_url.parse::<PgConnectOptions>().unwrap();
-    options.log_statements(LevelFilter::Trace);
+    options.log_statements(LevelFilter::Debug);
 
     let pg_pool = PgPoolOptions::new()
         .max_connections(5)
@@ -140,7 +143,7 @@ async fn start_server(app: Router) -> Result<(), Box<dyn Error>> {
 
 #[tokio::main]
 async fn main() {
-    env::set_var("RUST_LOG", "info");
+    env::set_var("RUST_LOG", "debug");
     env_logger::builder().target(Target::Stdout).init();
     dotenv().ok();
 

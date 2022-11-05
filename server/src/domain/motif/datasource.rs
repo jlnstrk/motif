@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-use chrono::{FixedOffset, Offset, Utc};
-use sea_orm::sea_query::{OnConflict, Query};
+use std::collections::{HashMap, HashSet};
+
+use chrono::{DateTime, FixedOffset, Offset, Utc};
+use sea_orm::sea_query::OnConflict;
 use sea_orm::ActiveValue::Set;
+use sea_orm::IdenStatic;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, DbErr, DeriveColumn, EntityTrait,
     EnumIter, ModelTrait, NotSet, Order, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
     TransactionTrait,
 };
-use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
+use db::util::OptLimitOffset;
 use entity::isrc_metadata::{Entity as MetadataEntity, Model as MetadataModel};
 use entity::isrc_services::{Entity as IsrcServiceEntity, Model as IsrcServiceModel};
 use entity::motif_listeners::Entity as MotifListenerEntity;
 use entity::motifs::{Entity as MotifEntity, Model as MotifModel};
-use entity::profile_follows::Entity as ProfileFollowEntity;
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
-use entity::{isrc_metadata, isrc_services, motif_listeners, motifs, profile_follows};
-use sea_orm::IdenStatic;
+use entity::{isrc_metadata, isrc_services, motif_listeners, motifs};
 
+use crate::db;
 use crate::domain::common::typedef::Service;
 use crate::domain::motif::typedef::{CreateMotif, Metadata, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
@@ -76,11 +78,26 @@ pub async fn get_by_id(db: &DatabaseConnection, motif_id: i32) -> ApiResult<Moti
     Ok(motif.into())
 }
 
-pub async fn get_by_creator_id(db: &DatabaseConnection, creator_id: Uuid) -> ApiResult<Vec<Motif>> {
-    let models = MotifEntity::find()
+pub async fn get_by_creator_id(
+    db: &DatabaseConnection,
+    creator_id: Uuid,
+    after: Option<DateTime<Utc>>,
+    before: Option<DateTime<Utc>>,
+    limit: Option<u64>,
+) -> ApiResult<Vec<Motif>> {
+    let mut query = MotifEntity::find()
         .filter(motifs::Column::CreatorId.eq(creator_id))
-        .all(db)
-        .await?;
+        .order_by(motifs::Column::CreatedAt, Order::Desc);
+    if let Some(after) = after {
+        query = query.filter(motifs::Column::CreatedAt.lt(after));
+    }
+    if let Some(before) = before {
+        query = query.filter(motifs::Column::CreatedAt.gt(before));
+    }
+    if let Some(limit) = limit {
+        query = query.limit(limit);
+    }
+    let models = query.all(db).await?;
     let mapped: Vec<Motif> = models.into_iter().map(|model| model.into()).collect();
     Ok(mapped)
 }
@@ -106,32 +123,6 @@ pub async fn get_public_feed(db: &DatabaseConnection) -> ApiResult<Vec<Motif>> {
     Ok(mapped)
 }
 
-pub async fn get_feed_by_profile_id(
-    db: &DatabaseConnection,
-    profile_id: Uuid,
-) -> ApiResult<Vec<Motif>> {
-    let models = MotifEntity::find()
-        .filter(
-            Condition::all()
-                .add(
-                    motifs::Column::CreatorId.in_subquery(
-                        Query::select()
-                            .column(profile_follows::Column::FollowedId)
-                            .cond_where(profile_follows::Column::FollowerId.eq(profile_id))
-                            .from(ProfileFollowEntity)
-                            .to_owned(),
-                    ),
-                )
-                .add(motifs::Column::CreatedAt.lt(Utc::now().with_timezone(&FixedOffset::east(0)))),
-        )
-        .order_by(motifs::Column::CreatedAt, Order::Desc)
-        .all(db)
-        .await?;
-
-    let mapped: Vec<Motif> = models.into_iter().map(|model| model.into()).collect();
-    Ok(mapped)
-}
-
 pub async fn get_listeners_count_by_id(db: &DatabaseConnection, motif_id: i32) -> ApiResult<i32> {
     MotifListenerEntity::find()
         .filter(motif_listeners::Column::MotifId.eq(motif_id))
@@ -144,12 +135,14 @@ pub async fn get_listeners_count_by_id(db: &DatabaseConnection, motif_id: i32) -
 pub async fn get_listeners_by_id(
     db: &DatabaseConnection,
     motif_id: i32,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> ApiResult<Vec<Profile>> {
-    let models = MotifListenerEntity::find()
+    let query = MotifListenerEntity::find()
         .find_with_related(ProfileEntity)
         .filter(motif_listeners::Column::MotifId.eq(motif_id))
-        .all(db)
-        .await?;
+        .opt_limit_offset(limit, offset);
+    let models = query.all(db).await?;
 
     let profile_models: Vec<ProfileModel> = models
         .into_iter()

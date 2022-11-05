@@ -15,6 +15,7 @@
  */
 
 use chrono::{FixedOffset, Utc};
+use itertools::Itertools;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, EntityTrait, ModelTrait, NotSet,
@@ -22,6 +23,7 @@ use sea_orm::{
 };
 use uuid::Uuid;
 
+use crate::db::util::OptLimitOffset;
 use entity::collection_motifs::{Entity as CollectionMotifEntity, Model as CollectionMotifModel};
 use entity::collections::{Entity as CollectionEntity, Model as CollectionModel};
 use entity::motifs::{Entity as MotifEntity, Model as MotifModel};
@@ -52,22 +54,26 @@ pub async fn get_by_id(db: &DatabaseConnection, collection_id: Uuid) -> ApiResul
 pub async fn get_by_owner_id(
     db: &DatabaseConnection,
     owner_id: Uuid,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> ApiResult<Vec<Collection>> {
-    let models = CollectionEntity::find()
+    let query = CollectionEntity::find()
         .filter(collections::Column::OwnerId.eq(owner_id))
-        .all(db)
-        .await?;
-    let mapped: Vec<Collection> = models.into_iter().map(|model| model.into()).collect();
-    Ok(mapped)
+        .opt_limit_offset(limit, offset);
+    let collections: Vec<Collection> = query.all(db).await?.into_iter().map_into().collect();
+    Ok(collections)
 }
 
 pub async fn get_motifs_by_id(
     db: &DatabaseConnection,
     collection_id: Uuid,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> ApiResult<Vec<Motif>> {
     let join_with_motifs = CollectionMotifEntity::find()
         .find_with_related(MotifEntity)
         .filter(collection_motifs::Column::CollectionId.eq(collection_id))
+        .opt_limit_offset(limit, offset)
         .all(db)
         .await?;
 
@@ -77,7 +83,7 @@ pub async fn get_motifs_by_id(
         // .flatten()
         .collect();
 
-    let mapped: Vec<Motif> = motifs.into_iter().map(|model| model.into()).collect();
+    let mapped: Vec<Motif> = motifs.into_iter().map_into().collect();
     Ok(mapped)
 }
 

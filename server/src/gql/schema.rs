@@ -18,23 +18,30 @@ use async_graphql::{MergedObject, MergedSubscription, Schema};
 
 use crate::domain::collection::resolver::{CollectionMutation, CollectionQuery};
 use crate::domain::comment::resolver::{CommentMutation, CommentQuery};
+use crate::domain::feed::resolver::FeedQuery;
 use crate::domain::like::resolver::{LikeMutation, LikeSubscription};
 use crate::domain::motif::resolver::{MotifMutation, MotifQuery, MotifSubscription};
 use crate::domain::profile::resolver::{ProfileMutation, ProfileQuery, ProfileSubscription};
 
 #[derive(MergedObject, Default)]
-pub struct Query(ProfileQuery, MotifQuery, CommentQuery, CollectionQuery);
+pub struct Query(
+    FeedQuery,
+    CollectionQuery,
+    CommentQuery,
+    MotifQuery,
+    ProfileQuery,
+);
 
 #[derive(MergedObject, Default)]
 pub struct Mutation(
-    ProfileMutation,
-    MotifMutation,
-    CommentMutation,
     CollectionMutation,
+    CommentMutation,
     LikeMutation,
+    MotifMutation,
+    ProfileMutation,
 );
 
 #[derive(MergedSubscription, Default)]
-pub struct Subscription(ProfileSubscription, MotifSubscription, LikeSubscription);
+pub struct Subscription(LikeSubscription, MotifSubscription, ProfileSubscription);
 
 pub type AppSchema = Schema<Query, Mutation, Subscription>;

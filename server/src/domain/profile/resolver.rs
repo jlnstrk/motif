@@ -16,6 +16,7 @@
 
 #![allow(dead_code)]
 
+use async_graphql::connection::{ConnectionNameType, EdgeNameType};
 use async_graphql::dataloader::DataLoader;
 use async_graphql::futures_util::Stream;
 use async_graphql::*;
@@ -24,22 +25,63 @@ use futures::stream::StreamExt;
 use uuid::Uuid;
 
 use crate::domain::collection::typedef::Collection;
+use crate::domain::motif::dataloader::MotifsByProfileLoader;
 use crate::domain::motif::typedef::Motif;
+use crate::domain::profile::dataloader::ProfileFollowsLoader;
 use crate::domain::profile::datasource;
 use crate::domain::profile::pubsub::{topic_profile_followed, topic_profile_updated};
 use crate::domain::profile::typedef::{Profile, ProfileUpdate};
 use crate::domain::{collection, motif};
 use crate::gql::auth::Authenticated;
-use crate::gql::dataloader::ProfileFollowsLoader;
-use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
+use crate::gql::connection::{
+    field_cursor_page, position_page, DateTimeCursor, FieldCursorConnection, PositionConnection,
+};
+use crate::gql::util::{AuthClaims, CoerceGraphqlError, ConnectionParams, ContextDependencies};
 use crate::PubSubHandle;
+
+struct MotifsByCreatedAtConnection;
+
+impl ConnectionNameType for MotifsByCreatedAtConnection {
+    fn type_name<T: OutputType>() -> String {
+        "MotifsByCreatedAtConnection".to_owned()
+    }
+}
+
+struct MotifsByCreatedAtEdge;
+
+impl EdgeNameType for MotifsByCreatedAtEdge {
+    fn type_name<T: OutputType>() -> String {
+        "MotifsByCreatedAtEdge".to_owned()
+    }
+}
+
+struct ProfilesByPositionConnection;
+
+impl ConnectionNameType for ProfilesByPositionConnection {
+    fn type_name<T: OutputType>() -> String {
+        "ProfilesByPositionConnection".to_owned()
+    }
+}
+
+struct ProfilesByPositionEdge;
+
+impl EdgeNameType for ProfilesByPositionEdge {
+    fn type_name<T: OutputType>() -> String {
+        "ProfilesByPositionEdge".to_owned()
+    }
+}
 
 #[ComplexObject]
 impl Profile {
-    async fn followers(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
-        datasource::get_followers(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn followers(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Profile>> {
+        position_page(page, |limit, offset| {
+            datasource::get_followers(ctx.require(), self.id, limit, offset)
+        })
+        .await
     }
 
     async fn followers_count(&self, ctx: &Context<'_>) -> Result<i64> {
@@ -57,10 +99,15 @@ impl Profile {
             .coerce_gql_err()
     }
 
-    async fn following(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
-        datasource::get_following(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn following(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Profile>> {
+        position_page(page, |limit, offset| {
+            datasource::get_following(ctx.require(), self.id, limit, offset)
+        })
+        .await
     }
 
     async fn following_count(&self, ctx: &Context<'_>) -> Result<i64> {
@@ -69,16 +116,52 @@ impl Profile {
             .coerce_gql_err()
     }
 
-    async fn motifs(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
-        motif::datasource::get_by_creator_id(ctx.require(), self.id)
+    async fn feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
+        let loader: &DataLoader<MotifsByProfileLoader> = ctx.require();
+        loader
+            .load_one(self.id)
             .await
+            .map(|opt| opt.unwrap_or(Vec::new()))
             .coerce_gql_err()
     }
 
-    async fn collections(&self, ctx: &Context<'_>) -> Result<Vec<Collection>> {
-        collection::datasource::get_by_owner_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn motifs(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<
+        FieldCursorConnection<
+            DateTimeCursor,
+            Motif,
+            MotifsByCreatedAtConnection,
+            MotifsByCreatedAtEdge,
+        >,
+    > {
+        field_cursor_page(
+            page,
+            |after, before, limit| {
+                motif::datasource::get_by_creator_id(
+                    ctx.require(),
+                    self.id,
+                    after.map(Into::into),
+                    before.map(Into::into),
+                    limit,
+                )
+            },
+            |node| node.created_at.clone().into(),
+        )
+        .await
+    }
+
+    async fn collections(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Collection>> {
+        position_page(page, |limit, offset| async move {
+            collection::datasource::get_by_owner_id(ctx.require(), self.id, limit, offset).await
+        })
+        .await
     }
 }
 
@@ -111,10 +194,16 @@ impl ProfileQuery {
     }
 
     #[graphql(guard = "Authenticated")]
-    async fn profile_search(&self, ctx: &Context<'_>, query: String) -> Result<Vec<Profile>> {
-        datasource::search(ctx.require(), query)
-            .await
-            .coerce_gql_err()
+    async fn profile_search(
+        &self,
+        ctx: &Context<'_>,
+        query: String,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Profile>> {
+        position_page(page, |limit, offset| async move {
+            datasource::search(ctx.require(), query, limit, offset).await
+        })
+        .await
     }
 
     async fn profile_is_username_available(

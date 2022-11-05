@@ -27,9 +27,10 @@ use crate::domain::comment::typedef::{Comment, CreateComment};
 use crate::domain::motif::typedef::Motif;
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{like, motif, profile};
+use crate::domain::comment::dataloader::CommentLikedLoader;
 use crate::gql::auth::Authenticated;
-use crate::gql::dataloader::{CommentLikedLoader};
-use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
+use crate::gql::connection::{position_page, PositionConnection};
+use crate::gql::util::{AuthClaims, CoerceGraphqlError, ConnectionParams, ContextDependencies};
 use crate::PubSubHandle;
 
 #[ComplexObject]
@@ -40,10 +41,10 @@ impl Comment {
             .coerce_gql_err()
     }
 
-    async fn child_comments(&self, ctx: &Context<'_>) -> Result<Vec<Comment>> {
-        datasource::get_child_comments_by_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn child_comments(&self, ctx: &Context<'_>, page: Option<ConnectionParams>) -> Result<PositionConnection<Comment>> {
+        position_page(page, |limit, offset| {
+            datasource::get_child_comments_by_id(ctx.require(), self.id, limit, offset)
+        }).await
     }
 
     async fn author(&self, ctx: &Context<'_>) -> Result<Profile> {
@@ -81,10 +82,10 @@ impl Comment {
             .coerce_gql_err()
     }
 
-    async fn likes(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
-        like::datasource::get_comment_likes(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn likes(&self, ctx: &Context<'_>,page: Option<ConnectionParams>) -> Result<PositionConnection<Profile>> {
+        position_page(page, |limit, offset| {
+            like::datasource::get_comment_likes(ctx.require(), self.id, limit, offset)
+        }).await
     }
 }
 

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-use crate::domain::motif::typedef::Metadata;
-use crate::domain::{like, motif, profile};
+use crate::domain::motif::datasource;
+use crate::domain::motif::typedef::{Metadata, Motif};
+use crate::domain::{feed, like};
 use crate::rest::util::ApiError;
 use async_graphql::dataloader::Loader;
 use async_trait::async_trait;
@@ -34,7 +35,7 @@ impl Loader<i32> for MotifListenedLoader {
     type Error = ApiError;
 
     async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
-        let set = motif::datasource::has_listened_all(&self.db, self.profile_id, keys).await?;
+        let set = datasource::has_listened_all(&self.db, self.profile_id, keys).await?;
         Ok(HashMap::from_iter(
             keys.into_iter().map(|id| (id.clone(), set.contains(id))),
         ))
@@ -59,42 +60,6 @@ impl Loader<i32> for MotifLikedLoader {
     }
 }
 
-pub struct CommentLikedLoader {
-    pub db: DatabaseConnection,
-    pub profile_id: Uuid,
-}
-
-#[async_trait]
-impl Loader<i32> for CommentLikedLoader {
-    type Value = bool;
-    type Error = ApiError;
-
-    async fn load(&self, keys: &[i32]) -> Result<HashMap<i32, Self::Value>, Self::Error> {
-        let set = like::datasource::has_liked_comment_all(&self.db, self.profile_id, keys).await?;
-        Ok(HashMap::from_iter(
-            keys.into_iter().map(|id| (id.clone(), set.contains(id))),
-        ))
-    }
-}
-
-pub struct ProfileFollowsLoader {
-    pub db: DatabaseConnection,
-    pub profile_id: Uuid,
-}
-
-#[async_trait]
-impl Loader<Uuid> for ProfileFollowsLoader {
-    type Value = bool;
-    type Error = ApiError;
-
-    async fn load(&self, keys: &[Uuid]) -> Result<HashMap<Uuid, Self::Value>, Self::Error> {
-        let set = profile::datasource::follows_all(&self.db, self.profile_id, keys).await?;
-        Ok(HashMap::from_iter(
-            keys.into_iter().map(|id| (id.clone(), set.contains(id))),
-        ))
-    }
-}
-
 pub struct MotifMetadataLoader {
     pub db: DatabaseConnection,
 }
@@ -105,7 +70,24 @@ impl Loader<String> for MotifMetadataLoader {
     type Error = ApiError;
 
     async fn load(&self, keys: &[String]) -> Result<HashMap<String, Self::Value>, Self::Error> {
-        let map = motif::datasource::get_metadata_all(&self.db, keys).await?;
+        let map = datasource::get_metadata_all(&self.db, keys).await?;
+        Ok(map)
+    }
+}
+
+// Dedicated Loader to optimize the feed,
+// which often involves loading motifs for each profile
+pub struct MotifsByProfileLoader {
+    pub db: DatabaseConnection,
+}
+
+#[async_trait]
+impl Loader<Uuid> for MotifsByProfileLoader {
+    type Value = Vec<Motif>;
+    type Error = ApiError;
+
+    async fn load(&self, keys: &[Uuid]) -> Result<HashMap<Uuid, Self::Value>, Self::Error> {
+        let map = feed::datasource::get_motifs_by_profile_ids(&self.db, keys).await?;
         Ok(map)
     }
 }

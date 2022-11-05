@@ -20,7 +20,7 @@ use uuid::Uuid;
 
 use crate::domain::common::typedef::Service;
 
-#[derive(SimpleObject)]
+#[derive(Clone, SimpleObject)]
 #[graphql(complex)]
 pub struct Motif {
     pub id: i32,

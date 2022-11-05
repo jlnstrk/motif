@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use sea_orm::sea_query::{OnConflict, SimpleExpr};
+use sea_orm::sea_query::SimpleExpr;
 use sea_orm::ActiveValue::{Set, Unchanged};
 use sea_orm::IdenStatic;
 use sea_orm::{
@@ -24,6 +24,7 @@ use sea_orm::{
 use std::collections::HashSet;
 use uuid::Uuid;
 
+use crate::db::util::OptLimitOffset;
 use entity::profile_follows::Entity as ProfileFollowEntity;
 use entity::profiles::{Entity as ProfileEntity, Model as ProfileModel};
 use entity::profiles_links::{ProfileFollowToFollower, ProfileFollowToFollowing};
@@ -61,13 +62,19 @@ pub async fn get_by_username(db: &DatabaseConnection, username: String) -> ApiRe
     Ok(model.into())
 }
 
-pub async fn search(db: &DatabaseConnection, query: String) -> ApiResult<Vec<Profile>> {
+pub async fn search(
+    db: &DatabaseConnection,
+    query: String,
+    limit: Option<u64>,
+    offset: Option<u64>,
+) -> ApiResult<Vec<Profile>> {
     let models = ProfileEntity::find()
         .filter(
             Condition::any()
                 .add(profiles::Column::Username.contains(&query))
                 .add(profiles::Column::DisplayName.contains(&query)),
         )
+        .opt_limit_offset(limit, offset)
         .all(db)
         .await?;
 
@@ -81,10 +88,13 @@ async fn get_profiles_from_follows<
     db: &DatabaseConnection,
     cond: SimpleExpr,
     link: L,
+    limit: Option<u64>,
+    offset: Option<u64>,
 ) -> ApiResult<Vec<Profile>> {
     let follows_with_profiles = ProfileFollowEntity::find()
         .find_also_linked(link)
         .filter(cond)
+        .opt_limit_offset(limit, offset)
         .all(db)
         .await?;
 
@@ -98,11 +108,18 @@ async fn get_profiles_from_follows<
     Ok(mapped)
 }
 
-pub async fn get_followers(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<Vec<Profile>> {
+pub async fn get_followers(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    limit: Option<u64>,
+    offset: Option<u64>,
+) -> ApiResult<Vec<Profile>> {
     get_profiles_from_follows(
         db,
         profile_follows::Column::FollowedId.eq(profile_id),
         ProfileFollowToFollower,
+        limit,
+        offset,
     )
     .await
 }
@@ -116,11 +133,18 @@ pub async fn get_followers_count(db: &DatabaseConnection, profile_id: Uuid) -> A
         .map(|count| count as i64)
 }
 
-pub async fn get_following(db: &DatabaseConnection, profile_id: Uuid) -> ApiResult<Vec<Profile>> {
+pub async fn get_following(
+    db: &DatabaseConnection,
+    profile_id: Uuid,
+    limit: Option<u64>,
+    offset: Option<u64>,
+) -> ApiResult<Vec<Profile>> {
     get_profiles_from_follows(
         db,
         profile_follows::Column::FollowerId.eq(profile_id),
         ProfileFollowToFollowing,
+        limit,
+        offset,
     )
     .await
 }
@@ -180,15 +204,22 @@ pub async fn follow(
     follower_id: Uuid,
     followed_id: Uuid,
 ) -> ApiResult<bool> {
-    let model = profile_follows::ActiveModel {
-        follower_id: Set(follower_id),
-        followed_id: Set(followed_id),
-    };
-    ProfileFollowEntity::insert(model)
-        .on_conflict(OnConflict::new().do_nothing().to_owned())
-        .exec(db)
+    let existing = ProfileFollowEntity::find()
+        .filter(
+            Condition::all()
+                .add(profile_follows::Column::FollowerId.eq(follower_id))
+                .add(profile_follows::Column::FollowedId.eq(followed_id)),
+        )
+        .one(db)
         .await?;
-    Ok(true)
+    if existing.is_none() {
+        let model = profile_follows::ActiveModel {
+            follower_id: Set(follower_id),
+            followed_id: Set(followed_id),
+        };
+        ProfileFollowEntity::insert(model).exec(db).await?;
+    }
+    Ok(existing.is_none())
 }
 
 pub async fn unfollow(

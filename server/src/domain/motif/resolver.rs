@@ -20,15 +20,17 @@ use apalis::prelude::Storage;
 use apalis::redis::RedisStorage;
 use async_graphql::dataloader::DataLoader;
 use async_graphql::futures_util::Stream;
-use async_graphql::types::connection::*;
 use async_graphql::*;
 use async_graphql::{ComplexObject, Context, Object, Subscription};
-use async_stream::stream;
 use fred::prelude::RedisValue;
+use futures_util::StreamExt;
 use log::error;
 use uuid::Uuid;
 
 use crate::domain::comment::typedef::Comment;
+use crate::domain::motif::dataloader::{
+    MotifLikedLoader, MotifListenedLoader, MotifMetadataLoader,
+};
 use crate::domain::motif::datasource;
 use crate::domain::motif::pubsub::{
     topic_motif_created, topic_motif_deleted, topic_motif_listened,
@@ -37,8 +39,8 @@ use crate::domain::motif::typedef::{CreateMotif, Metadata, Motif, ServiceId};
 use crate::domain::profile::typedef::Profile;
 use crate::domain::{comment, like, profile};
 use crate::gql::auth::Authenticated;
-use crate::gql::dataloader::{MotifLikedLoader, MotifListenedLoader, MotifMetadataLoader};
-use crate::gql::util::{AuthClaims, CoerceGraphqlError, ContextDependencies};
+use crate::gql::connection::{position_page, PositionConnection};
+use crate::gql::util::{AuthClaims, CoerceGraphqlError, ConnectionParams, ContextDependencies};
 use crate::metadata::FetchMetadata;
 use crate::PubSubHandle;
 
@@ -80,10 +82,15 @@ impl Motif {
             .coerce_gql_err()
     }
 
-    async fn listeners(&self, ctx: &Context<'_>) -> Result<Vec<Profile>> {
-        datasource::get_listeners_by_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn listeners(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Profile>> {
+        position_page(page, |limit, offset| async move {
+            datasource::get_listeners_by_id(ctx.require(), self.id, limit, offset).await
+        })
+        .await
     }
 
     async fn comments_count(&self, ctx: &Context<'_>) -> Result<i32> {
@@ -92,10 +99,15 @@ impl Motif {
             .coerce_gql_err()
     }
 
-    async fn comments(&self, ctx: &Context<'_>) -> Result<Vec<Comment>> {
-        comment::datasource::get_motif_comments_by_id(ctx.require(), self.id)
-            .await
-            .coerce_gql_err()
+    async fn comments(
+        &self,
+        ctx: &Context<'_>,
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Comment>> {
+        position_page(page, |limit, offset| {
+            comment::datasource::get_motif_comments_by_id(ctx.require(), self.id, limit, offset)
+        })
+        .await
     }
 
     async fn liked(&self, ctx: &Context<'_>) -> Result<bool> {
@@ -116,28 +128,10 @@ impl Motif {
     async fn likes(
         &self,
         ctx: &Context<'_>,
-        after: Option<String>,
-        first: Option<i32>,
-    ) -> Result<Connection<i32, Profile, EmptyFields, EmptyFields>> {
-        connection::query(after, None, first, None, |after, _, first, _| async move {
-            let likes = like::datasource::get_motif_likes(
-                ctx.require(),
-                self.id,
-                first.map(|first| first as i32),
-                after.map(|after| after as i32),
-            )
-            .await
-            .coerce_gql_err()?;
-            let nodes: Vec<Edge<i32, Profile, EmptyFields>> = likes
-                .into_iter()
-                .enumerate()
-                .map(|(index, node)| Edge::new(index as i32, node))
-                .collect();
-
-            let has_more = first.map(|first| first > nodes.len()).unwrap_or(false);
-            let mut connection = Connection::new(false, has_more);
-            connection.edges.extend(nodes.into_iter());
-            Ok::<_, Error>(connection)
+        page: Option<ConnectionParams>,
+    ) -> Result<PositionConnection<Profile>> {
+        position_page(page, |limit, offset| {
+            like::datasource::get_motif_likes(ctx.require(), self.id, limit, offset)
         })
         .await
     }
@@ -148,13 +142,6 @@ pub struct MotifQuery;
 
 #[Object]
 impl MotifQuery {
-    #[graphql(guard = "Authenticated")]
-    async fn motif_my_feed(&self, ctx: &Context<'_>) -> Result<Vec<Motif>> {
-        datasource::get_feed_by_profile_id(ctx.require(), ctx.require::<AuthClaims>().id)
-            .await
-            .coerce_gql_err()
-    }
-
     #[graphql(guard = "Authenticated")]
     async fn motif_by_id(&self, ctx: &Context<'_>, motif_id: i32) -> Result<Motif> {
         datasource::get_by_id(ctx.require(), motif_id)
@@ -234,19 +221,19 @@ impl MotifSubscription {
             .into_iter()
             .map(|id| topic_motif_created(id))
             .collect();
-        let mut subscription = ctx
+        let subscription = ctx
             .require::<PubSubHandle<RedisValue>>()
             .subscribe(topics)
             .await;
-        stream! {
-            while let Some(value) = subscription.receive().await {
-                if let RedisValue::Integer(motif_id) = value {
-                    if let Some(motif) = datasource::get_by_id(ctx.require(), motif_id as i32).await.ok() {
-                        yield motif;
-                    }
-                }
+        subscription.stream().filter_map(move |value| async move {
+            if let RedisValue::Integer(motif_id) = value {
+                datasource::get_by_id(ctx.require(), motif_id as i32)
+                    .await
+                    .ok()
+            } else {
+                None
             }
-        }
+        })
     }
 
     #[graphql(guard = "Authenticated")]
@@ -259,17 +246,17 @@ impl MotifSubscription {
             .into_iter()
             .map(|id| topic_motif_deleted(id))
             .collect();
-        let mut subscription = ctx
+        let subscription = ctx
             .require::<PubSubHandle<RedisValue>>()
             .subscribe(topics)
             .await;
-        stream! {
-            while let Some(value) = subscription.receive().await {
-                if let RedisValue::Integer(motif_id) = value {
-                    yield motif_id as i32;
-                }
+        subscription.stream().filter_map(move |value| async move {
+            if let RedisValue::Integer(motif_id) = value {
+                Some(motif_id as i32)
+            } else {
+                None
             }
-        }
+        })
     }
 
     #[graphql(guard = "Authenticated")]
@@ -278,20 +265,21 @@ impl MotifSubscription {
         ctx: &'a Context<'_>,
         motif_id: i32,
     ) -> impl Stream<Item = Profile> + 'a {
-        let mut subscription = ctx
+        let subscription = ctx
             .require::<PubSubHandle<RedisValue>>()
             .subscribe(vec![topic_motif_listened(motif_id)])
             .await;
-        stream! {
-            while let Some(value) = subscription.receive().await {
-                if let RedisValue::String(listener_id) = value {
-                    if let Some(profile) = profile::datasource::get_by_id(ctx.require(), Uuid::parse_str(&listener_id.to_string()).unwrap())
-                        .await
-                        .ok() {
-                        yield profile;
-                    }
-                }
+        subscription.stream().filter_map(move |value| async move {
+            if let RedisValue::String(listener_id) = value {
+                profile::datasource::get_by_id(
+                    ctx.require(),
+                    Uuid::parse_str(&listener_id.to_string()).unwrap(),
+                )
+                .await
+                .ok()
+            } else {
+                None
             }
-        }
+        })
     }
 }

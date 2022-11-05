@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 
-pub mod auth;
-pub mod connection;
-pub mod middleware;
-pub mod routing;
-pub mod schema;
-pub mod util;
+pub mod datasource;
+pub mod resolver;
