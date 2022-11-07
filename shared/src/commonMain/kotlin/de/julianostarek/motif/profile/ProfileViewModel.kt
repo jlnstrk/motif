@@ -16,24 +16,29 @@
 
 package de.julianostarek.motif.profile
 
+import com.kuuurt.paging.multiplatform.PagingData
 import de.julianostarek.motif.SharedViewModel
+import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.domain.ProfileReference
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
 class ProfileViewModel(
     private val reference: ProfileReference?
 ) : SharedViewModel(), KoinComponent {
-    private val repository: ProfileRepository by inject()
+    private val repository: ProfileRepository by inject { parametersOf(viewModelScope) }
 
-    private var profileJob: Job? = null
+    private var refreshJob: Job? = null
 
     private val profile: MutableSharedFlow<Profile.Detail?> = MutableSharedFlow()
+    private val motifs: MutableSharedFlow<PagingData<Motif.Simple>> = MutableSharedFlow()
     private val _state: MutableStateFlow<ProfileState> = MutableStateFlow(ProfileState.NotLoaded(reference))
     val state: StateFlow<ProfileState> get() = _state
 
@@ -41,9 +46,9 @@ class ProfileViewModel(
 
     init {
         viewModelScope.launch {
-            profile.mapLatest { profile ->
+            combine(profile, motifs) { profile, motifs ->
                 if (profile != null) {
-                    ProfileState.Loaded(reference, profile)
+                    ProfileState.Loaded(reference, profile, motifs)
                 } else {
                     ProfileState.NotFound(reference)
                 }
@@ -63,24 +68,31 @@ class ProfileViewModel(
     }
 
     fun refresh(): Job {
-        profileJob?.cancel()
-        profileJob = viewModelScope.launch {
+        refreshJob?.cancel()
+        refreshJob = SupervisorJob()
+        viewModelScope.launch(refreshJob!!) {
             (if (reference != null) repository.profile(reference.id) else repository.myProfile())
                 .onStart {
                     _state.value = ProfileState.Loading(reference)
                 }
                 .collect(profile)
         }
-        return profileJob!!
+        viewModelScope.launch(refreshJob!!) {
+            (if (reference != null) repository.motifs(reference.id) else repository.myMotifs())
+                .pagingData.collect(motifs)
+        }
+        return refreshJob!!
     }
 
     fun follow() = viewModelScope.launch {
         if (isMyProfile) return@launch
         if (repository.followProfile(reference!!.id)) {
             (state.value as? ProfileState.Loaded)?.profile?.let { profile ->
-                this@ProfileViewModel.profile.emit(profile.copy(
-                    follows = true
-                ))
+                this@ProfileViewModel.profile.emit(
+                    profile.copy(
+                        follows = true
+                    )
+                )
             }
         }
     }
@@ -89,9 +101,11 @@ class ProfileViewModel(
         if (isMyProfile) return@launch
         if (repository.unfollowProfile(reference!!.id)) {
             (state.value as? ProfileState.Loaded)?.profile?.let { profile ->
-                this@ProfileViewModel.profile.emit(profile.copy(
-                    follows = false
-                ))
+                this@ProfileViewModel.profile.emit(
+                    profile.copy(
+                        follows = false
+                    )
+                )
             }
         }
     }

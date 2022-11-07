@@ -16,9 +16,11 @@
 
 package de.julianostarek.motif.profilesearch
 
+import com.kuuurt.paging.multiplatform.Pager
+import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.domain.Profile
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileSearchRepository {
-    suspend fun searchProfiles(query: String): Flow<List<Profile>>
+    suspend fun searchProfiles(query: String): Pager<String, Profile>
 }

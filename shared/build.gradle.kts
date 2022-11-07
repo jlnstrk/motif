@@ -30,7 +30,8 @@ kotlin {
             isStatic = true
             export(project(":player:player-spotify"))
             export(project(":player:player-applemusic"))
-
+            export(libs.multiplatformPaging)
+            export(libs.kotlinx.datetime)
             linkerOpts("-lsqlite3")
         }
     }
@@ -38,16 +39,19 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":client"))
+                api(project(":player"))
+
+                implementation(libs.kermit.runtime)
                 implementation(libs.kotlinx.coroutines.core)
-                api(libs.koin.kotlin)
-                api(libs.koin.annotations)
                 implementation(libs.sqldelight.coroutinesExtensions)
                 implementation(libs.sqldelight.primitiveAdapters)
                 implementation(libs.settings.core)
                 implementation(libs.settings.serialization)
                 implementation(libs.settings.coroutines)
-                implementation(project(":client"))
-                api(project(":player"))
+                api(libs.koin.kotlin)
+                api(libs.koin.annotations)
+                api(libs.multiplatformPaging)
             }
         }
         val androidMain by getting {

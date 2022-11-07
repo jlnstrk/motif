@@ -10,7 +10,7 @@ public interface MatchingCredentialsProvider {
 public sealed interface MatchingCredentials {
     public data class AppleMusicCredentials(
         public val developerToken: String,
-        public val musicUserToken: String
+        public val musicUserToken: String? = null
     ) : MatchingCredentials
 
     public data class SpotifyCredentials(

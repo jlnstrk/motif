@@ -25,7 +25,8 @@ sealed interface Motif {
     val liked: Boolean
     val listened: Boolean
     val createdAt: Instant
-    val creator: Profile
+    val creator: Profile?
+    val metadata: Metadata?
 
     data class Simple(
         override val id: Int,
@@ -34,7 +35,8 @@ sealed interface Motif {
         override val liked: Boolean,
         override val listened: Boolean,
         override val createdAt: Instant,
-        override val creator: Profile
+        override val creator: Profile?,
+        override val metadata: Metadata?,
     ) : Motif
 
     data class Detail(
@@ -45,11 +47,11 @@ sealed interface Motif {
         override val listened: Boolean,
         override val createdAt: Instant,
         override val creator: Profile,
+        override val metadata: Metadata?,
         val listenersCount: Int,
-        val listeners: List<Profile>,
+        val listenersPhotoUrls: List<String?>,
         val likesCount: Int,
-        val likedBy: List<Profile>,
+        val likedByPhotoUrls: List<String?>,
         val commentsCount: Int,
-        val comments: List<Comment>
     ) : Motif
 }

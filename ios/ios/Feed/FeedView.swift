@@ -25,59 +25,47 @@ import MediaPlayer
 import KMPNativeCoroutinesAsync
 
 struct FeedView: View {
-    @ObservedObject var playerViewModel: PlayerViewModelShim
     @StateObject var viewModel: FeedViewModelShim = FeedViewModelShim()
 
+    private let columns: [GridItem] = [
+        .init(.adaptive(minimum: 72), spacing: 8)
+    ]
+
+    private var sections: [(Recentness, [ProfileWithMotifs])] {
+        Dictionary(grouping: viewModel.feedState.profilesOrEmpty, by: { $0.motifs.first!.recentness })
+            .sorted(by: { a, b in a.key.rawValue < b.key.rawValue })
+    }
+
     var body: some View {
-        ScrollView([.horizontal, .vertical]) {
+        ScrollView {
             if let data = viewModel.feedState as? Shared.FeedState.Data {
-                let grid = data.profilesGrid
-                let gridSize = Int(grid.size)
-                let columns = [GridItem](
-                    repeating: GridItem(.fixed(72), spacing: 8),
-                    count: gridSize
-                )
-                LazyVGrid(columns: columns, alignment: .center) {
-                    ForEach(Array(viewModel.feedState.gridOrEmpty.enumerated()), id: \.element?.profile.id_) { index, element in
-                        if let profile = element {
-                            NavigationLink(destination: PlayerView(
-                                viewModel: playerViewModel,
-                                profile: profile
-                            )) {
-                                FeedProfile(profileWithMotifs: profile)
+                LazyVGrid(columns: columns, pinnedViews: [.sectionHeaders]) {
+                    ForEach(sections, id: \.0) { (recentness, profiles) in
+                        Section {
+                            ForEach(profiles, id: \.profile.id) { profile in
+                                NavigationLink(destination: MotifDetailView(viewModel: MotifDetailViewModelShim(motifId: Int(profile.motifs.first!.id_)))) {
+                                    FeedProfile(profileWithMotifs: profile)
+                                }
                             }
-                            .offset(x: (index / gridSize) % 2 == 0 ? 40 : 0)
-                        } else {
-                            EmptyView()
+                        } header: {
+                            Text(recentness.title)
+                                .font(.headline)
+                                .frame(height: 32)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }
+                .padding(.horizontal)
             } else {
                 Text("No feed")
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Image("Logo")
-                    .resizable()
-                    .scaledToFit()
-                    .padding(.vertical, 10)
-            }
-        }
-        .navigationTitle("Motif")
+        .navigationTitle("Feed")
     }
 }
 
 extension Shared.FeedState {
-    var gridOrEmpty: [Shared.ProfileWithMotifs?] {
-        get {
-            if let data = self as? Shared.FeedState.Data {
-                return data.profilesGrid.grid as! [Shared.ProfileWithMotifs?]
-            }
-            return []
-        }
-        set {
-            print(newValue)
-        }
+    var profilesOrEmpty: [Shared.ProfileWithMotifs] {
+        (self as? Shared.FeedState.Data)?.profiles ?? []
     }
 }

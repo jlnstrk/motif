@@ -2,6 +2,7 @@ package de.julianostarek.motif.player
 
 import de.julianostarek.motif.player.applemusic.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlin.jvm.JvmInline
 
@@ -26,8 +27,11 @@ public value class AppleMusicPlayer(internal val backing: MusicPlayerController)
     }
 
     override suspend fun playerState(): Flow<PlayerState> {
-        return backing.playbackStateChanged()
-            .map { _ -> AppleMusicPlayerState(backing) }
+        val playbackState = backing.playbackStateChanged()
+        val currentItem = backing.currentItemChanged()
+        return combine(playbackState, currentItem) { _, _ ->
+            AppleMusicPlayerState(backing)
+        }
     }
 
     override suspend fun seekTo(position: Long) {

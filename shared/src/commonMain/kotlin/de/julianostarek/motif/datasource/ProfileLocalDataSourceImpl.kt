@@ -16,16 +16,16 @@
 
 package de.julianostarek.motif.datasource
 
-import app.cash.sqldelight.coroutines.asFlow
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.persist.MotifDatabase
 import de.julianostarek.motif.persist.entity.ProfileEntity
 import de.julianostarek.motif.util.toEntity
 import de.julianostarek.motif.util.toSimple
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
+@Single
 class ProfileLocalDataSourceImpl(
     private val database: MotifDatabase
 ) : ProfileLocalDataSource {

@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.client.auth
 
+import co.touchlab.kermit.Logger
 import kotlinx.datetime.Clock
 import org.koin.core.annotation.Single
 
@@ -53,9 +54,15 @@ class BackendAuthRepository(
         getAppAuthOptionalRefresh()
 
         // Try to get service tokens from auth
-        var serviceToken = auth?.serviceTokens?.firstOrNull { it.service == service } ?: return null
+        var serviceToken = auth?.serviceTokens?.firstOrNull { it.service == service } ?: kotlin.run {
+            Logger.i("Expected $service service auth but none is held")
+            return null
+        }
         if (!serviceToken.token.isValid()) {
-            serviceToken = authClient.refreshServiceAuth(service) ?: return null
+            serviceToken = authClient.refreshServiceAuth(service) ?: kotlin.run {
+                Logger.i("Failed to refresh $service service auth")
+                return null
+            }
             auth = auth?.copy(
                 serviceTokens = auth?.serviceTokens
                     ?.filterNot { it.service == service }

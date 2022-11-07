@@ -1,9 +1,23 @@
-query ProfileSearch($query: String!) {
-    profileSearch(query: $query) {
-        displayName
-        id
-        photoUrl
-        username
+query ProfileSearch($query: String!, $first: Int!, $after: String) {
+    profileSearch(
+        query: $query,
+        page: {
+            first: $first,
+            after: $after
+        }
+    ) {
+        nodes {
+            displayName
+            id
+            photoUrl
+            username
+        }
+        pageInfo {
+            hasPreviousPage
+            hasNextPage
+            startCursor
+            endCursor
+        }
     }
 }
 

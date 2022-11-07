@@ -17,6 +17,10 @@
 package de.julianostarek.motif
 
 import android.app.Application
+import androidx.paging.InvalidatingPagingSourceFactory
+import androidx.paging.Pager
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 
@@ -27,7 +31,19 @@ class MotifApp : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
+        Pager()
         return ImageLoader.Builder(this)
             .build()
+    }
+
+    companion object : PagingSource<Int, String>() {
+        override fun getRefreshKey(state: PagingState<Int, String>): Int? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, String> {
+            invalidate()
+        }
+
     }
 }

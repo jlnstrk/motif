@@ -9,7 +9,39 @@ type Collection {
 
   ownerId: UUID!
 
-  motifs: [Motif!]!
+  motifs(page: ConnectionParams): MotifConnection!
+}
+
+type CollectionConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [CollectionEdge!]!
+
+  """
+  A list of nodes.
+  """
+  nodes: [Collection!]!
+}
+
+"""
+An edge in a connection.
+"""
+type CollectionEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge
+  """
+  node: Collection!
 }
 
 type Comment {
@@ -25,7 +57,7 @@ type Comment {
 
   childCommentsCount: Int!
 
-  childComments: [Comment!]!
+  childComments(page: ConnectionParams): CommentConnection!
 
   author: Profile!
 
@@ -37,7 +69,49 @@ type Comment {
 
   likesCount: Int!
 
-  likes: [Profile!]!
+  likes(page: ConnectionParams): ProfileConnection!
+}
+
+type CommentConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [CommentEdge!]!
+
+  """
+  A list of nodes.
+  """
+  nodes: [Comment!]!
+}
+
+"""
+An edge in a connection.
+"""
+type CommentEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge
+  """
+  node: Comment!
+}
+
+input ConnectionParams {
+  after: String
+
+  before: String
+
+  first: Int
+
+  last: Int
 }
 
 input CreateCollection {
@@ -67,6 +141,14 @@ The input/output is a string in RFC3339 format.
 """
 scalar DateTime
 
+type Metadata {
+  name: String!
+
+  artist: String!
+
+  coverArtUrl: String
+}
+
 type Motif {
   id: Int!
 
@@ -78,6 +160,8 @@ type Motif {
 
   creatorId: UUID!
 
+  metadata: Metadata
+
   serviceIds: [ServiceId!]!
 
   creator: Profile!
@@ -86,38 +170,84 @@ type Motif {
 
   listenersCount: Int!
 
-  listeners: [Profile!]!
+  listeners(page: ConnectionParams): ProfileConnection!
 
   commentsCount: Int!
 
-  comments: [Comment!]!
+  comments(page: ConnectionParams): CommentConnection!
 
   liked: Boolean!
 
   likesCount: Int!
 
-  likes(after: String, first: Int): ProfileConnection!
+  likes(page: ConnectionParams): ProfileConnection!
+}
+
+type MotifConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [MotifEdge!]!
+
+  """
+  A list of nodes.
+  """
+  nodes: [Motif!]!
+}
+
+"""
+An edge in a connection.
+"""
+type MotifEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge
+  """
+  node: Motif!
+}
+
+type MotifsByCreatedAtConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+
+  """
+  A list of edges.
+  """
+  edges: [MotifsByCreatedAtEdge!]!
+
+  """
+  A list of nodes.
+  """
+  nodes: [Motif!]!
+}
+
+"""
+An edge in a connection.
+"""
+type MotifsByCreatedAtEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge
+  """
+  node: Motif!
 }
 
 type Mutation {
-  profileMeUpdate(update: ProfileUpdate!): Profile!
-
-  profileFollowById(profileId: UUID!): Boolean!
-
-  profileUnfollowById(profileId: UUID!): Boolean!
-
-  motifCreate(args: CreateMotif!): Motif!
-
-  motifDeleteById(motifId: Int!): Boolean!
-
-  motifListenById(motifId: Int!): Boolean!
-
-  motifCommentCreate(motifId: Int!, args: CreateComment!): Comment!
-
-  motifCommentCreateSub(parentCommentId: Int!, args: CreateComment!): Comment!
-
-  commentDeleteById(commentId: Int!): Boolean!
-
   collectionCreate(args: CreateCollection!): Collection!
 
   collectionDeleteById(collectionId: UUID!): Boolean!
@@ -126,6 +256,12 @@ type Mutation {
 
   collectionRemoveMotif(collectionId: UUID!, motifId: Int!): Boolean!
 
+  motifCommentCreate(motifId: Int!, args: CreateComment!): Comment!
+
+  motifCommentCreateSub(parentCommentId: Int!, args: CreateComment!): Comment!
+
+  commentDeleteById(commentId: Int!): Boolean!
+
   motifLikeById(motifId: Int!): Boolean!
 
   commentLikeById(commentId: Int!): Boolean!
@@ -133,6 +269,18 @@ type Mutation {
   motifUnlikeById(motifId: Int!): Boolean!
 
   commentUnlikeById(commentId: Int!): Boolean!
+
+  motifCreate(args: CreateMotif!): Motif!
+
+  motifDeleteById(motifId: Int!): Boolean!
+
+  motifListenById(motifId: Int!): Boolean!
+
+  profileMeUpdate(update: ProfileUpdate!): Profile!
+
+  profileFollowById(profileId: UUID!): Boolean!
+
+  profileUnfollowById(profileId: UUID!): Boolean!
 }
 
 """
@@ -171,19 +319,21 @@ type Profile {
 
   biography: String
 
-  followers: [Profile!]!
+  followers(page: ConnectionParams): ProfileConnection!
 
   followersCount: Int!
 
   follows: Boolean!
 
-  following: [Profile!]!
+  following(page: ConnectionParams): ProfileConnection!
 
   followingCount: Int!
 
-  motifs: [Motif!]!
+  feed: [Motif!]!
 
-  collections: [Collection!]!
+  motifs(page: ConnectionParams): MotifsByCreatedAtConnection!
+
+  collections(page: ConnectionParams): CollectionConnection!
 }
 
 type ProfileConnection {
@@ -229,25 +379,25 @@ input ProfileUpdate {
 }
 
 type Query {
+  feedMotifs(page: ConnectionParams): MotifConnection!
+
+  feedProfiles(page: ConnectionParams): ProfileConnection!
+
+  collectionById(collectionId: UUID!): Collection!
+
+  commentById(commentId: Int!): Comment!
+
+  motifById(motifId: Int!): Motif!
+
   profileMe: Profile!
 
   profileById(profileId: UUID!): Profile
 
   profileByUsername(username: String!): Profile
 
-  profileSearch(query: String!): [Profile!]!
+  profileSearch(query: String!, page: ConnectionParams): ProfileConnection!
 
   profileIsUsernameAvailable(username: String!): Boolean!
-
-  motifMyFeed: [Motif!]!
-
-  motifPublicFeed: [Motif!]!
-
-  motifById(motifId: Int!): Motif!
-
-  commentById(commentId: Int!): Comment!
-
-  collectionById(collectionId: UUID!): Collection!
 }
 
 enum Service {
@@ -269,9 +419,7 @@ input ServiceIdInput {
 }
 
 type Subscription {
-  profileMe: Profile!
-
-  profileMeNewFollower: Profile!
+  motifLiked(motifId: Int!): Profile!
 
   motifCreated: Motif!
 
@@ -279,7 +427,9 @@ type Subscription {
 
   motifListened(motifId: Int!): Profile!
 
-  motifLiked(motifId: Int!): Profile!
+  profileMe: Profile!
+
+  profileMeNewFollower: Profile!
 }
 
 """

@@ -32,6 +32,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(libs.kermit.runtime)
                 implementation(libs.kotlinx.coroutines.core)
             }
         }

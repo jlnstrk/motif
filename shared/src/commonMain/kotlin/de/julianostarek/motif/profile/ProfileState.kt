@@ -16,6 +16,8 @@
 
 package de.julianostarek.motif.profile
 
+import com.kuuurt.paging.multiplatform.PagingData
+import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.domain.ProfileReference
 
@@ -32,7 +34,8 @@ sealed class ProfileState {
 
     data class Loaded(
         override val reference: ProfileReference?,
-        val profile: Profile.Detail
+        val profile: Profile.Detail,
+        val motifs: PagingData<Motif.Simple>,
     ) : ProfileState()
 
     data class NotFound(

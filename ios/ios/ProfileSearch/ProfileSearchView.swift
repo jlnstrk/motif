@@ -35,7 +35,7 @@ struct ProfileSearchView: View {
                 .foregroundColor(.secondary)
         case let results as Shared.ProfileSearchState.Results:
             List {
-                ForEach(results.results, id: \.id_) { profile in
+                ForEach(results.results, id: \.id) { profile in
                     NavigationLink(destination: ProfileView(viewModel: ProfileViewModelShim(for: ProfileReference.Simple(simple: profile as! ProfileSimple)))) {
                         ProfileSearchProfile(profile: profile)
                     }

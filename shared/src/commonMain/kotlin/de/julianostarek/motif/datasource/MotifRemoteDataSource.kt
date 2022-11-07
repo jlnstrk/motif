@@ -16,13 +16,20 @@
 
 package de.julianostarek.motif.datasource
 
+import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.dto.MotifCreateDto
 import de.julianostarek.motif.domain.Motif
+import de.julianostarek.motif.domain.ProfileWithMotifs
 import kotlinx.coroutines.flow.Flow
 
-interface MotifRemoteDataSource : MotifDataSource {
+interface MotifRemoteDataSource {
     fun motifCreated(): Flow<Motif.Simple>
     fun motifDeleted(): Flow<Int>
 
+    suspend fun feedProfiles(cursor: String?, count: Int): PagingResult<String, ProfileWithMotifs>
+    suspend fun motifs(cursor: String?, count: Int): PagingResult<String, Motif.Simple>
+    suspend fun motifsByProfile(profileId: String, key: String?, count: Int): PagingResult<String, Motif.Simple>
+
     suspend fun createMotif(dto: MotifCreateDto): Motif.Detail
+    suspend fun motifDetail(motifId: Int): Flow<Motif.Detail>
 }

@@ -16,12 +16,14 @@
 
 package de.julianostarek.motif.datasource
 
+import com.apollographql.apollo3.api.Optional
+import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.client.*
 import de.julianostarek.motif.domain.Profile
+import de.julianostarek.motif.graphql.toDetail
+import de.julianostarek.motif.graphql.toSimple
+import de.julianostarek.motif.graphql.toUpdate
 import de.julianostarek.motif.profileedit.ProfileEdit
-import de.julianostarek.motif.util.toDetail
-import de.julianostarek.motif.util.toSimple
-import de.julianostarek.motif.util.toUpdate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -72,11 +74,22 @@ class ProfileRemoteDataSourceImpl(
             .execute().dataAssertNoErrors.profileUnfollowById
     }
 
-    override suspend fun searchProfiles(query: String): List<Profile> {
-        return backendClient.apollo.query(ProfileSearchQuery(query))
+    override suspend fun searchProfiles(query: String, key: String?, count: Int): PagingResult<String, Profile> {
+        val query = ProfileSearchQuery(
+            query = query,
+            first = count,
+            after = Optional.presentIfNotNull(key)
+        )
+        val data = backendClient.apollo.query(query)
             .execute()
             .dataAssertNoErrors
             .profileSearch
-            .map { profile -> profile.toSimple() }
+        val page = data.nodes.map { profile -> profile.toSimple() }
+        return PagingResult(
+            items = page,
+            currentKey = key ?: "",
+            prevKey = { null },
+            nextKey = { data.pageInfo.endCursor }
+        )
     }
 }

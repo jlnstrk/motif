@@ -22,12 +22,15 @@ import UIKit
 import KMPNativeCoroutinesCore
 import KMPNativeCoroutinesCombine
 import Combine
+import MediaPlayer
 
 class PlayerViewModelShim: ObservableObject {
     let shared = Shared.PlayerViewModel()
 
-    @Published var frontendState: FrontendState = FrontendState.Disconnected()
+    @Published var remoteState: Shared.RemoteState = Shared.RemoteState.Disconnected()
     @Published var trackImage: UIImage?
+
+    @Published var isPresentingChooser: Bool = false
 
     private var cancellables: [AnyCancellable] = []
 
@@ -36,22 +39,24 @@ class PlayerViewModelShim: ObservableObject {
     }
     
     init() {
-        createPublisher(for: shared.frontendStateNative)
+        createPublisher(for: shared.remoteStateNative)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)
-            .assign(to: \.frontendState, on: self)
+            .assign(to: \.remoteState, on: self)
             .store(in: &cancellables)
         
-        createPublisher(for: shared.frontendStateNative)
+        createPublisher(for: shared.remoteStateNative)
             .assertNoFailure()
-            .map { ($0 as? Shared.FrontendState.ConnectedPlayback)?.track }
+            .map { ($0 as? Shared.RemoteState.ConnectedPlayback)?.track }
             .removeDuplicates { old, new in old?.url == new?.url }
-            .debounce(for: 0.25, scheduler: RunLoop.main, options: nil)
+            .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
             .sink { [weak self] track in
                 if let track = track {
                     self?.shared.playerOrNull()?.platform.trackImage(track: track, size: 256) { [weak self] (image, error) in
                         self?.trackImage = image
                     }
+                } else {
+                    self?.trackImage = nil
                 }
             }
             .store(in: &cancellables)

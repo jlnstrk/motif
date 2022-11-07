@@ -21,7 +21,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class CreateMotifViewModel : SharedViewModel(), KoinComponent {
-    private val repository: CreateMotifRepository by inject()
+    private val repository: MotifRepository by inject()
 
 
 }

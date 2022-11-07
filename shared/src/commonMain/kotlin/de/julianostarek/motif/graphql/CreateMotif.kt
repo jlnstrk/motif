@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.create
+package de.julianostarek.motif.graphql
 
+import de.julianostarek.motif.client.type.CreateMotif
 import de.julianostarek.motif.dto.MotifCreateDto
-import de.julianostarek.motif.domain.Motif
 
-interface CreateMotifRepository {
-    suspend fun createMotif(dto: MotifCreateDto): Motif.Detail
+fun MotifCreateDto.toCreateMotif(): CreateMotif {
+    return CreateMotif(
+        isrc = isrc,
+        serviceIds = emptyList(),
+        offset = offset
+    )
 }

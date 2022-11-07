@@ -62,6 +62,8 @@ struct ProfileView: View {
                             .padding()
                     }
                 }
+                Divider()
+                ProfileMotifsGrid(motifs: motifs)
             }
         }
         .navigationTitle(navigationTitle)
@@ -75,6 +77,10 @@ struct ProfileView: View {
                 }
             }
         }
+    }
+
+    var motifs: [Shared.MotifSimple] {
+        (viewModel.state as? ProfileState.Loaded)?.motifs ?? []
     }
 
     var followButton: any View {

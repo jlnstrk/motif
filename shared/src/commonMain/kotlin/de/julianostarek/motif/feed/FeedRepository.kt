@@ -16,11 +16,15 @@
 
 package de.julianostarek.motif.feed
 
+import com.kuuurt.paging.multiplatform.Pager
 import de.julianostarek.motif.domain.ProfileWithMotifs
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface FeedRepository {
     val isFeedRefreshing: StateFlow<Boolean>
-    fun myFeed(): Flow<List<ProfileWithMotifs>>
+
+    fun feedProfiles(): Pager<String, ProfileWithMotifs>
 }

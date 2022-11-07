@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.datasource
+package de.julianostarek.motif.graphql
 
-import de.julianostarek.motif.domain.Motif
-import de.julianostarek.motif.domain.MotifWithProfile
-import kotlinx.coroutines.flow.Flow
+import de.julianostarek.motif.client.ProfileMeUpdatedSubscription
+import de.julianostarek.motif.domain.Profile
 
-interface MotifDataSource {
-    fun motifsFeed(): Flow<List<Motif.Simple>>
+fun ProfileMeUpdatedSubscription.ProfileMe.toDetail(): Profile.Detail {
+    return Profile.Detail(
+        displayName = displayName,
+        id = id,
+        username = username,
+        photoUrl = photoUrl,
+        biography = biography,
+        follows = false,
+        followersCount = followersCount,
+        followingCount = followingCount
+    )
 }

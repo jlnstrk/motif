@@ -36,10 +36,10 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
 
     val playerNegotiation: PlayerNegotiation by inject()
     private var negotiationState: PlayerNegotiation.State = PlayerNegotiation.State.NotConnected
-    private val _frontendState: MutableStateFlow<FrontendState> = MutableStateFlow(FrontendState.Disconnected)
+    private val _remoteState: MutableStateFlow<RemoteState> = MutableStateFlow(RemoteState.Disconnected)
 
     val availableServices: List<PlayerServiceAvailabilityInfo.ServiceStatus> get() = serviceAvailabilityInfo.availableServices()
-    val frontendState: StateFlow<FrontendState> get() = _frontendState
+    val remoteState: StateFlow<RemoteState> get() = _remoteState
 
     init {
         viewModelScope.launch {
@@ -64,6 +64,20 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
     fun playerOrNull(): Player? = (negotiationState as? PlayerNegotiation.State.Connected)?.player
 
     fun selectPlayer(service: PlayerService) {
+        /*
+        TODO: Hot swap
+        val remoteState = remoteState.value
+        if (remoteState is RemoteState.Connected.Playback) {
+            viewModelScope.launch {
+                withTimeoutOrNull(2500) {
+                    playerNegotiation.state.filterIsInstance<PlayerNegotiation.State.Connected>()
+                        .filter { it.service == service }
+                        .first()
+                }?.apply {
+                    player.playFromIsrc(credentialsProvider, ) // ISRC?
+                }
+            }
+        }*/
         playerNegotiation.setService(service)
     }
 
@@ -89,12 +103,12 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
     }
 
     private fun updateFrontendState(negotiationState: PlayerNegotiation.State, playerStateOrNull: PlayerState?) {
-        println("playerState: $playerStateOrNull")
-        _frontendState.value = when (negotiationState) {
+        println("remoteState: $playerStateOrNull")
+        _remoteState.value = when (negotiationState) {
             is PlayerNegotiation.State.Connected -> {
                 playerStateOrNull?.let { playerState ->
                     playerState.track?.let { track ->
-                        FrontendState.Connected.Playback(
+                        RemoteState.Connected.Playback(
                             negotiationState.service,
                             track = track,
                             playerState.state != PlayerState.PlaybackState.PLAYING,
@@ -102,14 +116,14 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
                             isMotif = true
                         )
                     }
-                } ?: FrontendState.Connected.NoPlayback(
+                } ?: RemoteState.Connected.NoPlayback(
                     negotiationState.service
                 )
             }
 
-            is PlayerNegotiation.State.Connecting -> FrontendState.Connecting(negotiationState.service)
+            is PlayerNegotiation.State.Connecting -> RemoteState.Connecting(negotiationState.service)
             is PlayerNegotiation.State.Error,
-            PlayerNegotiation.State.NotConnected -> FrontendState.Disconnected
+            PlayerNegotiation.State.NotConnected -> RemoteState.Disconnected
         }
     }
 

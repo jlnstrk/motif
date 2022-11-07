@@ -16,12 +16,13 @@
 
 package de.julianostarek.motif.datasource
 
+import com.apollographql.apollo3.api.Optional
+import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.client.*
 import de.julianostarek.motif.dto.MotifCreateDto
 import de.julianostarek.motif.domain.Motif
-import de.julianostarek.motif.util.toCreateMotif
-import de.julianostarek.motif.util.toDetail
-import de.julianostarek.motif.util.toSimple
+import de.julianostarek.motif.domain.ProfileWithMotifs
+import de.julianostarek.motif.graphql.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,10 +47,60 @@ class MotifRemoteDataSourceImpl(
     override fun motifCreated(): Flow<Motif.Simple> = motifCreated
     override fun motifDeleted(): Flow<Int> = motifDeleted
 
-    override fun motifsFeed(): Flow<List<Motif.Simple>> {
-        return backend.apollo.query(MotifMyFeedQuery())
-            .toFlow()
-            .map { response -> response.dataAssertNoErrors.motifMyFeed.map { it.toSimple() } }
+    override suspend fun feedProfiles(cursor: String?, count: Int): PagingResult<String, ProfileWithMotifs> {
+        val query = FeedProfilesQuery(
+            first = Optional.present(count),
+            after = Optional.present(cursor)
+        )
+        val data = backend.apollo.query(query)
+            .execute()
+            .dataAssertNoErrors.feedProfiles
+        val items = data.nodes.map { it.toProfileWithMotifs() }
+        return PagingResult(
+            items = items,
+            currentKey = cursor ?: "",
+            prevKey = { null },
+            nextKey = { data.pageInfo.endCursor }
+        )
+    }
+
+    override suspend fun motifs(cursor: String?, count: Int): PagingResult<String, Motif.Simple> {
+        val query = ProfileMeMotifsQuery(
+            first = Optional.present(count),
+            after = Optional.present(cursor)
+        )
+        val data = backend.apollo.query(query)
+            .execute()
+            .dataAssertNoErrors.profileMe.motifs
+        val items = data.nodes.map { it.toSimpleMotif() }
+        return PagingResult(
+            items = items,
+            currentKey = cursor ?: "",
+            prevKey = { null },
+            nextKey = { data.pageInfo.endCursor }
+        )
+    }
+
+    override suspend fun motifsByProfile(
+        profileId: String,
+        key: String?,
+        count: Int
+    ): PagingResult<String, Motif.Simple> {
+        val query = ProfileByIdMotifsQuery(
+            profileId = profileId,
+            first = Optional.present(count),
+            after = Optional.present(key)
+        )
+        val data = backend.apollo.query(query)
+            .execute()
+            .dataAssertNoErrors.profileById!!.motifs
+        val items = data.nodes.map { it.toSimpleMotif() }
+        return PagingResult(
+            items = items,
+            currentKey = key ?: "",
+            prevKey = { null },
+            nextKey = { data.pageInfo.endCursor }
+        )
     }
 
     override suspend fun createMotif(dto: MotifCreateDto): Motif.Detail {
@@ -58,5 +109,11 @@ class MotifRemoteDataSourceImpl(
             .dataAssertNoErrors
             .motifCreate
             .toDetail()
+    }
+
+    override suspend fun motifDetail(motifId: Int): Flow<Motif.Detail> {
+        return backend.apollo.query(MotifDetailQuery(motifId))
+            .toFlow()
+            .map { it.dataAssertNoErrors.motifById.toDetail() }
     }
 }

@@ -31,6 +31,7 @@ firebase = "1.6.1"
 google-services = "4.3.13"
 jdkDesugar = "1.1.5"
 junit = "4.13.2"
+kermit = "1.1.3"
 koin = "3.2.2"
 koin-annotations = "1.0.3"
 kotlin = "1.7.20"
@@ -40,6 +41,7 @@ ktor = "2.1.2"
 material = "1.7.0-beta01"
 minSdk = "21"
 okhttp = "4.10.0"
+mpPaging = "0.5.0"
 room = "2.5.0-alpha02"
 secrets = "2.0.1"
 settings = "0.9"
@@ -109,6 +111,8 @@ firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = 
 google-android-material = { module = "com.google.android.material:material", version.ref = "material" }
 google-gradlePlugin = { module = "com.google.gms:google-services", version.ref = "google-services" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kermit-runtime = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kermit-gradlePlugin = { module = "co.touchlab:kermit-gradle-plugin", version.ref = "kermit" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version = "3.2.1" }
 koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
@@ -131,6 +135,7 @@ ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotia
 ktor-client-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+multiplatformPaging = { module = "io.github.kuuuurt:multiplatform-paging", version.ref = "mpPaging" }
 settings-core = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
 settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
 settings-serialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "settings" }
@@ -147,6 +152,7 @@ sqldelight-primitiveAdapters = { module = "app.cash.sqldelight:primitive-adapter
 [plugins]
 apollo = { id = "com.apollographql.apollo3", version.ref = "apollo" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "google-services" }
+kermit = { id = "co.touchlab.kermit", version.ref = "kermit" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }

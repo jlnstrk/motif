@@ -1,20 +1,3 @@
-query MotifMyFeed {
-    motifMyFeed {
-        createdAt
-        creator {
-            displayName
-            id
-            photoUrl
-            username
-        }
-        id
-        isrc
-        liked
-        listened
-        offset
-    }
-}
-
 query MotifDetail($motifId: Int!) {
     motifById(motifId: $motifId) {
         createdAt
@@ -24,20 +7,37 @@ query MotifDetail($motifId: Int!) {
             photoUrl
             username
         }
+        commentsCount
         id
         isrc
         listened
-        offset
-        commentsCount
-        liked
-        likesCount
-        likes(first: 3) {
-            edges {
-                node {
-                    photoUrl
-                }
+        listenersCount
+        listeners(
+            page: {
+                first: 3
+            }
+        ) {
+            nodes {
+                photoUrl
             }
         }
+        liked
+        likesCount
+        likes(
+            page: {
+                first: 3
+            }
+        ) {
+            nodes {
+                photoUrl
+            }
+        }
+        metadata {
+            name
+            artist
+            coverArtUrl
+        }
+        offset
     }
 }
 
@@ -54,6 +54,11 @@ subscription MotifCreated {
         isrc
         liked
         listened
+        metadata {
+            name
+            artist
+            coverArtUrl
+        }
         offset
     }
 }
@@ -75,16 +80,84 @@ mutation MotifCreate($args: CreateMotif!) {
         isrc
         listened
         listenersCount
+        listeners(
+            page: {
+                first: 3
+            }
+        ) {
+            nodes {
+                photoUrl
+            }
+        }
         offset
         commentsCount
         liked
         likesCount
-        likes(first: 3) {
+        likes(
+            page: {
+                first: 3
+            }
+        ) {
             nodes {
-                displayName
-                id
                 photoUrl
-                username
+            }
+        }
+    }
+}
+
+query ProfileMeMotifs($first: Int, $after: String) {
+    profileMe {
+        motifs(
+            page: {
+                after: $after
+                first: $first
+            }
+        ) {
+            nodes {
+                createdAt
+                id
+                isrc
+                liked
+                listened
+                metadata {
+                    name
+                    artist
+                    coverArtUrl
+                }
+                offset
+            }
+            pageInfo {
+                startCursor
+                endCursor
+            }
+        }
+    }
+}
+
+query ProfileByIdMotifs($profileId: UUID!, $first: Int, $after: String) {
+    profileById(profileId: $profileId) {
+        motifs(
+            page: {
+                after: $after
+                first: $first
+            }
+        ) {
+            nodes {
+                createdAt
+                id
+                isrc
+                liked
+                listened
+                metadata {
+                    name
+                    artist
+                    coverArtUrl
+                }
+                offset
+            }
+            pageInfo {
+                startCursor
+                endCursor
             }
         }
     }

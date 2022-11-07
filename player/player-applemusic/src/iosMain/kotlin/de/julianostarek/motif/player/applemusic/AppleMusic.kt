@@ -28,16 +28,15 @@ import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSNotificationCenter
 import platform.MediaPlayer.*
-import platform.StoreKit.*
 import platform.UIKit.UIImage
-import platform.darwin.NSObjectProtocol
+import platform.darwin.*
 
-public actual class MusicPlayerController(externalScope: CoroutineScope) {
+public actual class MusicPlayerController(private val externalScope: CoroutineScope) {
     private val musicPlayer: MPMusicPlayerController get() = MPMusicPlayerController.systemMusicPlayer
     private val _playbackStateChanged: MutableSharedFlow<PlaybackState> =
-        MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+        MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val _currentItemChanged: MutableSharedFlow<MusicPlayerMediaItem?> =
-        MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
+        MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     public val currentItemChanged: SharedFlow<MusicPlayerMediaItem?> get() = _currentItemChanged
 
     private var playbackStateObserver: NSObjectProtocol? = null
@@ -48,10 +47,12 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
             combine(listOf(_playbackStateChanged.subscriptionCount, _currentItemChanged.subscriptionCount)) { it.sum() }
                 .map { it > 0 }
                 .distinctUntilChanged()
-                .collectLatest { subscribed ->
-                    if (subscribed) {
+                .collectLatest { subscribe ->
+                    if (subscribe) {
+                        println("AppleMusic subscribing to updates")
                         subscribeToUpdates()
                     } else {
+                        println("AppleMusic unsubscribing from updates")
                         unsubscribeFromUpdates()
                     }
                 }
@@ -63,17 +64,24 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
             MPMusicPlayerControllerPlaybackStateDidChangeNotification,
             MPMusicPlayerController.systemMusicPlayer,
             queue = null
-        ) { notification ->
-            _playbackStateChanged.tryEmit(musicPlayer.playbackState.toCommon())
+        ) { _ ->
+            externalScope.launch {
+                _playbackStateChanged.emit(musicPlayer.playbackState.toCommon())
+            }
         }
         currentItemObserver = NSNotificationCenter.defaultCenter.addObserverForName(
             MPMusicPlayerControllerNowPlayingItemDidChangeNotification,
             MPMusicPlayerController.systemMusicPlayer,
             queue = null
-        ) { notification ->
-            _currentItemChanged.tryEmit(musicPlayer.nowPlayingItem?.let(::MusicPlayerMediaItem))
+        ) { _ ->
+            println("current item observer ${musicPlayer.nowPlayingItem}")
+            externalScope.launch {
+                _currentItemChanged.emit(musicPlayer.nowPlayingItem?.let(::MusicPlayerMediaItem))
+            }
         }
         musicPlayer.beginGeneratingPlaybackNotifications()
+        _playbackStateChanged.tryEmit(musicPlayer.playbackState.toCommon())
+        _currentItemChanged.tryEmit(musicPlayer.nowPlayingItem?.let(::MusicPlayerMediaItem))
     }
 
     private fun unsubscribeFromUpdates() {
@@ -88,6 +96,7 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
 
     public actual suspend fun setQueue(storeIds: List<String>, playWhenReady: Boolean) {
         musicPlayer.setQueueWithStoreIDs(storeIds)
+        musicPlayer.prepareToPlay()
         if (playWhenReady) {
             musicPlayer.play()
         }
@@ -110,6 +119,8 @@ public actual class MusicPlayerController(externalScope: CoroutineScope) {
     }
 
     public actual fun playbackStateChanged(): Flow<PlaybackState> = _playbackStateChanged
+
+    public actual fun currentItemChanged(): Flow<MusicPlayerMediaItem?> = _currentItemChanged
 
     public actual var playbackRate: Float
         get() = musicPlayer.currentPlaybackRate
@@ -220,7 +231,8 @@ public actual class MusicPlayerMediaItem(public val ios: MPMediaItem) {
         get() = ios.lyrics
 
     public fun artwork(width: Int, height: Int): UIImage? {
-        return ios.artwork?.imageWithSize(CGSizeMake(width.toDouble(), height.toDouble()))
+        // See https://stackoverflow.com/questions/25998621/mpmediaitemartwork-is-null-while-cover-is-available-in-itunes/26463261#26463261
+        return ios.artwork?.imageWithSize(CGSizeMake(width.toDouble(), height.toDouble())) ?: artwork()
     }
 
     public fun artwork(): UIImage? {

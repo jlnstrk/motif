@@ -18,16 +18,11 @@ package de.julianostarek.motif.ui.feed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -66,7 +61,7 @@ fun Feed(
                 CircularProgressIndicator()
             }
 
-            is FeedState.Data -> FeedContent(cast.profilesGrid,
+            is FeedState.Data -> FeedContent(cast.profiles,
                 onClicked = { profileWithMotifs ->
                     playerViewModel.shared.play(profileWithMotifs.motifs.first())
                 })

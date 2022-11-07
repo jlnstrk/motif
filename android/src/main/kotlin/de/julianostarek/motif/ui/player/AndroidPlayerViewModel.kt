@@ -39,8 +39,8 @@ class AndroidPlayerViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            shared.frontendState
-                .map { (it as? FrontendState.Connected.Playback)?.track }
+            shared.remoteState
+                .map { (it as? de.julianostarek.motif.player.FrontendState.Connected.PlayerState.Connected.Playback)?.track }
                 .distinctUntilChanged()
                 .mapLatest { track -> track?.let { shared.playerOrNull()?.platform?.trackImage(track, 500) } }
                 .collectLatest { image ->

@@ -28,12 +28,10 @@ class BackendMatchingCredentialsProvider(
     private val authRepository: BackendAuthRepository
 ) : MatchingCredentialsProvider {
     override suspend fun appleCredentials(): MatchingCredentials.AppleMusicCredentials? {
-        return authRepository.getServiceAuthOptionalRefresh(Service.AppleMusic)?.let { token ->
-            MatchingCredentials.AppleMusicCredentials(
-                developerToken = BuildKonfig.APPLE_DEVELOPER_TOKEN,
-                musicUserToken = token.accessToken
-            )
-        }
+        return MatchingCredentials.AppleMusicCredentials(
+            developerToken = BuildKonfig.APPLE_DEVELOPER_TOKEN,
+            musicUserToken = null
+        )
     }
 
     override suspend fun spotifyCredentials(): MatchingCredentials.SpotifyCredentials? {

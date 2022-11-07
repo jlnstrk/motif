@@ -16,13 +16,13 @@
 
 package de.julianostarek.motif.feed
 
+import com.kuuurt.paging.multiplatform.Pager
+import com.kuuurt.paging.multiplatform.PagingConfig
 import de.julianostarek.motif.datasource.MotifLocalDataSource
 import de.julianostarek.motif.datasource.MotifRemoteDataSource
 import de.julianostarek.motif.domain.ProfileWithMotifs
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Single
 
@@ -64,27 +64,17 @@ class FeedRepositoryImpl(
 
     private fun removeListener() = listeners.getAndUpdate { it - 1 }
 
-    override fun myFeed(): Flow<List<ProfileWithMotifs>> {
-        return local.motifsFeed()
-            .onStart {
-                clientScope.launch {
-                    remote.motifsFeed().collect {
-                        local.saveMyFeed(it)
-                    }
-                }
-                addListener()
-            }
-            .onCompletion { removeListener() }
-            .map { motifs ->
-                motifs.groupBy { it.creator.id }
-                    .map { group ->
-                        val first = group.value.first()
-                        val creator = first.creator
-                        ProfileWithMotifs(
-                            profile = creator,
-                            motifs = group.value
-                        )
-                    }
-            }
+    override fun feedProfiles(): Pager<String, ProfileWithMotifs> {
+        return Pager(
+            clientScope,
+            config = PagingConfig(pageSize = FEED_PAGE_SIZE),
+            initialKey = "",
+        ) { key, count ->
+            remote.feedProfiles(key.takeIf(String::isNotEmpty), count)
+        }
+    }
+
+    companion object {
+        const val FEED_PAGE_SIZE = 10
     }
 }

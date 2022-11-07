@@ -39,7 +39,7 @@ struct PlayerChooser: View {
                     Button("Disconnect") {
                         playerViewModel.shared.disconnect()
                     }
-                    .disabled(!(playerViewModel.frontendState is FrontendState.Connected))
+                    .disabled(!(playerViewModel.remoteState is Shared.RemoteState.Connected))
                     .frame(maxWidth: .infinity)
                 }
             }
@@ -53,7 +53,7 @@ struct PlayerChooser: View {
             Spacer()
             VStack {
                 Spacer()
-                if playerViewModel.frontendState is FrontendState.Connected {
+                if playerViewModel.remoteState is Shared.RemoteState.Connected {
                     Image(systemName: "checkmark.circle.fill")
                 } else {
                     ProgressView()
@@ -115,10 +115,10 @@ struct PlayerChooser: View {
             }
 
             var service: PlayerPlayerService? = nil
-            switch playerViewModel.frontendState {
-            case let connecting as FrontendState.Connecting:
+            switch playerViewModel.remoteState {
+            case let connecting as Shared.RemoteState.Connecting:
                 let _ = service = connecting.service
-            case let connected as FrontendState.Connected:
+            case let connected as Shared.RemoteState.Connected:
                 let _ = service = connected.service
             default:
                 let _ = ()

@@ -18,7 +18,7 @@ package de.julianostarek.motif.datasource
 
 import de.julianostarek.motif.domain.Motif
 
-interface MotifLocalDataSource : MotifDataSource {
+interface MotifLocalDataSource {
     suspend fun saveMyFeed(motifsFeed: List<Motif>)
     suspend fun saveMotif(motif: Motif)
     suspend fun deleteMotif(motifId: Int)

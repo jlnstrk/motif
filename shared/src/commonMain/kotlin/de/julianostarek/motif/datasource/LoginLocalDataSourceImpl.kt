@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.datasource
 
+import co.touchlab.kermit.Logger
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.coroutines.getStringOrNullFlow
@@ -46,12 +47,14 @@ class LoginLocalDataSourceImpl(
                 Json.decodeFromString(it)
             }
         }?.also {
-            println("Reading authentication: ${it.appToken.accessToken}")
+            Logger.d("Authentication") { "Read access token: ${it.appToken.accessToken}" }
+            Logger.d("Authentication") { "Read service tokens: ${it.serviceTokens}" }
         }
     }
 
     override suspend fun persistAuth(auth: BackendAuth?) {
-        println("Persist authentication: ${auth?.appToken?.accessToken}")
+        Logger.d("Authentication") { "Write access token: ${auth?.appToken?.accessToken}" }
+        Logger.d("Authentication") { "Write service tokens: ${auth?.serviceTokens}" }
         withContext(Dispatchers.Default) {
             loginSettings[SETTINGS_KEY_AUTH] = auth?.let { value -> Json.encodeToString(value) }
         }

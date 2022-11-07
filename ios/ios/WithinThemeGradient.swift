@@ -26,8 +26,8 @@ struct WithinThemeGradient<Content>: View where Content : View {
         ZStack {
             LinearGradient(
                 stops: [
-                    .init(color: .accentColor, location: 0.0),
-                    .init(color: .black, location: 0.33)
+                    .init(color: .accentColorDark, location: 0.0),
+                    .init(color: Color(uiColor: .systemBackground), location: 0.33)
                 ],
                 startPoint: .top,
                 endPoint: .bottom

@@ -22,9 +22,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
 class ProfileSearchViewModel : SharedViewModel(), KoinComponent {
-    private val repository: ProfileSearchRepository by inject()
+    private val repository: ProfileSearchRepository by inject { parametersOf(viewModelScope) }
     private val query: MutableStateFlow<String?> = MutableStateFlow(null)
 
     private val _state: MutableStateFlow<ProfileSearchState> = MutableStateFlow(ProfileSearchState.NoQuery)
@@ -40,13 +41,9 @@ class ProfileSearchViewModel : SharedViewModel(), KoinComponent {
                         // Not using dedicated operator since we want to emit 'Loading' always
                         delay(QUERY_DELAY_MS)
 
-                        val results = repository.searchProfiles(query)
+                        val results = repository.searchProfiles(query).pagingData
                             .mapLatest { results ->
-                                if (results.isEmpty()) {
-                                    ProfileSearchState.NoResults
-                                } else {
-                                    ProfileSearchState.Results(results)
-                                }
+                                ProfileSearchState.Results(results)
                             }
                         emitAll(results)
                     }

@@ -20,7 +20,7 @@ import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.persist.entity.MotifEntity
 import de.julianostarek.motif.persist.entity.ProfileEntity
-import de.julianostarek.motif.persist.entity.SelectUnlistened
+import de.julianostarek.motif.persist.entity.SelectFeed
 
 fun ProfileEntity.toSimple(): Profile.Simple {
     return Profile.Simple(
@@ -40,7 +40,7 @@ fun Profile.toEntity(): ProfileEntity {
     )
 }
 
-fun SelectUnlistened.toSimple(): Motif.Simple {
+fun SelectFeed.toSimple(): Motif.Simple {
     return Motif.Simple(
         id = id.toInt(),
         liked = liked,
@@ -53,7 +53,8 @@ fun SelectUnlistened.toSimple(): Motif.Simple {
             username = username,
             displayName = displayName,
             photoUrl = photoUrl
-        )
+        ),
+        metadata = null
     )
 }
 
@@ -65,6 +66,6 @@ fun Motif.toEntity(): MotifEntity {
         createdAt = createdAt,
         liked = liked,
         listened = listened,
-        creatorId = creator.id
+        creatorId = creator!!.id
     )
 }

@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.datasource
 
+import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.profileedit.ProfileEdit
 import kotlinx.coroutines.flow.Flow
@@ -33,5 +34,5 @@ interface ProfileRemoteDataSource {
 
     suspend fun unfollowProfile(id: String): Boolean
 
-    suspend fun searchProfiles(query: String): List<Profile>
+    suspend fun searchProfiles(query: String, key: String?, count: Int): PagingResult<String, Profile>
 }

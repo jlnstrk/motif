@@ -16,13 +16,14 @@
 
 package de.julianostarek.motif.feed
 
+import com.kuuurt.paging.multiplatform.PagingData
 import de.julianostarek.motif.domain.ProfileWithMotifs
 
 sealed class FeedState {
     object NotLoading : FeedState()
     object Loading : FeedState()
     data class Data(
-        val profilesGrid: SquareGrid<ProfileWithMotifs?>,
+        val profiles: PagingData<ProfileWithMotifs>,
         val refreshing: Boolean = false
     ) : FeedState()
 }

@@ -16,10 +16,10 @@
 
 package de.julianostarek.motif.player
 
-sealed class FrontendState {
-    object Disconnected : FrontendState()
-    data class Connecting(val service: PlayerService) : FrontendState()
-    sealed class Connected : FrontendState() {
+sealed class RemoteState {
+    object Disconnected : RemoteState()
+    data class Connecting(val service: PlayerService) : RemoteState()
+    sealed class Connected : RemoteState() {
         abstract val service: PlayerService
 
         data class NoPlayback(

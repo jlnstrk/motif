@@ -20,7 +20,6 @@ import Foundation
 import SwiftUI
 
 struct FeedOrProfileSearchView: View {
-    @ObservedObject var playerViewModel: PlayerViewModelShim
     @ObservedObject var profileSearchViewModel: ProfileSearchViewModelShim
     @Environment(\.isSearching) var isSearching: Bool
 
@@ -28,7 +27,7 @@ struct FeedOrProfileSearchView: View {
         if isSearching {
             ProfileSearchView(viewModel: profileSearchViewModel)
         } else {
-            FeedView(playerViewModel: playerViewModel)
+            FeedView()
         }
     }
 }

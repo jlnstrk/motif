@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif.create
+package de.julianostarek.motif.graphql
 
-import de.julianostarek.motif.datasource.MotifRemoteDataSource
-import de.julianostarek.motif.dto.MotifCreateDto
-import de.julianostarek.motif.domain.Motif
-import org.koin.core.annotation.Single
+import com.apollographql.apollo3.api.Optional
+import de.julianostarek.motif.client.type.ProfileUpdate
+import de.julianostarek.motif.profileedit.ProfileEdit
 
-@Single
-class CreateMotifRepositoryImpl(
-    private val remote: MotifRemoteDataSource
-) : CreateMotifRepository {
-    override suspend fun createMotif(dto: MotifCreateDto): Motif.Detail {
-        return remote.createMotif(dto)
-    }
+fun ProfileEdit.toUpdate(): ProfileUpdate {
+    return ProfileUpdate(
+        displayName = Optional.presentIfNotNull(displayName),
+        username = Optional.presentIfNotNull(username),
+        photoUrl = Optional.absent(),
+        biography = Optional.presentIfNotNull(biography)
+    )
 }

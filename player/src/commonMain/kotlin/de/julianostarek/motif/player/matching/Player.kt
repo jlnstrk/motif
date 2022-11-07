@@ -1,5 +1,6 @@
 package de.julianostarek.motif.player.matching
 
+import co.touchlab.kermit.Logger
 import com.adamratzman.spotify.models.Token
 import com.adamratzman.spotify.spotifyClientApi
 import com.adamratzman.spotify.spotifyImplicitGrantApi
@@ -20,6 +21,7 @@ import kotlinx.datetime.periodUntil
 import kotlinx.serialization.json.Json
 
 public suspend fun Player.playFromIsrc(credentialsProvider: MatchingCredentialsProvider, isrc: String): Boolean {
+    Logger.i("Playing from ISRC: $isrc")
     return when (this) {
         is AppleMusicPlayer -> backing.playFromIsrc(credentialsProvider, isrc)
         is SpotifyPlayer -> backing.playFromIsrc(credentialsProvider, isrc)
@@ -30,6 +32,7 @@ private suspend fun MusicPlayerController.playFromIsrc(
     credentialsProvider: MatchingCredentialsProvider,
     isrc: String
 ): Boolean {
+    Logger.i("Playing from ISRC using Apple Music")
     val client = HttpClient {
         install(ContentNegotiation) {
             json(
@@ -39,7 +42,10 @@ private suspend fun MusicPlayerController.playFromIsrc(
             )
         }
     }
-    val credentials = credentialsProvider.appleCredentials() ?: return false
+    val credentials = credentialsProvider.appleCredentials() ?: kotlin.run {
+        Logger.i("Unable to match Apple Music track because of missing credentials")
+        return false
+    }
     val response = client.get(
         URLBuilder("https://api.music.apple.com/v1/catalog")
             .appendEncodedPathSegments("de")
@@ -52,7 +58,11 @@ private suspend fun MusicPlayerController.playFromIsrc(
     }
 
     val appleMusicResponse = response.body<AppleMusicResponse>()
-    val songId = appleMusicResponse.data.firstOrNull()?.id ?: return false
+    println(appleMusicResponse.data)
+    val songId = appleMusicResponse.data.firstOrNull()?.id ?: kotlin.run {
+        Logger.i("Couldn't match ISRC to any Apple Music track")
+        return false
+    }
 
     setQueue(listOf(songId), true)
     return true
@@ -62,7 +72,11 @@ private suspend fun SpotifyRemote.playFromIsrc(
     credentialsProvider: MatchingCredentialsProvider,
     isrc: String
 ): Boolean {
-    val credentials = credentialsProvider.spotifyCredentials() ?: return false
+    Logger.i("Playing from ISRC using Spotify")
+    val credentials = credentialsProvider.spotifyCredentials() ?: kotlin.run {
+        Logger.i("Unable to match Spotify track because of missing credentials")
+        return false
+    }
     val spotifyApi = spotifyImplicitGrantApi(
         credentials.clientId,
         Token.from(
@@ -73,7 +87,10 @@ private suspend fun SpotifyRemote.playFromIsrc(
         )
     )
 
-    val track = spotifyApi.search.searchTrack("isrc:$isrc", limit = 1).firstOrNull() ?: return false
+    val track = spotifyApi.search.searchTrack("isrc:$isrc", limit = 1).firstOrNull() ?: kotlin.run {
+        Logger.i("Couldn't match ISRC to any Spotify track")
+        return false
+    }
     val uri = track.uri.uri
     playerApi.play(uri)
     return true

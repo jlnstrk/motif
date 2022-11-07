@@ -16,6 +16,8 @@
 
 package de.julianostarek.motif.profile
 
+import com.kuuurt.paging.multiplatform.Pager
+import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.profileedit.ProfileEdit
 import kotlinx.coroutines.flow.Flow
@@ -32,4 +34,8 @@ interface ProfileRepository {
     suspend fun followProfile(id: String): Boolean
 
     suspend fun unfollowProfile(id: String): Boolean
+
+    fun myMotifs(): Pager<String, Motif.Simple>
+
+    fun motifs(profileId: String): Pager<String, Motif.Simple>
 }

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import de.julianostarek.motif.R
-import de.julianostarek.motif.player.FrontendState
+import de.julianostarek.motif.player.RemoteState
 import de.julianostarek.motif.player.PlayerService
 
 @Composable
@@ -62,13 +62,13 @@ fun Player(
                 Text("Connect to Spotify")
             }
 
-            val frontendState = viewModel.shared.frontendState.collectAsState()
+            val frontendState = viewModel.shared.remoteState.collectAsState()
             Text(
                 when (val state = frontendState.value) {
-                    is FrontendState.Connected.NoPlayback -> "Connected: ${state.service}. (No Playback)"
-                    is FrontendState.Connected.Playback -> "Connected: ${state.service}. (${state.track.title})"
-                    FrontendState.Disconnected -> "Disconnected"
-                    is FrontendState.Connecting -> "Connecting: ${state.service}"
+                    is RemoteState.Connected.NoPlayback -> "Connected: ${state.service}. (No Playback)"
+                    is RemoteState.Connected.Playback -> "Connected: ${state.service}. (${state.track.title})"
+                    RemoteState.Disconnected -> "Disconnected"
+                    is RemoteState.Connecting -> "Connecting: ${state.service}"
                 }
             )
         }
@@ -119,7 +119,7 @@ fun TrackImage(viewModel: AndroidPlayerViewModel) {
 fun PlayerChooser(
     viewModel: AndroidPlayerViewModel
 ) {
-    val state = viewModel.shared.frontendState.collectAsState()
+    val state = viewModel.shared.remoteState.collectAsState()
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {

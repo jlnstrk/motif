@@ -93,7 +93,6 @@ public actual class MusicPlayerController(
         MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
     private val _currentItemChanged: MutableSharedFlow<MusicPlayerMediaItem?> =
         MutableSharedFlow(onBufferOverflow = BufferOverflow.DROP_OLDEST, replay = 1)
-    public val currentItemChanged: SharedFlow<MusicPlayerMediaItem?> get() = _currentItemChanged
 
     init {
         externalScope.launch {
@@ -137,6 +136,8 @@ public actual class MusicPlayerController(
     }
 
     public actual fun playbackStateChanged(): Flow<PlaybackState> = _playbackStateChanged
+
+    public actual fun currentItemChanged(): Flow<MusicPlayerMediaItem?> = _currentItemChanged
 
     public actual var playbackRate: Float
         get() = controller.playbackRate

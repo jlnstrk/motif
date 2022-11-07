@@ -16,16 +16,11 @@
 
 package de.julianostarek.motif.datasource
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
 import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.persist.MotifDatabase
 import de.julianostarek.motif.util.toEntity
-import de.julianostarek.motif.util.toSimple
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 
@@ -34,15 +29,6 @@ class MotifLocalDataSourceImpl(
     private val database: MotifDatabase,
     private val externalScope: CoroutineScope
 ) : MotifLocalDataSource {
-
-    override fun motifsFeed(): Flow<List<Motif.Simple>> {
-        return database.motifQueries
-            .selectUnlistened()
-            .asFlow()
-            .mapToList(externalScope.coroutineContext)
-            .map { row -> row.map { it.toSimple() } }
-    }
-
     override suspend fun saveMyFeed(motifsFeed: List<Motif>) {
         val ids = motifsFeed.map { it.id.toLong() }
         withContext(Dispatchers.Default) {
@@ -50,7 +36,7 @@ class MotifLocalDataSourceImpl(
                 database.motifQueries.deleteExceptIds(ids)
                 motifsFeed.forEach { motif ->
                     database.motifQueries.upsert(motif.toEntity())
-                    database.profileQueries.upsert(motif.creator.toEntity())
+                    motif.creator?.toEntity()?.let(database.profileQueries::upsert)
                 }
             }
         }
@@ -60,7 +46,7 @@ class MotifLocalDataSourceImpl(
         withContext(Dispatchers.Default) {
             database.transaction {
                 database.motifQueries.upsert(motif.toEntity())
-                database.profileQueries.upsert(motif.creator.toEntity())
+                motif.creator?.toEntity()?.let(database.profileQueries::upsert)
             }
         }
     }

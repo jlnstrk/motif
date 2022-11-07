@@ -16,32 +16,36 @@
 
 package de.julianostarek.motif.profilesearch
 
+import com.kuuurt.paging.multiplatform.Pager
+import com.kuuurt.paging.multiplatform.PagingConfig
+import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.datasource.ProfileLocalDataSource
 import de.julianostarek.motif.datasource.ProfileRemoteDataSource
 import de.julianostarek.motif.domain.Profile
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Single
 
 @Single
 class ProfileSearchRepositoryImpl(
     private val remote: ProfileRemoteDataSource,
     private val local: ProfileLocalDataSource,
+    @InjectedParam private val clientScope: CoroutineScope,
 ) : ProfileSearchRepository {
-    override suspend fun searchProfiles(query: String): Flow<List<Profile>> {
-        val localFetch = flow {
-            emit(emptyList())
-            emit(local.searchProfiles(query))
+    override suspend fun searchProfiles(query: String): Pager<String, Profile> {
+        return Pager(
+            clientScope,
+            config = PagingConfig(pageSize = SEARCH_PAGE_SIZE),
+            initialKey = ""
+        ) { key, count ->
+            remote.searchProfiles(query, key.takeIf(String::isNotEmpty), count)
         }
-        val remoteFetch = flow {
-            emit(emptyList())
-            emit(remote.searchProfiles(query))
-        }
-        return combine(localFetch, remoteFetch) { local, remote ->
-            (remote + local)
-                .distinctBy { it.id }
-                .sortedBy { it.displayName }
-        }
+    }
+
+    companion object {
+        const val SEARCH_PAGE_SIZE = 10
     }
 }

@@ -27,6 +27,7 @@ public expect class MusicPlayerController {
     public suspend fun release()
 
     public fun playbackStateChanged(): Flow<PlaybackState>
+    public fun currentItemChanged(): Flow<MusicPlayerMediaItem?>
 
     public val currentItem: MusicPlayerMediaItem?
     public val playbackState: PlaybackState

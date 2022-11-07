@@ -17,7 +17,6 @@
 package de.julianostarek.motif.feed
 
 import de.julianostarek.motif.SharedViewModel
-import de.julianostarek.motif.domain.ProfileWithMotifs
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,13 +41,10 @@ open class FeedViewModel : SharedViewModel(), KoinComponent {
     fun refreshFeed() {
         feedJob?.cancel()
         feedJob = viewModelScope.launch {
-            repository.myFeed()
+            repository.feedProfiles().pagingData
                 .onStart { _state.value = FeedState.Loading }
                 .collect { profiles ->
-                    _state.value = FeedState.Data(
-                        profilesGrid = profiles.sortedByDescending { it.motifs.first().createdAt }
-                            .toSpiralHexagon()
-                    )
+                    _state.value = FeedState.Data(profiles)
                 }
         }
     }

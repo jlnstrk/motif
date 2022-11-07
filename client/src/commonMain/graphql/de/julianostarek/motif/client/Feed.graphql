@@ -1,0 +1,65 @@
+query FeedProfiles($first: Int, $after: String) {
+    feedProfiles(
+        page: {
+            first: $first
+            after: $after
+        }
+    ) {
+        nodes {
+            displayName
+            id
+            photoUrl
+            username
+            feed {
+                createdAt
+                id
+                isrc
+                liked
+                listened
+                metadata {
+                    name
+                    artist
+                    coverArtUrl
+                }
+                offset
+            }
+        }
+        pageInfo {
+            startCursor
+            endCursor
+        }
+    }
+}
+
+query FeedMotifs($first: Int, $after: String) {
+    feedMotifs(
+        page: {
+            first: $first
+            after: $after
+        }
+    ) {
+        nodes {
+            createdAt
+            creator {
+                displayName
+                id
+                photoUrl
+                username
+            }
+            id
+            isrc
+            liked
+            listened
+            metadata {
+                name
+                artist
+                coverArtUrl
+            }
+            offset
+        }
+        pageInfo {
+            startCursor
+            endCursor
+        }
+    }
+}
