@@ -14,14 +14,5 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif
-
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-
-class SpotifyActiveReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-
-    }
-}
+configurations.maybeCreate("default")
+artifacts.add("default", file("spotify-app-remote-release-0.7.2.aar"))

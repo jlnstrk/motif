@@ -20,8 +20,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation(files("./src/androidMain/libs/mediaplayback-release-1.1.1.aar"))
-                implementation(files("./src/androidMain/libs/musickitauth-release-1.1.2.aar"))
+                compileOnly(project(":player:player-applemusic:musickit-auth"))
+                compileOnly(project(":player:player-applemusic:musickit-mediaplayback"))
             }
         }
     }

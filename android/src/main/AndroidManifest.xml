@@ -42,13 +42,5 @@
                 <data android:scheme="motif" android:host="auth-callback"/>
             </intent-filter>
         </activity>
-
-        <receiver
-                android:exported="true"
-                android:name="de.julianostarek.motif.SpotifyActiveReceiver">
-            <intent-filter>
-                <action android:name="com.spotify.music.active"/>
-            </intent-filter>
-        </receiver>
     </application>
 </manifest> 

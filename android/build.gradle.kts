@@ -10,12 +10,12 @@ repositories {
 
 android {
     sourceSets.getByName("main").java.srcDir("src/main/kotlin")
-    compileSdk = 32
+    compileSdk = 33
     
     defaultConfig {
         applicationId = "de.julianostarek.motif"
         minSdk = 28
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -41,6 +41,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
@@ -50,10 +51,11 @@ dependencies {
     implementation(project(":client"))
     implementation(project(":player:player-spotify"))
 
-    implementation("com.google.code.gson:gson:2.8.6")
-
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.accompanist.drawablePainter)
+    implementation(libs.accompanist.placeholder.material)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.palette)
@@ -64,6 +66,7 @@ dependencies {
 
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
@@ -71,6 +74,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     implementation(libs.coil.kt.compose)
 
@@ -82,4 +88,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     coreLibraryDesugaring(libs.core.jdk.desugaring)
+
+    implementation(project(":player:player-applemusic:musickit-auth"))
+    implementation(project(":player:player-applemusic:musickit-mediaplayback"))
+    implementation(project(":player:player-spotify:spotify-app-remote"))
 }

@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package de.julianostarek.motif
+package de.julianostarek.motif.ui.detail
 
-import android.app.Application
-import coil.ImageLoader
-import coil.ImageLoaderFactory
+import androidx.lifecycle.ViewModel
+import de.julianostarek.motif.detail.MotifDetailViewModel
 
-class MotifApp : Application(), ImageLoaderFactory {
-    override fun onCreate() {
-        super.onCreate()
-        androidStartKoin(this)
-    }
-
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
-            .build()
-    }
+class AndroidMotifDetailViewModel(motifId: Int) : ViewModel() {
+    val shared: MotifDetailViewModel = MotifDetailViewModel(motifId)
 }

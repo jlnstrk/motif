@@ -17,7 +17,8 @@
 package de.julianostarek.motif.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.darkColors
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
@@ -35,22 +36,23 @@ fun MotifTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colors = OscillyColors,
-        typography = OscillyTypography,
-        shapes = OscillyShapes,
-        content = content
-    )
+        colorScheme = MotifColorSchemeDark,
+        typography = MotifTypography,
+        shapes = MotifShapes
+    ) {
+        MotifThemeMaterial2(content = content)
+    }
 }
 
-val OscillyShapes = Shapes(
+private val MotifShapes = Shapes(
     small = RoundedCornerShape(percent = 50),
-    medium = RoundedCornerShape(size = 8.dp),
-    large = RoundedCornerShape(size = 0.dp)
+    medium = RoundedCornerShape(size = 6.dp),
+    large = RoundedCornerShape(size = 20.dp)
 )
 
 val Keyline1 = 24.dp
 
-private val Poppins = FontFamily(
+val Poppins = FontFamily(
     Font(R.font.poppins_extralight, FontWeight.ExtraLight),
     Font(R.font.poppins_extralightitalic, FontWeight.ExtraLight, FontStyle.Italic),
     Font(R.font.poppins_light, FontWeight.Light),
@@ -69,93 +71,107 @@ private val Poppins = FontFamily(
     Font(R.font.poppins_blackitalic, FontWeight.Black, FontStyle.Italic)
 )
 
-val OscillyTypography = Typography(
-    h1 = TextStyle(
+private val MotifTypography = Typography(
+    displayLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 96.sp,
+        fontSize = 57.sp,
         fontWeight = FontWeight.Light,
-        lineHeight = 117.sp,
+        lineHeight = 64.sp,
         letterSpacing = (-1.5).sp
     ),
-    h2 = TextStyle(
+    displayMedium = TextStyle(
         fontFamily = Poppins,
-        fontSize = 60.sp,
+        fontSize = 45.sp,
         fontWeight = FontWeight.Light,
-        lineHeight = 73.sp,
+        lineHeight = 52.sp,
         letterSpacing = (-0.5).sp
     ),
-    h3 = TextStyle(
+    displaySmall = TextStyle(
         fontFamily = Poppins,
-        fontSize = 48.sp,
+        fontSize = 36.sp,
         fontWeight = FontWeight.Normal,
-        lineHeight = 59.sp
+        lineHeight = 44.sp
     ),
-    h4 = TextStyle(
+    headlineLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 30.sp,
+        fontSize = 32.sp,
         fontWeight = FontWeight.SemiBold,
-        lineHeight = 37.sp
+        lineHeight = 40.sp
     ),
-    h5 = TextStyle(
+    headlineMedium = TextStyle(
+        fontFamily = Poppins,
+        fontSize = 32.sp,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 36.sp
+    ),
+    headlineSmall = TextStyle(
         fontFamily = Poppins,
         fontSize = 24.sp,
         fontWeight = FontWeight.SemiBold,
-        lineHeight = 29.sp
+        lineHeight = 32.sp
     ),
-    h6 = TextStyle(
+    titleLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 20.sp,
+        fontSize = 22.sp,
         fontWeight = FontWeight.SemiBold,
-        lineHeight = 24.sp
-    ),
-    subtitle1 = TextStyle(
-        fontFamily = Poppins,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 20.sp,
+        lineHeight = 28.sp,
         letterSpacing = 0.5.sp
     ),
-    subtitle2 = TextStyle(
-        fontFamily = Poppins,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 17.sp,
-        letterSpacing = 0.1.sp
-    ),
-    body1 = TextStyle(
+    titleMedium = TextStyle(
         fontFamily = Poppins,
         fontSize = 16.sp,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 24.sp,
+        letterSpacing = 0.1.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = Poppins,
+        fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
         lineHeight = 20.sp,
         letterSpacing = 0.15.sp
     ),
-    body2 = TextStyle(
+    bodyLarge = TextStyle(
+        fontFamily = Poppins,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 24.sp,
+        letterSpacing = 0.25.sp
+    ),
+    bodyMedium = TextStyle(
         fontFamily = Poppins,
         fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
-    ),
-    button = TextStyle(
-        fontFamily = Poppins,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.SemiBold,
-        lineHeight = 16.sp,
         letterSpacing = 1.25.sp
     ),
-    caption = TextStyle(
+    bodySmall = TextStyle(
         fontFamily = Poppins,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 16.sp,
         letterSpacing = 0.sp
     ),
-    overline = TextStyle(
+    labelLarge = TextStyle(
+        fontFamily = Poppins,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 20.sp,
+        letterSpacing = 0.5.sp
+    ),
+    labelMedium = TextStyle(
         fontFamily = Poppins,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 16.sp,
-        letterSpacing = 1.sp
+        letterSpacing = 0.5.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = Poppins,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.SemiBold,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
     )
 )
 
@@ -171,19 +187,23 @@ const val MinContrastOfPrimaryVsSurface = 3f
  * given [alpha]. Useful for situations where semi-transparent colors are undesirable.
  */
 @Composable
-fun Colors.compositedOnSurface(alpha: Float): Color {
+fun ColorScheme.compositedOnSurface(alpha: Float): Color {
     return onSurface.copy(alpha = alpha).compositeOver(surface)
 }
 
-val Yellow800 = Color(0xFFF29F05)
-val Red300 = Color(0xFFEA6D7E)
+val PrimaryLight = Color(0xFF6477C0)
+val PrimaryDark = Color(0xFF3E4A78)
 
-val OscillyColors = darkColors(
-    primary = Yellow800,
-    onPrimary = Color.Black,
-    primaryVariant = Yellow800,
-    secondary = Yellow800,
-    onSecondary = Color.Black,
-    error = Red300,
+
+val MotifColorSchemeDark = darkColorScheme(
+    primary = PrimaryLight,
+    onPrimary = Color.White,
+    primaryContainer = PrimaryLight,
+    onPrimaryContainer = Color.White,
+    secondary = PrimaryLight,
+    onSecondary = Color.White,
+    secondaryContainer = PrimaryLight,
+    onSecondaryContainer = Color.White,
+    error = Color.Red,
     onError = Color.Black
 )

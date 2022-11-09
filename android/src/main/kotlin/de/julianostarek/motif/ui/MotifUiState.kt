@@ -38,9 +38,10 @@ import androidx.navigation.compose.rememberNavController
 sealed class Screen(val route: String) {
     object Feed : Screen("feed")
     object Player : Screen("player")
-    object Profile : Screen("profile/{userId}") {
-        fun createRoute(userId: String) = "profile/$userId"
+    object Profile : Screen("profile/{profileId}") {
+        fun createRoute(profileId: String) = "profile/$profileId"
     }
+    object MyProfile : Screen("myprofile")
 }
 
 @Composable

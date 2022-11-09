@@ -38,8 +38,9 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
+                implementation("com.google.code.gson:gson:2.8.9")
                 implementation(libs.spotify.android.auth)
-                api(files("./src/androidMain/libs/spotify-app-remote-release-0.7.2.aar"))
+                compileOnly(project(":player:player-spotify:spotify-app-remote"))
             }
         }
     }

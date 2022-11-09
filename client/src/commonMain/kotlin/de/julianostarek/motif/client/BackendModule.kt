@@ -18,6 +18,10 @@ package de.julianostarek.motif.client
 
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.CustomScalarType
+import com.apollographql.apollo3.cache.normalized.FetchPolicy
+import com.apollographql.apollo3.cache.normalized.fetchPolicy
+import com.apollographql.apollo3.cache.normalized.normalizedCache
+import com.apollographql.apollo3.cache.normalized.sql.SqlNormalizedCacheFactory
 import com.apollographql.apollo3.network.ws.GraphQLWsProtocol
 import de.julianostarek.motif.client.adapter.DateTimeAdapter
 import de.julianostarek.motif.client.auth.BackendAuthExpiredException
@@ -39,6 +43,7 @@ class BackendModule {
         authRepository: BackendAuthRepository,
         authInterceptor: BackendAuthInterceptor
     ): ApolloClient {
+        val cacheFactory = SqlNormalizedCacheFactory(name = "apollo.db")
         return ApolloClient.Builder()
             .httpServerUrl(config.httpGraphQlServerUrl)
             .webSocketServerUrl(config.wsGraphQlServerUrl)
@@ -57,6 +62,8 @@ class BackendModule {
             .addHttpInterceptor(authInterceptor)
             .webSocketIdleTimeoutMillis(Long.MAX_VALUE)
             .addCustomScalarAdapter(CustomScalarType("DateTime", Instant::class.qualifiedName!!), DateTimeAdapter)
+            .normalizedCache(cacheFactory)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
             .build()
     }
 }

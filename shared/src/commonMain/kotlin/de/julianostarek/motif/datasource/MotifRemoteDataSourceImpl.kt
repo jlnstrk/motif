@@ -16,7 +16,16 @@
 
 package de.julianostarek.motif.datasource
 
+import com.apollographql.apollo3.api.ApolloRequest
+import com.apollographql.apollo3.api.ApolloResponse
+import com.apollographql.apollo3.api.Operation
 import com.apollographql.apollo3.api.Optional
+import com.apollographql.apollo3.cache.normalized.FetchPolicy
+import com.apollographql.apollo3.cache.normalized.fetchPolicy
+import com.apollographql.apollo3.cache.normalized.fetchPolicyInterceptor
+import com.apollographql.apollo3.cache.normalized.storeExpirationDate
+import com.apollographql.apollo3.interceptor.ApolloInterceptor
+import com.apollographql.apollo3.interceptor.ApolloInterceptorChain
 import com.kuuurt.paging.multiplatform.PagingResult
 import de.julianostarek.motif.client.*
 import de.julianostarek.motif.dto.MotifCreateDto
@@ -53,6 +62,7 @@ class MotifRemoteDataSourceImpl(
             after = Optional.present(cursor)
         )
         val data = backend.apollo.query(query)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
             .execute()
             .dataAssertNoErrors.feedProfiles
         val items = data.nodes.map { it.toProfileWithMotifs() }

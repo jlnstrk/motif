@@ -29,6 +29,10 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(libs.ktor.client.okhttp)
+
+                compileOnly(project(":player:player-applemusic:musickit-auth"))
+                compileOnly(project(":player:player-applemusic:musickit-mediaplayback"))
+                compileOnly(project(":player:player-spotify:spotify-app-remote"))
             }
         }
         val iosMain by getting {

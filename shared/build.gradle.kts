@@ -60,6 +60,10 @@ kotlin {
                 implementation(libs.koin.test.junit4)
                 implementation(libs.androidx.lifecycle.viewmodel.ktx)
                 implementation(libs.sqldelight.driver.android)
+
+                compileOnly(project(":player:player-applemusic:musickit-auth"))
+                compileOnly(project(":player:player-applemusic:musickit-mediaplayback"))
+                compileOnly(project(":player:player-spotify:spotify-app-remote"))
             }
         }
         val androidAndroidTest by getting {

@@ -26,7 +26,6 @@ import com.apple.android.music.playback.model.PlayerMediaItem
 import com.apple.android.music.playback.model.PlayerQueueItem
 import com.apple.android.music.playback.queue.CatalogPlaybackQueueItemProvider
 import com.apple.android.music.playback.queue.PlaybackQueueInsertionType
-import com.apple.android.music.playback.queue.PlaybackQueueItemProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -38,54 +37,82 @@ import kotlinx.datetime.toLocalDateTime
 
 public actual class MusicPlayerController(
     private val controller: MediaPlayerController,
-    externalScope: CoroutineScope,
+    private val externalScope: CoroutineScope,
 ) {
     private val listener = object : MediaPlayerController.Listener {
-        override fun onPlayerStateRestored(p0: MediaPlayerController) {
+        override fun onPlayerStateRestored(playerController: MediaPlayerController) {
             // nop
         }
 
-        override fun onPlaybackStateChanged(p0: MediaPlayerController, p1: Int, p2: Int) {
-            _playbackStateChanged.tryEmit(p2.playbackStateToCommon())
+        override fun onPlaybackStateChanged(
+            playerController: MediaPlayerController,
+            previousState: Int,
+            currentState: Int
+        ) {
+            externalScope.launch {
+                _playbackStateChanged.tryEmit(currentState.playbackStateToCommon())
+            }
         }
 
-        override fun onPlaybackStateUpdated(p0: MediaPlayerController) {
+        override fun onPlaybackStateUpdated(playerController: MediaPlayerController) {
             // nop
         }
 
-        override fun onBufferingStateChanged(p0: MediaPlayerController, p1: Boolean) {
+        override fun onBufferingStateChanged(playerController: MediaPlayerController, buffering: Boolean) {
             // nop
         }
 
-        override fun onCurrentItemChanged(p0: MediaPlayerController, p1: PlayerQueueItem?, p2: PlayerQueueItem?) {
-            p1?.let { _currentItemChanged.tryEmit(MusicPlayerMediaItem(it.item)) }
+        override fun onCurrentItemChanged(
+            playerController: MediaPlayerController,
+            previousItem: PlayerQueueItem?,
+            currentItem: PlayerQueueItem?
+        ) {
+            currentItem?.let { queueItem ->
+                externalScope.launch {
+                    _currentItemChanged.emit(MusicPlayerMediaItem(queueItem.item))
+                }
+            }
         }
 
-        override fun onItemEnded(p0: MediaPlayerController, p1: PlayerQueueItem, p2: Long) {
+        override fun onItemEnded(
+            playerController: MediaPlayerController,
+            queueItem: PlayerQueueItem,
+            endPosition: Long
+        ) {
             // nop
         }
 
-        override fun onMetadataUpdated(p0: MediaPlayerController, p1: PlayerQueueItem) {
+        override fun onMetadataUpdated(playerController: MediaPlayerController, currentItem: PlayerQueueItem) {
+            externalScope.launch {
+                _currentItemChanged.emit(MusicPlayerMediaItem(currentItem.item))
+            }
+        }
+
+        override fun onPlaybackQueueChanged(
+            playerController: MediaPlayerController,
+            playbackQueueItems: MutableList<PlayerQueueItem>
+        ) {
             // nop
         }
 
-        override fun onPlaybackQueueChanged(p0: MediaPlayerController, p1: MutableList<PlayerQueueItem>) {
+        override fun onPlaybackQueueItemsAdded(
+            playerController: MediaPlayerController,
+            queueInsertionType: Int,
+            containerType: Int,
+            itemType: Int
+        ) {
             // nop
         }
 
-        override fun onPlaybackQueueItemsAdded(p0: MediaPlayerController, p1: Int, p2: Int, p3: Int) {
+        override fun onPlaybackError(playerController: MediaPlayerController, error: MediaPlayerException) {
             // nop
         }
 
-        override fun onPlaybackError(p0: MediaPlayerController, p1: MediaPlayerException) {
+        override fun onPlaybackRepeatModeChanged(playerController: MediaPlayerController, currentRepeatMode: Int) {
             // nop
         }
 
-        override fun onPlaybackRepeatModeChanged(p0: MediaPlayerController, p1: Int) {
-            // nop
-        }
-
-        override fun onPlaybackShuffleModeChanged(p0: MediaPlayerController, p1: Int) {
+        override fun onPlaybackShuffleModeChanged(playerController: MediaPlayerController, currentShuffleMode: Int) {
             // nop
         }
     }
@@ -99,8 +126,9 @@ public actual class MusicPlayerController(
             combine(listOf(_playbackStateChanged.subscriptionCount, _currentItemChanged.subscriptionCount)) { it.sum() }
                 .map { it > 0 }
                 .distinctUntilChanged()
-                .collectLatest { subscribed ->
-                    if (subscribed) {
+                .collectLatest { subscribe ->
+                    println("AppleMusic subscribing $subscribe")
+                    if (subscribe) {
                         controller.addListener(listener)
                     } else {
                         controller.removeListener(listener)

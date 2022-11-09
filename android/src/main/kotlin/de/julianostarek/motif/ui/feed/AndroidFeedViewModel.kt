@@ -16,6 +16,49 @@
 
 package de.julianostarek.motif.ui.feed
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
+import de.julianostarek.motif.domain.ProfileWithMotifs
 import de.julianostarek.motif.feed.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Clock
 
-class AndroidFeedViewModel : FeedViewModel()
+class AndroidFeedViewModel : ViewModel() {
+    val shared: FeedViewModel = FeedViewModel()
+
+    val profiles: Flow<PagingData<FeedItem>> = shared.state
+        .filterIsInstance<FeedState.Data>().map { it.profiles }
+        .map {
+            it.map { FeedItem.Item(it) }
+                .insertSeparators { a, b ->
+                    val aRecentness = a?.data?.recentness()
+                    val bRecentness = b?.data?.recentness()
+                    when {
+                        bRecentness != null && (aRecentness == null || aRecentness != bRecentness) -> FeedItem.Header(bRecentness)
+                        else -> null
+                    }
+                }
+        }
+        .cachedIn(viewModelScope)
+}
+
+fun ProfileWithMotifs.recentness(): Recentness {
+    val offset = (Clock.System.now() - motifs.first().createdAt)
+    return when {
+        offset.inWholeDays < 1 -> Recentness.TODAY
+        offset.inWholeDays < 2 -> Recentness.YESTERDAY
+        offset.inWholeDays < 7 -> Recentness.LAST_WEEK
+        else -> Recentness.OLDER
+    }
+}
+
+sealed class FeedItem {
+    data class Header(val recentness: Recentness) : FeedItem()
+    data class Item(val data: ProfileWithMotifs) : FeedItem()
+}

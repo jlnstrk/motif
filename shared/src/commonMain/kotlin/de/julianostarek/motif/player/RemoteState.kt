@@ -18,10 +18,11 @@ package de.julianostarek.motif.player
 
 sealed class RemoteState {
     object Disconnected : RemoteState()
-    data class Connecting(val service: PlayerService) : RemoteState()
-    sealed class Connected : RemoteState() {
+    sealed class ConnectingOrConnected : RemoteState() {
         abstract val service: PlayerService
-
+    }
+    data class Connecting(override val service: PlayerService) : ConnectingOrConnected()
+    sealed class Connected : ConnectingOrConnected() {
         data class NoPlayback(
             override val service: PlayerService
         ) : Connected()

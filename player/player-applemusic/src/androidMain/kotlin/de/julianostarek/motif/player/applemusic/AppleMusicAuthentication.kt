@@ -45,7 +45,6 @@ public actual class AppleMusicAuthentication(
     private val manager: AuthenticationManager = AuthenticationFactory.createAuthenticationManager(context)
 
     public fun createIntent(): Intent = manager.createIntentBuilder(developerToken.token)
-        .setHideStartScreen(true)
         .build()
 
     public fun handleIntent(intent: Intent) {
