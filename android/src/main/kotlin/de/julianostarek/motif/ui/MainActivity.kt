@@ -64,10 +64,8 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                println("pre collect")
                 playerViewModel.playerConnectIntent()
                     .collect { intent ->
-                        println("collect intent")
                         appleIntentResult.launch(intent)
                     }
             }

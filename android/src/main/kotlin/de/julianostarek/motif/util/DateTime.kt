@@ -18,6 +18,7 @@ package de.julianostarek.motif.util
 
 import android.icu.text.RelativeDateTimeFormatter
 import kotlinx.datetime.*
+import kotlin.math.abs
 
 fun Instant.formatRelative(): String {
     val now = Clock.System.now()
@@ -25,18 +26,21 @@ fun Instant.formatRelative(): String {
     val formatter = RelativeDateTimeFormatter.getInstance()
     return when {
         offset.inWholeDays != 0L -> formatter.format(
-            offset.inWholeDays.toDouble(),
-            RelativeDateTimeFormatter.RelativeDateTimeUnit.DAY
+            abs(offset.inWholeDays.toDouble()),
+            if (offset.inWholeDays > 0) RelativeDateTimeFormatter.Direction.NEXT else RelativeDateTimeFormatter.Direction.LAST,
+            RelativeDateTimeFormatter.RelativeUnit.DAYS
         )
 
         offset.inWholeHours != 0L -> formatter.format(
-            offset.inWholeHours.toDouble(),
-            RelativeDateTimeFormatter.RelativeDateTimeUnit.DAY
+            abs(offset.inWholeHours.toDouble()),
+            if (offset.inWholeHours > 0) RelativeDateTimeFormatter.Direction.NEXT else RelativeDateTimeFormatter.Direction.LAST,
+            RelativeDateTimeFormatter.RelativeUnit.HOURS
         )
 
         offset.inWholeMinutes != 0L -> formatter.format(
-            offset.inWholeMinutes.toDouble(),
-            RelativeDateTimeFormatter.RelativeDateTimeUnit.DAY
+            abs(offset.inWholeMinutes.toDouble()),
+            if (offset.inWholeMinutes > 0) RelativeDateTimeFormatter.Direction.NEXT else RelativeDateTimeFormatter.Direction.LAST,
+            RelativeDateTimeFormatter.RelativeUnit.MINUTES
         )
 
         else -> formatter.format(RelativeDateTimeFormatter.Direction.PLAIN, RelativeDateTimeFormatter.AbsoluteUnit.NOW)

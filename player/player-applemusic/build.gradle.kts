@@ -20,18 +20,18 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                compileOnly(project(":player:player-applemusic:musickit-auth"))
-                compileOnly(project(":player:player-applemusic:musickit-mediaplayback"))
+                api(libs.appleMusic.authentication)
+                api(libs.appleMusic.playback)
             }
         }
     }
 }
 
 android {
-    compileSdk = 32
+    compileSdk = libs.versions.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = 28
-        targetSdk = 32
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
     }
 }

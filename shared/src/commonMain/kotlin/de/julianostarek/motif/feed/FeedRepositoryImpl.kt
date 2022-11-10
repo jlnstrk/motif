@@ -67,7 +67,10 @@ class FeedRepositoryImpl(
     override fun feedProfiles(): Pager<String, ProfileWithMotifs> {
         return Pager(
             clientScope,
-            config = PagingConfig(pageSize = FEED_PAGE_SIZE),
+            config = PagingConfig(
+                pageSize = FEED_PAGE_SIZE,
+                enablePlaceholders = true
+            ),
             initialKey = "",
         ) { key, count ->
             remote.feedProfiles(key.takeIf(String::isNotEmpty), count)

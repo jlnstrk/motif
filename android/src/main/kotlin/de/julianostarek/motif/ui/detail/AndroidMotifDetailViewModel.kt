@@ -16,9 +16,32 @@
 
 package de.julianostarek.motif.ui.detail
 
+import android.graphics.drawable.Drawable
+import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.palette.graphics.Palette
 import de.julianostarek.motif.detail.MotifDetailViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AndroidMotifDetailViewModel(motifId: Int) : ViewModel() {
     val shared: MotifDetailViewModel = MotifDetailViewModel(motifId)
+
+    val _themeColor: MutableStateFlow<Color?> = MutableStateFlow(null)
+    val themeColor: StateFlow<Color?> get() = _themeColor
+
+    fun submitDrawableForThemeColor(drawable: Drawable) = viewModelScope.launch {
+        _themeColor.value = withContext(Dispatchers.Default) {
+            val bitmap = drawable.toBitmap()
+            val rgbInt = Palette.Builder(bitmap)
+                .generate().darkMutedSwatch?.rgb
+            rgbInt?.let(::Color)
+        }
+    }
 }

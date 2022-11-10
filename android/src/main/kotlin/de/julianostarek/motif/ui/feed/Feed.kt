@@ -46,6 +46,7 @@ import coil.compose.AsyncImage
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
+import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.feed.FeedState
 import de.julianostarek.motif.domain.ProfileWithMotifs
 import de.julianostarek.motif.ui.PrimaryDark
@@ -56,8 +57,8 @@ import de.julianostarek.motif.ui.player.AndroidPlayerViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Feed(
-    playerViewModel: AndroidPlayerViewModel,
-    feedViewModel: AndroidFeedViewModel = viewModel()
+    feedViewModel: AndroidFeedViewModel = viewModel(),
+    onNavigateToMotifDetail: (Int) -> Unit,
 ) {
     val feedState by feedViewModel.shared.state.collectAsState()
     val appBarState = rememberTopAppBarState()
@@ -67,14 +68,15 @@ fun Feed(
         topBar = {
             FeedAppBar(scrollBehavior)
         },
-        containerColor = Color.Transparent
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets(bottom = 0.dp)
     ) { padding ->
         FeedContent(feedViewModel,
             modifier = Modifier.padding(padding),
             feedState = feedState,
             scrollBehavior = scrollBehavior,
             onProfileClick = { profileWithMotifs ->
-                playerViewModel.shared.play(profileWithMotifs.motifs.first())
+                onNavigateToMotifDetail(profileWithMotifs.motifs.first().id)
             }
         )
     }

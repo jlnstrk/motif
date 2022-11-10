@@ -24,7 +24,7 @@ kotlin {
         homepage = "https://github.com/jlnstrk/motif"
         name = "Shared"
         license = null
-        ios.deploymentTarget = "13.0"
+        ios.deploymentTarget = "15.0"
         framework {
             baseName = "Shared"
             isStatic = true
@@ -39,9 +39,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":client"))
-                api(project(":player"))
-
                 implementation(libs.kermit.runtime)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.sqldelight.coroutinesExtensions)
@@ -52,6 +49,9 @@ kotlin {
                 api(libs.koin.kotlin)
                 api(libs.koin.annotations)
                 api(libs.multiplatformPaging)
+
+                implementation(project(":client"))
+                api(project(":player"))
             }
         }
         val androidMain by getting {
@@ -60,10 +60,6 @@ kotlin {
                 implementation(libs.koin.test.junit4)
                 implementation(libs.androidx.lifecycle.viewmodel.ktx)
                 implementation(libs.sqldelight.driver.android)
-
-                compileOnly(project(":player:player-applemusic:musickit-auth"))
-                compileOnly(project(":player:player-applemusic:musickit-mediaplayback"))
-                compileOnly(project(":player:player-spotify:spotify-app-remote"))
             }
         }
         val androidAndroidTest by getting {
@@ -128,10 +124,13 @@ sqldelight {
 }
 
 android {
-    compileSdk = 32
+    compileSdk = libs.versions.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = 28
-        targetSdk = 32
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+
+        manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
+        manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }
 }

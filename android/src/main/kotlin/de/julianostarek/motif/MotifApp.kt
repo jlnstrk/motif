@@ -19,6 +19,11 @@ package de.julianostarek.motif
 import android.app.Application
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import okhttp3.Call
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.util.concurrent.TimeUnit
 
 class MotifApp : Application(), ImageLoaderFactory {
     override fun onCreate() {
@@ -28,6 +33,19 @@ class MotifApp : Application(), ImageLoaderFactory {
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
+            .callFactory { request ->
+                OkHttpClient.Builder()
+                    .build()
+                    .newCall(
+                        request.newBuilder()
+                            .url(
+                                request.url.newBuilder()
+                                    .scheme("https")
+                                    .build()
+                            )
+                            .build()
+                    )
+            }
             .build()
     }
 }

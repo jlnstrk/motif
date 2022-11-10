@@ -8,7 +8,7 @@ Pod::Spec.new do |spec|
     spec.summary                  = 'Motif Shared Module'
     spec.vendored_frameworks      = 'build/cocoapods/framework/Shared.framework'
     spec.libraries                = 'c++'
-    spec.ios.deployment_target = '13.0'
+    spec.ios.deployment_target = '15.0'
                 
                 
     spec.pod_target_xcconfig = {

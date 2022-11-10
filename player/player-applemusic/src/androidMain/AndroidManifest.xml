@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:host="de.julianostarek.motif"
+                        android:host="${applicationId}"
                         android:pathPattern="/authenticateresult.*"
                         android:scheme="musicsdk"/>
             </intent-filter>

@@ -17,7 +17,7 @@ kotlin {
     explicitApi()
 
     cocoapods {
-        ios.deploymentTarget = "9.0"
+        ios.deploymentTarget = "15.0"
         pod("SpotifyiOS") {
             version = "1.2.2"
             source = path(project.file("./pod"))
@@ -40,7 +40,7 @@ kotlin {
             dependencies {
                 implementation("com.google.code.gson:gson:2.8.9")
                 implementation(libs.spotify.android.auth)
-                compileOnly(project(":player:player-spotify:spotify-app-remote"))
+                api(libs.spotify.android.appremote)
             }
         }
     }
@@ -56,10 +56,13 @@ tasks.named<org.jetbrains.kotlin.gradle.tasks.DefFileTask>("generateDefSpotifyiO
 }
 
 android {
-    compileSdk = 32
+    compileSdk = libs.versions.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = 28
-        targetSdk = 32
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+
+        manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
+        manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }
 }

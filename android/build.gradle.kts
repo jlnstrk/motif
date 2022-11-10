@@ -10,12 +10,12 @@ repositories {
 
 android {
     sourceSets.getByName("main").java.srcDir("src/main/kotlin")
-    compileSdk = 33
+    compileSdk = libs.versions.compileSdk.get().toInt()
     
     defaultConfig {
         applicationId = "de.julianostarek.motif"
-        minSdk = 28
-        targetSdk = 33
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -33,8 +33,8 @@ android {
 
     kotlinOptions {
         freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+            // "-P",
+            // "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=1.7.20"
         )
     }
 
@@ -88,8 +88,4 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     coreLibraryDesugaring(libs.core.jdk.desugaring)
-
-    implementation(project(":player:player-applemusic:musickit-auth"))
-    implementation(project(":player:player-applemusic:musickit-mediaplayback"))
-    implementation(project(":player:player-spotify:spotify-app-remote"))
 }

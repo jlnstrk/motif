@@ -98,7 +98,6 @@ public fun RepeatMode.repeatModeToSpecific(): Int = when (this) {
     RepeatMode.OFF -> Repeat.OFF
     RepeatMode.TRACK -> Repeat.ONE
     RepeatMode.CONTEXT -> Repeat.ALL
-    else -> throw IllegalStateException()
 }
 
 public actual typealias PlayerRestrictions = com.spotify.protocol.types.PlayerRestrictions

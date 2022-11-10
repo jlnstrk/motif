@@ -23,6 +23,7 @@ allprojects {
         }
     }
     repositories {
+        maven { url = uri("file://${project.rootDir}/repository") }
         google()
         mavenLocal()
         mavenCentral()

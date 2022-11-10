@@ -19,7 +19,6 @@ package de.julianostarek.motif.ui
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +40,11 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile/{profileId}") {
         fun createRoute(profileId: String) = "profile/$profileId"
     }
+
     object MyProfile : Screen("myprofile")
+    object MotifDetail : Screen("motif/{motifId}") {
+        fun createRoute(motifId: Int) = "motif/$motifId"
+    }
 }
 
 @Composable
@@ -70,21 +73,22 @@ class MotifUiState(
         }
     }
 
+    fun navigateToMotifDetail(motifId: Int, from: NavBackStackEntry) {
+        if (from.lifecycleIsResumed()) {
+            navController.navigate(Screen.MotifDetail.createRoute(motifId))
+        }
+    }
+
     fun navigateBack() {
         navController.popBackStack()
     }
 
-    @Suppress("DEPRECATION")
     private fun checkIfOnline(): Boolean {
         val cm = getSystemService(context, ConnectivityManager::class.java)
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val capabilities = cm?.getNetworkCapabilities(cm.activeNetwork) ?: return false
-            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                    capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        } else {
-            cm?.activeNetworkInfo?.isConnectedOrConnecting == true
-        }
+        val capabilities = cm?.getNetworkCapabilities(cm.activeNetwork) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }
 

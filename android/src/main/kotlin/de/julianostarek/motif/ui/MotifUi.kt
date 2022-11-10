@@ -21,26 +21,26 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.ViewList
-import androidx.compose.material.ripple.LocalRippleTheme
-import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import de.julianostarek.motif.login.LoginState
+import de.julianostarek.motif.ui.detail.MotifDetail
 import de.julianostarek.motif.ui.feed.Feed
 import de.julianostarek.motif.ui.player.PlayerBarLayout
 import de.julianostarek.motif.ui.login.Login
 import de.julianostarek.motif.ui.login.AndroidLoginViewModel
 import de.julianostarek.motif.ui.player.AndroidPlayerViewModel
+import de.julianostarek.motif.ui.profile.Profile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,8 +59,8 @@ fun MotifUi(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .requiredHeight(88.dp)
-                                .offset(y = (-16).dp)
+                                .requiredHeight(120.dp)
+                                .offset(y = (-32).dp)
                                 .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black))),
                         )
 
@@ -87,11 +87,24 @@ fun MotifUi(
                     startDestination = Screen.Feed.route,
                     modifier = Modifier.padding(padding)
                 ) {
-                    composable(Screen.Feed.route) {
-                        Feed(playerViewModel)
+                    composable(Screen.Feed.route) { backStackEntry ->
+                        Feed(onNavigateToMotifDetail = { motifId ->
+                            uiState.navigateToMotifDetail(motifId, backStackEntry)
+                        })
                     }
-                    composable(Screen.Player.route) {
-
+                    composable(Screen.Profile.route) {
+                        Profile()
+                    }
+                    composable(
+                        Screen.MotifDetail.route,
+                        arguments = listOf(navArgument("motifId") {
+                            type = NavType.IntType
+                        })
+                    ) { backStackEntry ->
+                        MotifDetail(
+                            motifId = backStackEntry.arguments!!.getInt("motifId"),
+                            playerViewModel = playerViewModel
+                        )
                     }
                 }
             }

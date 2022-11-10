@@ -162,7 +162,6 @@ public fun RepeatMode.toSpecific(): MPMusicRepeatMode = when (this) {
     RepeatMode.ONE -> MPMusicRepeatMode.MPMusicRepeatModeOne
     RepeatMode.DEFAULT -> MPMusicRepeatMode.MPMusicRepeatModeDefault
     RepeatMode.ALL -> MPMusicRepeatMode.MPMusicRepeatModeAll
-    else -> throw IllegalStateException()
 }
 
 public fun MPMusicShuffleMode.toCommon(): ShuffleMode = when (this) {
@@ -178,7 +177,6 @@ public fun ShuffleMode.toSpecific(): MPMusicShuffleMode = when (this) {
     ShuffleMode.OFF -> MPMusicShuffleMode.MPMusicShuffleModeOff
     ShuffleMode.ALBUMS -> MPMusicShuffleMode.MPMusicShuffleModeAlbums
     ShuffleMode.DEFAULT -> MPMusicShuffleMode.MPMusicShuffleModeDefault
-    else -> throw IllegalStateException()
 }
 
 public fun MPMusicPlaybackState.toCommon(): PlaybackState = when (this) {

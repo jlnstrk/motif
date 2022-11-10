@@ -77,7 +77,6 @@ public fun RepeatMode.toSpecific(): SPTAppRemotePlaybackOptionsRepeatMode = when
     RepeatMode.OFF -> SPTAppRemotePlaybackOptionsRepeatModeOff
     RepeatMode.TRACK -> SPTAppRemotePlaybackOptionsRepeatModeTrack
     RepeatMode.CONTEXT -> SPTAppRemotePlaybackOptionsRepeatModeContext
-    else -> throw IllegalStateException()
 }
 
 public actual class PlayerRestrictions(public val ios: SPTAppRemotePlaybackRestrictionsProtocol) {
@@ -180,8 +179,7 @@ public actual class PlayerApi(
     }
 
     public actual suspend fun getCrossfadeState(): CrossfadeState? {
-        val iosCrossfadeState =
-            suspendAwaitRemoteCallback<SPTAppRemoteCrossfadeStateProtocol>(ios::getCrossfadeState) ?: return null
+        val iosCrossfadeState = suspendAwaitRemoteCallback<SPTAppRemoteCrossfadeStateProtocol>(ios::getCrossfadeState)
         return CrossfadeState(iosCrossfadeState)
     }
 }
@@ -189,8 +187,9 @@ public actual class PlayerApi(
 public actual class ImagesApi(public val ios: SPTAppRemoteImageAPIProtocol) {
     public suspend fun getImage(track: Track, width: Int, height: Int): UIImage? {
         println("ImagesApi: getImage(): width: $width, height: $height, track: ${track.uri}")
-        if (track.ios.imageIdentifier().isNullOrEmpty()) return null
+        if (track.ios.imageIdentifier().isEmpty()) return null
         return suspendAwaitRemoteCallback {
+            @Suppress("UNCHECKED_CAST")
             ios.fetchImageForItem(
                 track.ios,
                 CGSizeMake(width.toDouble(), height.toDouble()) as CValue<CGSize>,

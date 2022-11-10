@@ -62,7 +62,10 @@ class ProfileRepositoryImpl(
     override fun myMotifs(): Pager<String, Motif.Simple> {
         return Pager(
             clientScope = clientScope,
-            config = PagingConfig(pageSize = MOTIFS_PAGE_SIZE),
+            config = PagingConfig(
+                pageSize = MOTIFS_PAGE_SIZE,
+                enablePlaceholders = true
+            ),
             initialKey = ""
         ) { key, count ->
             motifRemote.motifs(key.takeIf(String::isNotEmpty), count)
@@ -72,7 +75,10 @@ class ProfileRepositoryImpl(
     override fun motifs(profileId: String): Pager<String, Motif.Simple> {
         return Pager(
             clientScope = clientScope,
-            config = PagingConfig(pageSize = MOTIFS_PAGE_SIZE),
+            config = PagingConfig(
+                pageSize = MOTIFS_PAGE_SIZE,
+                enablePlaceholders = true
+            ),
             initialKey = ""
         ) { key, count ->
             motifRemote.motifsByProfile(profileId, key.takeIf(String::isNotEmpty), count)
