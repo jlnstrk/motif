@@ -35,14 +35,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3BE14AA0DD596B805EB5F312A3000E52 /* PBXContainerItemProxy */ = {
+		A42D3D516967243CF665D7B8978EF96F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 612C3D0A513061C3B89CC5062A1184AF;
 			remoteInfo = SpotifyiOS;
 		};
-		9B715F11E97ED80CD89DA78AD1C9C6F8 /* PBXContainerItemProxy */ = {
+		ABC8574F96C2F44F25779C3C1381C621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
@@ -52,53 +52,52 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0961777340F1160C55B79CAE847B7CC0 /* SpotifyiOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SpotifyiOS.debug.xcconfig; sourceTree = "<group>"; };
 		0E8A0075B7C20DADF927A33D704CACD0 /* Pods-ios-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ios-Info.plist"; sourceTree = "<group>"; };
+		0EECB7342B5F70BEA8613E09D44226DB /* SPTAppRemoteAlbum.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteAlbum.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteAlbum.h; sourceTree = "<group>"; };
 		0FD5417038E47DB90FCFAC31CA64AA0C /* Pods-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ios.debug.xcconfig"; sourceTree = "<group>"; };
-		17D8B4F6961840D7709DF40B7E13056F /* SPTAppRemoteUserAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteUserAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteUserAPI.h; sourceTree = "<group>"; };
+		1081A0EE9EA517954ED89F79A1DDABCF /* SPTAppRemoteUserCapabilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteUserCapabilities.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteUserCapabilities.h; sourceTree = "<group>"; };
+		1A2EE02175675050399B569370AE428B /* SPTAppRemotePlayerAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlayerAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlayerAPI.h; sourceTree = "<group>"; };
 		1E69B0198F6E246C44F510A0D2992DA4 /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
-		1FA09DEE66CF23DB17D1C09A74837710 /* Shared.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Shared.release.xcconfig; sourceTree = "<group>"; };
-		25FAEFEEE86D5226A53E1DA491EB61DE /* SPTAppRemoteLibraryState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteLibraryState.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteLibraryState.h; sourceTree = "<group>"; };
-		2942BC5D871E7044CD1BD6C2308BECF9 /* SPTAppRemoteTrack.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteTrack.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteTrack.h; sourceTree = "<group>"; };
-		29D5FE477A580C6459D6EFF99C2D6895 /* SPTAppRemotePlaybackRestrictions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlaybackRestrictions.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlaybackRestrictions.h; sourceTree = "<group>"; };
+		1EC218AA964E582C5E497FAF6D28C62E /* SPTAppRemoteCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteCommon.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteCommon.h; sourceTree = "<group>"; };
+		29ADA0D0B21F99FC7F673F6DF0245162 /* SPTAppRemoteLibraryState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteLibraryState.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteLibraryState.h; sourceTree = "<group>"; };
 		29FF57CCE92F7A1AFF979C4E76C5A041 /* Pods-ios-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-ios-umbrella.h"; sourceTree = "<group>"; };
+		2DFF34B00CF76EB79C09FB7F4DF068E9 /* SPTAppRemoteImageAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteImageAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteImageAPI.h; sourceTree = "<group>"; };
 		2F98FF0414AC0FFF8B9CB08F65794FC9 /* Pods-ios.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-ios.modulemap"; sourceTree = "<group>"; };
-		30DB5A0F65544F15F11AAB375519AD71 /* SpotifyiOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SpotifyiOS.debug.xcconfig; sourceTree = "<group>"; };
-		32251A535A772BBB667DD3ACF2E40C91 /* SPTAppRemoteCommon.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteCommon.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteCommon.h; sourceTree = "<group>"; };
-		3B847EF2EE01B155212BF2599B9F4243 /* Shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Shared.framework; path = build/cocoapods/framework/Shared.framework; sourceTree = "<group>"; };
-		49A8BCEB0F703EF91011EF8A64AC64CE /* SpotifyiOS.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SpotifyiOS.h; path = SpotifyiOS.framework/Versions/A/Headers/SpotifyiOS.h; sourceTree = "<group>"; };
-		4D6E1D64BB65BC38749AB65A352153E5 /* SPTAppRemotePodcastPlaybackSpeed.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePodcastPlaybackSpeed.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePodcastPlaybackSpeed.h; sourceTree = "<group>"; };
-		5552C844397D227230C3123F37B7718B /* SPTScope.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTScope.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTScope.h; sourceTree = "<group>"; };
-		57070F95BA32944F148F63B1F0DF3558 /* SPTError.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTError.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTError.h; sourceTree = "<group>"; };
+		4179A3B668D1F8066E3B2E0EE5E1DADB /* SPTSessionManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTSessionManager.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTSessionManager.h; sourceTree = "<group>"; };
+		46B652C32DE1D188CF24299161308330 /* SPTError.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTError.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTError.h; sourceTree = "<group>"; };
+		47289523B688EC0178C726E6D8A52C1D /* SPTAppRemotePlaybackOptions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlaybackOptions.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlaybackOptions.h; sourceTree = "<group>"; };
+		4C65B1F72BDA1005224FDBDEC9AE3EF0 /* SPTAppRemoteContentItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteContentItem.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteContentItem.h; sourceTree = "<group>"; };
+		4D8BB9F7615385CBC0CA6708C2C77E5D /* SPTAppRemoteArtist.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteArtist.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteArtist.h; sourceTree = "<group>"; };
+		544BAD148463D0A1E4A2112936C43772 /* SPTAppRemotePlayerState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlayerState.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlayerState.h; sourceTree = "<group>"; };
+		60AFB4D4D41D798C43A1A5E769BDCEB6 /* Shared.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Shared.debug.xcconfig; sourceTree = "<group>"; };
 		60BCD4C1541812A0BE7473E8BD1CBE4E /* Pods-ios-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-ios-acknowledgements.markdown"; sourceTree = "<group>"; };
 		628B66E12C4A6E4FB4B248C63974EFF2 /* Pods-ios-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-ios-acknowledgements.plist"; sourceTree = "<group>"; };
-		677D401D59B4A5D4A0BEE991BE50FCA8 /* SPTAppRemoteArtist.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteArtist.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteArtist.h; sourceTree = "<group>"; };
-		71235DC2D1C464AADD8A3376C64BC120 /* SPTAppRemoteCrossfadeState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteCrossfadeState.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteCrossfadeState.h; sourceTree = "<group>"; };
 		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		730C2F7D537999A3A1A07B7B2E095890 /* SpotifyAppRemote.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SpotifyAppRemote.h; path = SpotifyiOS.framework/Versions/A/Headers/SpotifyAppRemote.h; sourceTree = "<group>"; };
-		7DC613827522C5CAB4EA67639AC9C0BA /* SPTAppRemotePlayerAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlayerAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlayerAPI.h; sourceTree = "<group>"; };
-		816129E71BD4598B232923EFE459C148 /* SPTSessionManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTSessionManager.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTSessionManager.h; sourceTree = "<group>"; };
-		92727A8706F7A909D75EF4FF3D7856D1 /* shared.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = shared.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		752773AE40096B02CBC14E00B6A3E80A /* SPTAppRemotePodcastPlaybackSpeed.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePodcastPlaybackSpeed.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePodcastPlaybackSpeed.h; sourceTree = "<group>"; };
+		7C12BE36AE1B4BE285DC53E4B64A8F7A /* SPTConfiguration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTConfiguration.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTConfiguration.h; sourceTree = "<group>"; };
+		8689F77BCA9C1CCDFF89E6D0B3DEFA31 /* SPTAppRemoteCrossfadeState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteCrossfadeState.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteCrossfadeState.h; sourceTree = "<group>"; };
+		8B99D25D864464CC822A7E4118FBE123 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
+		95F8205E0F73C52A649F8AC1B7D65047 /* SPTLogin.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTLogin.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTLogin.h; sourceTree = "<group>"; };
 		9C3BF771D6D89EA1AFD6304178EA5A6E /* Pods-ios-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-ios-dummy.m"; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		A75FEACE1C66C02D67D64106BBB047B4 /* SpotifyiOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SpotifyiOS.release.xcconfig; sourceTree = "<group>"; };
-		A86F18FE44398A58B77D59D37425EE19 /* SPTLogin.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTLogin.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTLogin.h; sourceTree = "<group>"; };
-		AD8AB0AB0C31991AC448BC01470D1C7C /* SPTAppRemoteImageRepresentable.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteImageRepresentable.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteImageRepresentable.h; sourceTree = "<group>"; };
-		AEAA67A580BD72BE11AE525E3B65F4F4 /* SPTAppRemotePlaybackOptions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlaybackOptions.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlaybackOptions.h; sourceTree = "<group>"; };
-		B01D61B455C1A3782BC086B763411A95 /* SPTConfiguration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTConfiguration.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTConfiguration.h; sourceTree = "<group>"; };
-		B0E6ED4DD886DACF0EEAC5EDB688A945 /* SPTAppRemoteConnectionParams.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteConnectionParams.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteConnectionParams.h; sourceTree = "<group>"; };
-		B4C211DA0211DCC28B13CE6A8C0D430D /* SPTAppRemoteContentItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteContentItem.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteContentItem.h; sourceTree = "<group>"; };
-		B6A859B1DAD86542E136BAFEE11A2E41 /* SPTAppRemotePlayerState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlayerState.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlayerState.h; sourceTree = "<group>"; };
-		C90ADEAA26D6A694614DC0AC79A757DE /* SPTAppRemoteImageAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteImageAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteImageAPI.h; sourceTree = "<group>"; };
-		CA902A5153F948682BF815FE0F27D6A0 /* SPTAppRemoteContentAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteContentAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteContentAPI.h; sourceTree = "<group>"; };
-		D067C55532D89E122DF9DA20D55BFFB2 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
-		D216D1BE3A0357352E5687199DD9DA2F /* SPTSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTSession.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTSession.h; sourceTree = "<group>"; };
+		AA73240B995341A57D1445D51F9F6845 /* SPTAppRemoteUserAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteUserAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteUserAPI.h; sourceTree = "<group>"; };
+		AC69028A028EF3541D9F193DF7B964A4 /* Shared.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Shared.release.xcconfig; sourceTree = "<group>"; };
+		B03D6D32B56C148FBE7DB34198A336C7 /* SpotifyiOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SpotifyiOS.release.xcconfig; sourceTree = "<group>"; };
+		B13BB5A0DD6E86EFBD2E5E80DDCBD4CD /* SPTAppRemoteConnectionParams.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteConnectionParams.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteConnectionParams.h; sourceTree = "<group>"; };
+		B3A5B6DB61C99EC14DE68DF687ED7DDC /* SpotifyiOS.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SpotifyiOS.h; path = SpotifyiOS.framework/Versions/A/Headers/SpotifyiOS.h; sourceTree = "<group>"; };
+		B424465336CBB61CE40AA5410885C89C /* shared.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = shared.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		B73E8A06E246B375A09925224B261A30 /* SpotifyAppRemote.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SpotifyAppRemote.h; path = SpotifyiOS.framework/Versions/A/Headers/SpotifyAppRemote.h; sourceTree = "<group>"; };
+		CACFF5BB1C0C6C9A7F0E4A65E1C2C568 /* SPTMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTMacros.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTMacros.h; sourceTree = "<group>"; };
+		CD87D52AD3E2DB8864A77ED92702C2EA /* SPTAppRemote.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemote.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemote.h; sourceTree = "<group>"; };
+		DA1679F5122F35AA5B4779CA50176076 /* SPTAppRemoteImageRepresentable.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteImageRepresentable.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteImageRepresentable.h; sourceTree = "<group>"; };
 		DB84425C5097649DB7039BCDFCA4DB6C /* Pods-ios */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-ios"; path = Pods_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E2726DB3BF0720F8D9FBF2FFC5ACDC39 /* SPTAppRemoteUserCapabilities.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteUserCapabilities.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteUserCapabilities.h; sourceTree = "<group>"; };
-		E8980AF8D06D4B8300B12818BC1FBF54 /* SPTAppRemoteAlbum.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteAlbum.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteAlbum.h; sourceTree = "<group>"; };
-		EDFF51527C243E5F78407EDB270601FD /* SPTAppRemote.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemote.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemote.h; sourceTree = "<group>"; };
-		F148F27B65C140CE087A72876D303167 /* SPTMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTMacros.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTMacros.h; sourceTree = "<group>"; };
-		FCFA2D11B91EC90754D5666EA0169799 /* SpotifyiOS.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = SpotifyiOS.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		FD84684F2AE5DE3715806AB3B6FF4865 /* Shared.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Shared.debug.xcconfig; sourceTree = "<group>"; };
+		DC8237F67008C9293EEA23E762C18BBE /* SpotifyiOS.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = SpotifyiOS.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		DF98789FDC1EFC5B71EE04F19CC00F59 /* SPTAppRemoteTrack.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteTrack.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteTrack.h; sourceTree = "<group>"; };
+		E96632C40F4A30F52788400D4E262029 /* SPTAppRemotePlaybackRestrictions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemotePlaybackRestrictions.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemotePlaybackRestrictions.h; sourceTree = "<group>"; };
+		F1A3833F8D60B62BD12C529983A08273 /* SPTScope.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTScope.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTScope.h; sourceTree = "<group>"; };
+		F1F89FC8CE1457401BFAC4ED5F4232D8 /* SPTSession.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTSession.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTSession.h; sourceTree = "<group>"; };
+		FB7F4A9D65D7D6498E822D6418EFAC94 /* SPTAppRemoteContentAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SPTAppRemoteContentAPI.h; path = SpotifyiOS.framework/Versions/A/Headers/SPTAppRemoteContentAPI.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +112,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0656950221F98E393C035239F1F4A7A4 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				549138698C091C862B35EF8C2F2E10CB /* Pod */,
+				280F1D2532A935813A43E0BC37FA5E56 /* Support Files */,
+			);
+			name = Shared;
+			path = ../../shared;
+			sourceTree = "<group>";
+		};
 		097ED71B52A0F9B065B489B68D0DDAB6 /* Targets Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -121,23 +130,53 @@
 			name = "Targets Support Files";
 			sourceTree = "<group>";
 		};
-		15389256A17B18DEFF528F67207A3D0C /* Shared */ = {
+		280F1D2532A935813A43E0BC37FA5E56 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				2E24F08063F700F7B509CD03560D32E7 /* Frameworks */,
-				8F2C677F2505E1B7085E11DE4AC4AB48 /* Pod */,
-				500CE35022E4D60BEA5289282FDCA6DC /* Support Files */,
+				60AFB4D4D41D798C43A1A5E769BDCEB6 /* Shared.debug.xcconfig */,
+				AC69028A028EF3541D9F193DF7B964A4 /* Shared.release.xcconfig */,
 			);
-			name = Shared;
-			path = ../../shared;
+			name = "Support Files";
+			path = "../ios/Pods/Target Support Files/Shared";
 			sourceTree = "<group>";
 		};
-		2E24F08063F700F7B509CD03560D32E7 /* Frameworks */ = {
+		34AE0E8355003F4E321088BE471D9689 /* SpotifyiOS */ = {
 			isa = PBXGroup;
 			children = (
-				3B847EF2EE01B155212BF2599B9F4243 /* Shared.framework */,
+				B73E8A06E246B375A09925224B261A30 /* SpotifyAppRemote.h */,
+				B3A5B6DB61C99EC14DE68DF687ED7DDC /* SpotifyiOS.h */,
+				CD87D52AD3E2DB8864A77ED92702C2EA /* SPTAppRemote.h */,
+				0EECB7342B5F70BEA8613E09D44226DB /* SPTAppRemoteAlbum.h */,
+				4D8BB9F7615385CBC0CA6708C2C77E5D /* SPTAppRemoteArtist.h */,
+				1EC218AA964E582C5E497FAF6D28C62E /* SPTAppRemoteCommon.h */,
+				B13BB5A0DD6E86EFBD2E5E80DDCBD4CD /* SPTAppRemoteConnectionParams.h */,
+				FB7F4A9D65D7D6498E822D6418EFAC94 /* SPTAppRemoteContentAPI.h */,
+				4C65B1F72BDA1005224FDBDEC9AE3EF0 /* SPTAppRemoteContentItem.h */,
+				8689F77BCA9C1CCDFF89E6D0B3DEFA31 /* SPTAppRemoteCrossfadeState.h */,
+				2DFF34B00CF76EB79C09FB7F4DF068E9 /* SPTAppRemoteImageAPI.h */,
+				DA1679F5122F35AA5B4779CA50176076 /* SPTAppRemoteImageRepresentable.h */,
+				29ADA0D0B21F99FC7F673F6DF0245162 /* SPTAppRemoteLibraryState.h */,
+				47289523B688EC0178C726E6D8A52C1D /* SPTAppRemotePlaybackOptions.h */,
+				E96632C40F4A30F52788400D4E262029 /* SPTAppRemotePlaybackRestrictions.h */,
+				1A2EE02175675050399B569370AE428B /* SPTAppRemotePlayerAPI.h */,
+				544BAD148463D0A1E4A2112936C43772 /* SPTAppRemotePlayerState.h */,
+				752773AE40096B02CBC14E00B6A3E80A /* SPTAppRemotePodcastPlaybackSpeed.h */,
+				DF98789FDC1EFC5B71EE04F19CC00F59 /* SPTAppRemoteTrack.h */,
+				AA73240B995341A57D1445D51F9F6845 /* SPTAppRemoteUserAPI.h */,
+				1081A0EE9EA517954ED89F79A1DDABCF /* SPTAppRemoteUserCapabilities.h */,
+				7C12BE36AE1B4BE285DC53E4B64A8F7A /* SPTConfiguration.h */,
+				46B652C32DE1D188CF24299161308330 /* SPTError.h */,
+				95F8205E0F73C52A649F8AC1B7D65047 /* SPTLogin.h */,
+				CACFF5BB1C0C6C9A7F0E4A65E1C2C568 /* SPTMacros.h */,
+				F1A3833F8D60B62BD12C529983A08273 /* SPTScope.h */,
+				F1F89FC8CE1457401BFAC4ED5F4232D8 /* SPTSession.h */,
+				4179A3B668D1F8066E3B2E0EE5E1DADB /* SPTSessionManager.h */,
+				6C91095748EDCB8F9591AB8296B691BD /* Frameworks */,
+				D61E5601552840C6CA7B1DB163AF7D71 /* Pod */,
+				D50C3E26AF1D0AE920258E8A87A7E978 /* Support Files */,
 			);
-			name = Frameworks;
+			name = SpotifyiOS;
+			path = "../../player/player-spotify/pod";
 			sourceTree = "<group>";
 		};
 		44F702A6B789F29211C4EBDABA900B73 /* Pods-ios */ = {
@@ -164,14 +203,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		500CE35022E4D60BEA5289282FDCA6DC /* Support Files */ = {
+		549138698C091C862B35EF8C2F2E10CB /* Pod */ = {
 			isa = PBXGroup;
 			children = (
-				FD84684F2AE5DE3715806AB3B6FF4865 /* Shared.debug.xcconfig */,
-				1FA09DEE66CF23DB17D1C09A74837710 /* Shared.release.xcconfig */,
+				B424465336CBB61CE40AA5410885C89C /* shared.podspec */,
 			);
-			name = "Support Files";
-			path = "../ios/Pods/Target Support Files/Shared";
+			name = Pod;
 			sourceTree = "<group>";
 		};
 		578452D2E740E91742655AC8F1636D1F /* iOS */ = {
@@ -182,76 +219,28 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		8E2BC746E0645DFDCA12B219058FDB45 /* Support Files */ = {
+		6C91095748EDCB8F9591AB8296B691BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				30DB5A0F65544F15F11AAB375519AD71 /* SpotifyiOS.debug.xcconfig */,
-				A75FEACE1C66C02D67D64106BBB047B4 /* SpotifyiOS.release.xcconfig */,
-			);
-			name = "Support Files";
-			path = "../../../ios/Pods/Target Support Files/SpotifyiOS";
-			sourceTree = "<group>";
-		};
-		8F2C677F2505E1B7085E11DE4AC4AB48 /* Pod */ = {
-			isa = PBXGroup;
-			children = (
-				92727A8706F7A909D75EF4FF3D7856D1 /* shared.podspec */,
-			);
-			name = Pod;
-			sourceTree = "<group>";
-		};
-		9A52C89EC7EA13A325348EA3AF3B886E /* SpotifyiOS */ = {
-			isa = PBXGroup;
-			children = (
-				730C2F7D537999A3A1A07B7B2E095890 /* SpotifyAppRemote.h */,
-				49A8BCEB0F703EF91011EF8A64AC64CE /* SpotifyiOS.h */,
-				EDFF51527C243E5F78407EDB270601FD /* SPTAppRemote.h */,
-				E8980AF8D06D4B8300B12818BC1FBF54 /* SPTAppRemoteAlbum.h */,
-				677D401D59B4A5D4A0BEE991BE50FCA8 /* SPTAppRemoteArtist.h */,
-				32251A535A772BBB667DD3ACF2E40C91 /* SPTAppRemoteCommon.h */,
-				B0E6ED4DD886DACF0EEAC5EDB688A945 /* SPTAppRemoteConnectionParams.h */,
-				CA902A5153F948682BF815FE0F27D6A0 /* SPTAppRemoteContentAPI.h */,
-				B4C211DA0211DCC28B13CE6A8C0D430D /* SPTAppRemoteContentItem.h */,
-				71235DC2D1C464AADD8A3376C64BC120 /* SPTAppRemoteCrossfadeState.h */,
-				C90ADEAA26D6A694614DC0AC79A757DE /* SPTAppRemoteImageAPI.h */,
-				AD8AB0AB0C31991AC448BC01470D1C7C /* SPTAppRemoteImageRepresentable.h */,
-				25FAEFEEE86D5226A53E1DA491EB61DE /* SPTAppRemoteLibraryState.h */,
-				AEAA67A580BD72BE11AE525E3B65F4F4 /* SPTAppRemotePlaybackOptions.h */,
-				29D5FE477A580C6459D6EFF99C2D6895 /* SPTAppRemotePlaybackRestrictions.h */,
-				7DC613827522C5CAB4EA67639AC9C0BA /* SPTAppRemotePlayerAPI.h */,
-				B6A859B1DAD86542E136BAFEE11A2E41 /* SPTAppRemotePlayerState.h */,
-				4D6E1D64BB65BC38749AB65A352153E5 /* SPTAppRemotePodcastPlaybackSpeed.h */,
-				2942BC5D871E7044CD1BD6C2308BECF9 /* SPTAppRemoteTrack.h */,
-				17D8B4F6961840D7709DF40B7E13056F /* SPTAppRemoteUserAPI.h */,
-				E2726DB3BF0720F8D9FBF2FFC5ACDC39 /* SPTAppRemoteUserCapabilities.h */,
-				B01D61B455C1A3782BC086B763411A95 /* SPTConfiguration.h */,
-				57070F95BA32944F148F63B1F0DF3558 /* SPTError.h */,
-				A86F18FE44398A58B77D59D37425EE19 /* SPTLogin.h */,
-				F148F27B65C140CE087A72876D303167 /* SPTMacros.h */,
-				5552C844397D227230C3123F37B7718B /* SPTScope.h */,
-				D216D1BE3A0357352E5687199DD9DA2F /* SPTSession.h */,
-				816129E71BD4598B232923EFE459C148 /* SPTSessionManager.h */,
-				B293D306F0674D83513AFFBE20FDA01E /* Frameworks */,
-				EF162F7B407664D6CB497FE23AA04906 /* Pod */,
-				8E2BC746E0645DFDCA12B219058FDB45 /* Support Files */,
-			);
-			name = SpotifyiOS;
-			path = "../../player/player-spotify/pod";
-			sourceTree = "<group>";
-		};
-		B293D306F0674D83513AFFBE20FDA01E /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				D067C55532D89E122DF9DA20D55BFFB2 /* SpotifyiOS.framework */,
+				8B99D25D864464CC822A7E4118FBE123 /* SpotifyiOS.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A66C77F87D87A77073BB6C2F6CE67F4F /* Development Pods */ = {
+			isa = PBXGroup;
+			children = (
+				0656950221F98E393C035239F1F4A7A4 /* Shared */,
+				34AE0E8355003F4E321088BE471D9689 /* SpotifyiOS */,
+			);
+			name = "Development Pods";
 			sourceTree = "<group>";
 		};
 		CF1408CF629C7361332E53B88F7BD30C = {
 			isa = PBXGroup;
 			children = (
 				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
-				FD8D97DBF72DCA3509E7C6A4AA543FCD /* Development Pods */,
+				A66C77F87D87A77073BB6C2F6CE67F4F /* Development Pods */,
 				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
 				4650F3D42C1E4CDA1ED9AF084350051D /* Products */,
 				097ED71B52A0F9B065B489B68D0DDAB6 /* Targets Support Files */,
@@ -266,21 +255,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		EF162F7B407664D6CB497FE23AA04906 /* Pod */ = {
+		D50C3E26AF1D0AE920258E8A87A7E978 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				FCFA2D11B91EC90754D5666EA0169799 /* SpotifyiOS.podspec */,
+				0961777340F1160C55B79CAE847B7CC0 /* SpotifyiOS.debug.xcconfig */,
+				B03D6D32B56C148FBE7DB34198A336C7 /* SpotifyiOS.release.xcconfig */,
 			);
-			name = Pod;
+			name = "Support Files";
+			path = "../../../ios/Pods/Target Support Files/SpotifyiOS";
 			sourceTree = "<group>";
 		};
-		FD8D97DBF72DCA3509E7C6A4AA543FCD /* Development Pods */ = {
+		D61E5601552840C6CA7B1DB163AF7D71 /* Pod */ = {
 			isa = PBXGroup;
 			children = (
-				15389256A17B18DEFF528F67207A3D0C /* Shared */,
-				9A52C89EC7EA13A325348EA3AF3B886E /* SpotifyiOS */,
+				DC8237F67008C9293EEA23E762C18BBE /* SpotifyiOS.podspec */,
 			);
-			name = "Development Pods";
+			name = Pod;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -309,8 +299,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				0F35C334C36BD4E42DAA9F17BA7B1867 /* PBXTargetDependency */,
-				171BE94EA73C37B0B2CF0D59344839CC /* PBXTargetDependency */,
+				F20D5A597FE62084CD14D3A82C477D75 /* PBXTargetDependency */,
+				784A6494385A12AA63D6CEC8CD600E59 /* PBXTargetDependency */,
 			);
 			name = "Pods-ios";
 			productName = Pods_ios;
@@ -381,29 +371,29 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		0F35C334C36BD4E42DAA9F17BA7B1867 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Shared;
-			target = BEE42ABF215DD362BC110D392D85CA75 /* Shared */;
-			targetProxy = 9B715F11E97ED80CD89DA78AD1C9C6F8 /* PBXContainerItemProxy */;
-		};
-		171BE94EA73C37B0B2CF0D59344839CC /* PBXTargetDependency */ = {
+		784A6494385A12AA63D6CEC8CD600E59 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SpotifyiOS;
 			target = 612C3D0A513061C3B89CC5062A1184AF /* SpotifyiOS */;
-			targetProxy = 3BE14AA0DD596B805EB5F312A3000E52 /* PBXContainerItemProxy */;
+			targetProxy = A42D3D516967243CF665D7B8978EF96F /* PBXContainerItemProxy */;
+		};
+		F20D5A597FE62084CD14D3A82C477D75 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Shared;
+			target = BEE42ABF215DD362BC110D392D85CA75 /* Shared */;
+			targetProxy = ABC8574F96C2F44F25779C3C1381C621 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		4AF787BEC3B4053AD82C856EFDED3D58 /* Release */ = {
+		42708599C02CA5CF9980E9CFC90B1F38 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1FA09DEE66CF23DB17D1C09A74837710 /* Shared.release.xcconfig */;
+			baseConfigurationReference = AC69028A028EF3541D9F193DF7B964A4 /* Shared.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -416,7 +406,7 @@
 		};
 		54F8DBC2CFEE244BD2A1B52FE1E5DCC1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A75FEACE1C66C02D67D64106BBB047B4 /* SpotifyiOS.release.xcconfig */;
+			baseConfigurationReference = B03D6D32B56C148FBE7DB34198A336C7 /* SpotifyiOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -430,6 +420,23 @@
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
+		};
+		556CE18FE41A1FB14179161575D4482E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 60AFB4D4D41D798C43A1A5E769BDCEB6 /* Shared.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		593F10BFFA94DAC7D6E17FB8A7F32D72 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -492,23 +499,6 @@
 				SYMROOT = "${SRCROOT}/../build";
 			};
 			name = Release;
-		};
-		62A0F1EEA3A97CA1C6B9703B8FF4887C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FD84684F2AE5DE3715806AB3B6FF4865 /* Shared.debug.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
 		};
 		688852E77E24F2733777EAC55D9CB9BF /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -616,7 +606,7 @@
 		};
 		E9F46F0C4379358FCAB76AD8C95844BB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 30DB5A0F65544F15F11AAB375519AD71 /* SpotifyiOS.debug.xcconfig */;
+			baseConfigurationReference = 0961777340F1160C55B79CAE847B7CC0 /* SpotifyiOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -691,8 +681,8 @@
 		C22BD711389594305A92F51D3091691F /* Build configuration list for PBXAggregateTarget "Shared" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				62A0F1EEA3A97CA1C6B9703B8FF4887C /* Debug */,
-				4AF787BEC3B4053AD82C856EFDED3D58 /* Release */,
+				556CE18FE41A1FB14179161575D4482E /* Debug */,
+				42708599C02CA5CF9980E9CFC90B1F38 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

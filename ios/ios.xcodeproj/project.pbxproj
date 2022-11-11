@@ -51,7 +51,7 @@
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		5F74237C291541870076D124 /* ProfileMotifsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileMotifsGrid.swift; sourceTree = "<group>"; };
 		6F5B9FB91ABC64B58EC21765 /* Pods_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7555FF7B242A565900829871 /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7555FF7B242A565900829871 /* Motif.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Motif.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A176F8F676196AEACABC79D0 /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.release.xcconfig"; path = "Target Support Files/Pods-ios/Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
-				7555FF7D242A565900829871 /* ios */,
+				7555FF7D242A565900829871 /* Motif */,
 				7555FF7C242A565900829871 /* Products */,
 				4F008A1EB472BD9502DB6EBF /* Pods */,
 				9D5C83E1440E28BE6A4A3BA5 /* Frameworks */,
@@ -131,12 +131,12 @@
 		7555FF7C242A565900829871 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7555FF7B242A565900829871 /* ios.app */,
+				7555FF7B242A565900829871 /* Motif.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		7555FF7D242A565900829871 /* ios */ = {
+		7555FF7D242A565900829871 /* Motif */ = {
 			isa = PBXGroup;
 			children = (
 				B933A1D82918AFCD0061E155 /* Common */,
@@ -157,7 +157,7 @@
 				B9172E612911AB8A007E433D /* WithinThemeGradient.swift */,
 				B933A1D1291884B20061E155 /* Color.swift */,
 			);
-			path = ios;
+			path = Motif;
 			sourceTree = "<group>";
 		};
 		9D5C83E1440E28BE6A4A3BA5 /* Frameworks */ = {
@@ -241,9 +241,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7555FF7A242A565900829871 /* ios */ = {
+		7555FF7A242A565900829871 /* Motif */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "ios" */;
+			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "Motif" */;
 			buildPhases = (
 				05E1F933368D11D4C804E233 /* [CP] Check Pods Manifest.lock */,
 				7555FF77242A565900829871 /* Sources */,
@@ -254,7 +254,7 @@
 			);
 			dependencies = (
 			);
-			name = ios;
+			name = Motif;
 			packageProductDependencies = (
 				B91761D428E9026C00731A4D /* KMPNativeCoroutinesAsync */,
 				B91761D628E9026C00731A4D /* KMPNativeCoroutinesCombine */,
@@ -263,7 +263,7 @@
 				B9172E5F29118F8A007E433D /* SwiftUIPullToRefresh */,
 			);
 			productName = ios;
-			productReference = 7555FF7B242A565900829871 /* ios.app */;
+			productReference = 7555FF7B242A565900829871 /* Motif.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -299,7 +299,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7555FF7A242A565900829871 /* ios */,
+				7555FF7A242A565900829871 /* Motif */,
 			);
 		};
 /* End PBXProject section */
@@ -505,7 +505,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"ios/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Motif/Preview Content\"";
 				DEVELOPMENT_TEAM = BWY2HVVQ5X;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -518,7 +518,8 @@
 					"\"${PODS_ROOT}/../../shared/build/cocoapods/framework\"",
 					"\"${PODS_ROOT}/../../pod\"",
 				);
-				INFOPLIST_FILE = ios/Info.plist;
+				INFOPLIST_FILE = Motif/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Motif;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -548,7 +549,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"ios/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Motif/Preview Content\"";
 				DEVELOPMENT_TEAM = BWY2HVVQ5X;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -561,7 +562,8 @@
 					"\"${PODS_ROOT}/../../shared/build/cocoapods/framework\"",
 					"\"${PODS_ROOT}/../../pod\"",
 				);
-				INFOPLIST_FILE = ios/Info.plist;
+				INFOPLIST_FILE = Motif/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Motif;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -595,7 +597,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "ios" */ = {
+		7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "Motif" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7555FFA6242A565B00829871 /* Debug */,

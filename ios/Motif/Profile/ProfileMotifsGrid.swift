@@ -22,7 +22,7 @@ import Shared
 
 struct ProfileMotifsGrid: View {
     let motifs: [Shared.MotifSimple]
-    
+
     private let columns: [GridItem] = [
         .init(.adaptive(minimum: 96), spacing: 8)
     ]
@@ -37,7 +37,9 @@ struct ProfileMotifsGrid: View {
             ForEach(sections, id: \.0) { (key, motifs) in
                 Section {
                     ForEach(motifs, id: \.id_) { motif in
-                        NavigationLink(destination: MotifDetailView(viewModel: MotifDetailViewModelShim(motifId: Int(motif.id_)))) {
+                        NavigationLink(destination: MotifDetailView(
+                            viewModel: MotifDetailViewModelShim(motifId: Int(motif.id_))
+                        )) {
                             ProfileMotifsGridItem(motif: motif)
                         }
                     }

@@ -23,7 +23,7 @@ kotlin {
                 api(libs.kotlinx.serialization.json)
                 api(libs.kotlinx.datetime)
                 api(libs.apollo.runtime)
-                api(libs.apollo.normalizedCache.sqlite)
+                // api(libs.apollo.normalizedCache.sqlite)
             }
         }
         val commonTest by getting

@@ -24,6 +24,7 @@ import KMPNativeCoroutinesCombine
 
 class MotifDetailViewModelShim: ObservableObject {
     let shared: Shared.MotifDetailViewModel
+    let motifId: Int
 
     @Published var state: Shared.MotifDetailState = .NotLoading()
 
@@ -31,6 +32,7 @@ class MotifDetailViewModelShim: ObservableObject {
 
     init(motifId: Int) {
         self.shared = Shared.MotifDetailViewModel(motifId: Int32(motifId))
+        self.motifId = motifId
 
         createPublisher(for: shared.stateNative)
             .assertNoFailure()

@@ -37,30 +37,35 @@ struct FeedView: View {
     }
 
     var body: some View {
-        ScrollView {
-            if let data = viewModel.feedState as? Shared.FeedState.Data {
-                LazyVGrid(columns: columns, pinnedViews: [.sectionHeaders]) {
-                    ForEach(sections, id: \.0) { (recentness, profiles) in
-                        Section {
-                            ForEach(profiles, id: \.profile.id) { profile in
-                                NavigationLink(destination: MotifDetailView(viewModel: MotifDetailViewModelShim(motifId: Int(profile.motifs.first!.id_)))) {
-                                    FeedProfile(profileWithMotifs: profile)
+        ZStack {
+            ScrollView {
+                if let data = viewModel.feedState as? Shared.FeedState.Data {
+                    LazyVGrid(columns: columns, pinnedViews: [.sectionHeaders]) {
+                        ForEach(sections, id: \.0) { (recentness, profiles) in
+                            Section {
+                                ForEach(profiles, id: \.profile.id) { profile in
+                                    let motifId = Int(profile.motifs.first!.id_)
+                                    NavigationLink(destination: MotifDetailView(
+                                        viewModel: MotifDetailViewModelShim(motifId: motifId)
+                                    )) {
+                                        FeedProfile(profileWithMotifs: profile)
+                                    }
                                 }
+                            } header: {
+                                Text(recentness.title)
+                                    .font(.headline)
+                                    .frame(height: 32)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                        } header: {
-                            Text(recentness.title)
-                                .font(.headline)
-                                .frame(height: 32)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
+                    .padding(.horizontal)
+                } else {
+                    Text("No feed")
                 }
-                .padding(.horizontal)
-            } else {
-                Text("No feed")
             }
+            .navigationTitle("Feed")
         }
-        .navigationTitle("Feed")
     }
 }
 

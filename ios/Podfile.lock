@@ -13,7 +13,7 @@ EXTERNAL SOURCES:
     :path: "../player/player-spotify/pod"
 
 SPEC CHECKSUMS:
-  Shared: 0dcecd2699de0406e011edfbb26ecd872fc03872
+  Shared: 69670cd0f6b136bb0ed0eaf535f95ac0826a2c52
   SpotifyiOS: 65dfdbe99bb369184b4c8157de71d8c80c6892c9
 
 PODFILE CHECKSUM: 450fe2c12cbe52404c8be605b95cb32b5a783c48

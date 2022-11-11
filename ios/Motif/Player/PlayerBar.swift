@@ -33,20 +33,22 @@ struct PlayerBar: View {
         } label: {
             VStack {
                 HStack(spacing: 12) {
-                    Group {
-                        if let trackImage = viewModel.trackImage {
-                            Image(uiImage: trackImage)
-                                .resizable()
-                                .clipShape(RoundedRectangle(cornerSize: .init(width: 6, height: 6)))
-                                .aspectRatio(contentMode: .fill)
-                                .transition(.opacity.animation(.easeInOut))
-                                .scaledToFit()
-                                .id(viewModel.trackImage)
-                        } else {
-                            DefaultCoverArt()
+                    if isConnected {
+                        Group {
+                            if let trackImage = viewModel.trackImage {
+                                Image(uiImage: trackImage)
+                                    .resizable()
+                                    .clipShape(RoundedRectangle(cornerSize: .init(width: 6, height: 6)))
+                                    .aspectRatio(contentMode: .fill)
+                                    .transition(.opacity.animation(.easeInOut))
+                                    .scaledToFit()
+                                    .id(viewModel.trackImage)
+                            } else {
+                                DefaultCoverArt()
+                            }
                         }
+                        .padding([.leading, .top, .bottom], 8)
                     }
-                    .padding([.leading, .top, .bottom], 8)
 
                     metadataAndService
                     Spacer()
