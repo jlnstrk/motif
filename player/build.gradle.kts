@@ -1,7 +1,6 @@
 plugins {
-    kotlin("multiplatform")
+    `multiplatform-conventions`
     kotlin("plugin.serialization")
-    id("com.android.library")
 }
 
 kotlin {
@@ -40,12 +39,7 @@ kotlin {
 }
 
 android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-
         manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
         manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }

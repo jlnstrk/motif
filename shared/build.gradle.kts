@@ -1,24 +1,19 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
 import com.google.devtools.ksp.gradle.KspTask
 import com.google.devtools.ksp.gradle.KspTaskNative
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("multiplatform")
+    `multiplatform-conventions`
+    `ios-conventions`
     kotlin("native.cocoapods")
-    id("com.android.library")
     alias(libs.plugins.ksp)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.buildkonfig)
-    alias(libs.plugins.nativeCoroutines)
 }
 
 version = "1.0"
 
 kotlin {
-    android()
-    ios()
-
     cocoapods {
         summary = "Motif Shared Module"
         homepage = "https://github.com/jlnstrk/motif"
@@ -105,10 +100,6 @@ tasks.withType<KspTask>().configureEach {
     }
 }
 
-nativeCoroutines {
-    suffix = "Native"
-}
-
 dependencies {
     add("kspCommonMainMetadata", libs.koin.kspCompiler)
     add("kspAndroid", libs.koin.kspCompiler)
@@ -124,12 +115,7 @@ sqldelight {
 }
 
 android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-
         manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
         manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }

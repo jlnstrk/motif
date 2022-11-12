@@ -1,7 +1,6 @@
 plugins {
-    kotlin("multiplatform")
+    `multiplatform-conventions`
     kotlin("plugin.serialization")
-    id("com.android.library")
     alias(libs.plugins.apollo)
     alias(libs.plugins.ksp)
 }
@@ -9,9 +8,6 @@ plugins {
 version = "1.0"
 
 kotlin {
-    android()
-    ios()
-
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -29,15 +25,6 @@ kotlin {
         val commonTest by getting
         val androidMain by getting
         val androidTest by getting
-    }
-}
-
-android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
     }
 }
 

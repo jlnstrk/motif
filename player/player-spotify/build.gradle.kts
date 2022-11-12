@@ -1,19 +1,14 @@
 
 plugins {
-    kotlin("multiplatform")
+    `multiplatform-conventions`
+    `ios-conventions`
     kotlin("native.cocoapods")
-    id("com.android.library")
-    alias(libs.plugins.nativeCoroutines)
 }
 
 version = "1.0"
 
 
 kotlin {
-    android()
-    ios()
-    iosArm64()
-
     explicitApi()
 
     cocoapods {
@@ -56,12 +51,7 @@ tasks.named<org.jetbrains.kotlin.gradle.tasks.DefFileTask>("generateDefSpotifyiO
 }
 
 android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-
         manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
         manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }

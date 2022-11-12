@@ -149,6 +149,7 @@ ktor-client-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 multiplatformPaging = { module = "io.github.kuuuurt:multiplatform-paging", version.ref = "mpPaging" }
+nativeCoroutines-gradlePlugin = { module = "com.rickclephas.kmp:kmp-nativecoroutines-gradle-plugin", version.ref = "nativeCoroutines" }
 settings-core = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
 settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
 settings-serialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "settings" }

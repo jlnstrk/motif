@@ -1,13 +1,9 @@
 plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
-    alias(libs.plugins.nativeCoroutines)
+    `multiplatform-conventions`
+    `ios-conventions`
 }
 
 kotlin {
-    android()
-    ios()
-
     explicitApi()
 
     sourceSets {
@@ -24,14 +20,5 @@ kotlin {
                 api(libs.appleMusic.playback)
             }
         }
-    }
-}
-
-android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
     }
 }
