@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.jvm.JvmInline
 
 public expect class AppleMusicAuthentication {
-    public val result: StateFlow<AppleMusicAuthenticationResult>
+    public val status: StateFlow<AppleMusicAuthenticationStatus>
 
     public fun invalidate()
 }
@@ -43,8 +43,12 @@ public enum class AppleMusicAuthenticationError {
     USER_RESTRICTED
 }
 
-public sealed class AppleMusicAuthenticationResult {
-    public object NotDetermined : AppleMusicAuthenticationResult()
-    public data class Success(public val controller: MusicPlayerController) : AppleMusicAuthenticationResult()
-    public data class Error(public val error: AppleMusicAuthenticationError) : AppleMusicAuthenticationResult()
+public sealed class AppleMusicAuthenticationStatus {
+    public object NotDetermined : AppleMusicAuthenticationStatus()
+    public data class Success(
+        public val controller: MusicPlayerController,
+        public val musicUserToken: AppleMusicUserToken,
+    ) : AppleMusicAuthenticationStatus()
+
+    public data class Error(public val error: AppleMusicAuthenticationError) : AppleMusicAuthenticationStatus()
 }

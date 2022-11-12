@@ -28,11 +28,13 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 public actual class AppleMusicAuthentication(
+    private val developerToken: AppleMusicDeveloperToken,
     private val externalScope: CoroutineScope
 ) {
-    private val _result: MutableStateFlow<AppleMusicAuthenticationResult> =
-        MutableStateFlow(AppleMusicAuthenticationResult.NotDetermined)
-    public actual val result: StateFlow<AppleMusicAuthenticationResult> get() = _result
+    private val cloudServiceController: SKCloudServiceController = SKCloudServiceController()
+    private val _result: MutableStateFlow<AppleMusicAuthenticationStatus> =
+        MutableStateFlow(AppleMusicAuthenticationStatus.NotDetermined)
+    public actual val status: StateFlow<AppleMusicAuthenticationStatus> get() = _result
 
     public suspend fun requestAuthorization() {
         var authorizationStatus = SKCloudServiceController.authorizationStatus()
@@ -41,41 +43,68 @@ public actual class AppleMusicAuthentication(
                 SKCloudServiceController.requestAuthorization(continuation::resume)
             }
         }
-        when (authorizationStatus) {
+        _result.value = when (authorizationStatus) {
             SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusAuthorized -> {
-                val capabilities: ULong = suspendCoroutine {  continuation ->
-                    SKCloudServiceController().requestCapabilitiesWithCompletionHandler { capabilities, nsError ->
+                val capabilities: ULong = suspendCoroutine { continuation ->
+                    cloudServiceController.requestCapabilitiesWithCompletionHandler { capabilities, nsError ->
                         if (nsError != null) {
                             continuation.resumeWithException(RuntimeException(nsError.localizedDescription))
+                        } else {
+                            continuation.resume(capabilities)
                         }
-                        continuation.resume(capabilities)
                     }
                 }
-                if (capabilities and SKCloudServiceCapabilityMusicCatalogPlayback == SKCloudServiceCapabilityMusicCatalogPlayback) {
-                    _result.value = AppleMusicAuthenticationResult.Success(MusicPlayerController(externalScope))
-                    return
+                when {
+                    capabilities and SKCloudServiceCapabilityMusicCatalogPlayback == SKCloudServiceCapabilityMusicCatalogPlayback -> {
+                        val musicUserToken = requestMusicUserToken()
+                        if (musicUserToken != null) {
+                            AppleMusicAuthenticationStatus.Success(
+                                controller = MusicPlayerController(externalScope),
+                                musicUserToken = musicUserToken
+                            )
+                        } else {
+                            AppleMusicAuthenticationStatus.Error(AppleMusicAuthenticationError.DEVELOPER_TOKEN)
+                        }
+                    }
+
+                    capabilities and SKCloudServiceCapabilityMusicCatalogSubscriptionEligible == SKCloudServiceCapabilityMusicCatalogSubscriptionEligible -> AppleMusicAuthenticationStatus.Error(
+                        AppleMusicAuthenticationError.NO_SUBSCRIPTION
+                    )
+
+                    else -> AppleMusicAuthenticationStatus.Error(AppleMusicAuthenticationError.UNKNOWN)
                 }
-                if (capabilities and SKCloudServiceCapabilityMusicCatalogSubscriptionEligible == SKCloudServiceCapabilityMusicCatalogSubscriptionEligible) {
-                    _result.value = AppleMusicAuthenticationResult.Error(AppleMusicAuthenticationError.NO_SUBSCRIPTION)
-                    return
-                }
-                _result.value = AppleMusicAuthenticationResult.Error(AppleMusicAuthenticationError.UNKNOWN)
             }
 
-            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusNotDetermined -> {
-                _result.value = AppleMusicAuthenticationResult.NotDetermined
-            }
-
+            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusNotDetermined -> AppleMusicAuthenticationStatus.NotDetermined
             SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusRestricted,
-            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusDenied -> {
-                _result.value = AppleMusicAuthenticationResult.Error(AppleMusicAuthenticationError.USER_RESTRICTED)
-            }
+            SKCloudServiceAuthorizationStatus.SKCloudServiceAuthorizationStatusDenied -> AppleMusicAuthenticationStatus.Error(
+                AppleMusicAuthenticationError.USER_RESTRICTED
+            )
 
             else -> throw IllegalStateException()
         }
     }
 
+    private suspend fun requestMusicUserToken(): AppleMusicUserToken? {
+        try {
+            val tokenString = suspendCoroutine { continuation ->
+                cloudServiceController.requestUserTokenForDeveloperToken(
+                    developerToken = developerToken.token
+                ) { token, nsError ->
+                    if (nsError != null) {
+                        continuation.resumeWithException(RuntimeException(nsError.localizedDescription))
+                    } else {
+                        continuation.resume(token)
+                    }
+                }
+            }
+            return tokenString?.let(::AppleMusicUserToken)
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
     public actual fun invalidate() {
-        _result.value = AppleMusicAuthenticationResult.NotDetermined
+        _result.value = AppleMusicAuthenticationStatus.NotDetermined
     }
 }

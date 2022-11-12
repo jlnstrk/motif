@@ -1,7 +1,7 @@
 package de.julianostarek.motif.player
 
 import de.julianostarek.motif.player.applemusic.AppleMusicAuthentication
-import de.julianostarek.motif.player.applemusic.AppleMusicAuthenticationResult
+import de.julianostarek.motif.player.applemusic.AppleMusicAuthenticationStatus
 import de.julianostarek.motif.player.spotify.SpotifyRemoteConnectionState
 import de.julianostarek.motif.player.spotify.SpotifyRemoteConnector
 import kotlinx.coroutines.CoroutineScope
@@ -30,8 +30,8 @@ public class PlayerNegotiation(
     }
 
     private suspend fun disconnectAppleMusic() {
-        val appleResult = appleMusicAuthentication.result.value
-        if (appleResult is AppleMusicAuthenticationResult.Success) {
+        val appleResult = appleMusicAuthentication.status.value
+        if (appleResult is AppleMusicAuthenticationStatus.Success) {
             appleResult.controller.stop()
             appleResult.controller.release()
         }
@@ -50,7 +50,7 @@ public class PlayerNegotiation(
             service.distinctUntilChanged { old, new -> old == new }
                 .collectLatest { targetService ->
                     if (targetService != PlayerService.APPLE_MUSIC
-                        && appleMusicAuthentication.result.value is AppleMusicAuthenticationResult.Success
+                        && appleMusicAuthentication.status.value is AppleMusicAuthenticationStatus.Success
                     ) {
                         disconnectAppleMusic()
                     }
@@ -70,13 +70,13 @@ public class PlayerNegotiation(
             combine(
                 service,
                 spotifyConnector.state,
-                appleMusicAuthentication.result
+                appleMusicAuthentication.status
             ) { targetService, spotifyState, appleResult ->
                 when (targetService) {
                     PlayerService.APPLE_MUSIC -> when (appleResult) {
-                        is AppleMusicAuthenticationResult.Error -> State.Error(targetService, appleResult.error)
-                        AppleMusicAuthenticationResult.NotDetermined -> State.Connecting(targetService)
-                        is AppleMusicAuthenticationResult.Success -> {
+                        is AppleMusicAuthenticationStatus.Error -> State.Error(targetService, appleResult.error)
+                        AppleMusicAuthenticationStatus.NotDetermined -> State.Connecting(targetService)
+                        is AppleMusicAuthenticationStatus.Success -> {
                             val player = appleResult.controller.let(::AppleMusicPlayer)
                             State.Connected(targetService, player)
                         }

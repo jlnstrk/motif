@@ -44,6 +44,10 @@ public actual class AppleMusicAuthentication(
 ) {
     private val manager: AuthenticationManager = AuthenticationFactory.createAuthenticationManager(context)
 
+    private val _result: MutableStateFlow<AppleMusicAuthenticationStatus> =
+        MutableStateFlow(AppleMusicAuthenticationStatus.NotDetermined)
+    public actual val status: StateFlow<AppleMusicAuthenticationStatus> get() = _result
+
     public fun createIntent(): Intent = manager.createIntentBuilder(developerToken.token)
         .build()
 
@@ -58,7 +62,7 @@ public actual class AppleMusicAuthentication(
                 TokenError.TOKEN_FETCH_ERROR -> AppleMusicAuthenticationError.DEVELOPER_TOKEN
                 TokenError.UNKNOWN, null -> AppleMusicAuthenticationError.UNKNOWN
             }
-            _result.value = AppleMusicAuthenticationResult.Error(error)
+            _result.value = AppleMusicAuthenticationStatus.Error(error)
         } else {
             val tokenProvider = object : TokenProvider {
                 override fun getDeveloperToken(): String = this@AppleMusicAuthentication.developerToken.token
@@ -66,16 +70,15 @@ public actual class AppleMusicAuthentication(
             }
             val controller = MediaPlayerControllerFactory.createLocalController(context, tokenProvider)
             val musicPlayer = MusicPlayerController(controller, externalScope)
-            _result.value = AppleMusicAuthenticationResult.Success(musicPlayer)
+            _result.value = AppleMusicAuthenticationStatus.Success(
+                controller = musicPlayer,
+                musicUserToken = AppleMusicUserToken(token = tokenResult.musicUserToken)
+            )
         }
     }
 
-    private val _result: MutableStateFlow<AppleMusicAuthenticationResult> =
-        MutableStateFlow(AppleMusicAuthenticationResult.NotDetermined)
-    public actual val result: StateFlow<AppleMusicAuthenticationResult> get() = _result
-
     public actual fun invalidate() {
-        _result.value = AppleMusicAuthenticationResult.NotDetermined
+        _result.value = AppleMusicAuthenticationStatus.NotDetermined
     }
 
     private companion object {

@@ -27,8 +27,10 @@ import de.julianostarek.motif.player.PlayerService
 import de.julianostarek.motif.player.PlayerServiceAvailabilityInfo
 import de.julianostarek.motif.player.PlayerViewModel
 import de.julianostarek.motif.player.applemusic.AppleMusicAuthentication
+import de.julianostarek.motif.player.applemusic.AppleMusicDeveloperToken
 import de.julianostarek.motif.player.spotify.SpotifyRemoteConnector
 import de.julianostarek.motif.player.spotify.isSpotifyInstalled
+import de.julianostarek.motif.shared.BuildKonfig
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.*
 import org.koin.dsl.module
@@ -43,7 +45,10 @@ class IosModule {
     fun appleMusicAuthentication(
         externalScope: CoroutineScope
     ): AppleMusicAuthentication {
-        return AppleMusicAuthentication(externalScope)
+        return AppleMusicAuthentication(
+            developerToken = AppleMusicDeveloperToken(BuildKonfig.APPLE_DEVELOPER_TOKEN),
+            externalScope = externalScope,
+        )
     }
 
     @Single
