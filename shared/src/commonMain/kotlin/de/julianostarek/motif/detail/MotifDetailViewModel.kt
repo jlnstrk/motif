@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.detail
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import de.julianostarek.motif.create.MotifRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,7 @@ class MotifDetailViewModel(private val motifId: Int) : SharedViewModel(), KoinCo
     private val repository: MotifRepository by inject { parametersOf(viewModelScope) }
 
     private val _state: MutableStateFlow<MotifDetailState> = MutableStateFlow(MotifDetailState.NotFound)
+    @NativeCoroutinesState
     val state: StateFlow<MotifDetailState> get() = _state
 
     init {

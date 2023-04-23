@@ -6,7 +6,7 @@ plugins {
     `multiplatform-conventions`
     `ios-conventions`
     kotlin("native.cocoapods")
-    alias(libs.plugins.ksp)
+    id(libs.plugins.ksp.get().pluginId)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.buildkonfig)
 }
@@ -57,14 +57,6 @@ kotlin {
                 implementation(libs.sqldelight.driver.android)
             }
         }
-        val androidAndroidTest by getting {
-            dependencies {
-                implementation(libs.androidx.test.core)
-                implementation(libs.androidx.test.runner)
-                implementation(libs.androidx.test.rules)
-                implementation(libs.androidx.test.ext.junit)
-            }
-        }
         val iosMain by getting {
             dependencies {
                 implementation(libs.sqldelight.driver.native)
@@ -90,7 +82,7 @@ buildkonfig {
     }
 }
 
-tasks.withType<KspTask>().configureEach {
+/*tasks.withType<KspTask>().configureEach {
     when (this) {
         is KspTaskNative -> {
             this.compilerPluginOptions.addPluginArgument(
@@ -98,7 +90,7 @@ tasks.withType<KspTask>().configureEach {
             )
         }
     }
-}
+}*/
 
 dependencies {
     add("kspCommonMainMetadata", libs.koin.kspCompiler)
@@ -108,9 +100,11 @@ dependencies {
 }
 
 sqldelight {
-    database("MotifDatabase") {
-        packageName = "de.julianostarek.motif.persist"
-        dialect(libs.sqldelight.dialect.sqlite.get())
+    databases {
+        create("MotifDatabase") {
+            packageName.set("de.julianostarek.motif.persist")
+            dialect(libs.sqldelight.dialect.sqlite.get())
+        }
     }
 }
 
@@ -119,4 +113,5 @@ android {
         manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
         manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }
+    namespace = "de.julianostarek.motif.shared"
 }

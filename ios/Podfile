@@ -1,4 +1,4 @@
-target 'ios' do
+target 'Motif' do
   use_frameworks!
   platform :ios, '14.1'
   pod 'Shared', :path => '../shared'

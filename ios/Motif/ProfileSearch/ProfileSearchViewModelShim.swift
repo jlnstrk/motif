@@ -30,7 +30,7 @@ class ProfileSearchViewModelShim: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 
     init() {
-        createPublisher(for: shared.stateNative)
+        createPublisher(for: shared.stateFlow)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)
@@ -39,7 +39,7 @@ class ProfileSearchViewModelShim: ObservableObject {
         $query
             .flatMap { query in
                 let submitQuery: String? = query.count == 0 ? nil : query
-                return createPublisher(for: self.shared.setQueryNative(query: submitQuery))
+                return createFuture(for: self.shared.setQuery(query: submitQuery))
                     .assertNoFailure()
             }
             .sink(receiveValue: { _ in })

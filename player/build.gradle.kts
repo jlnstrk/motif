@@ -43,4 +43,5 @@ android {
         manifestPlaceholders["redirectSchemeName"] = "\${redirectSchemeName}"
         manifestPlaceholders["redirectHostName"] = "\${redirectHostName}"
     }
+    namespace = "de.julianostarek.motif.player"
 }

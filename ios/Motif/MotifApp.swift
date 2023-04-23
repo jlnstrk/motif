@@ -1,5 +1,5 @@
 //
-// iOSApp.swift
+// MotifApp.swift
 //
 //  Copyright 2022 Julian Ostarek
 //
@@ -21,7 +21,7 @@ import Shared
 
 
 @main
-struct iOSApp: App {
+struct MotifApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {

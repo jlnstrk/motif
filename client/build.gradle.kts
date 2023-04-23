@@ -2,7 +2,7 @@ plugins {
     `multiplatform-conventions`
     kotlin("plugin.serialization")
     alias(libs.plugins.apollo)
-    alias(libs.plugins.ksp)
+    id(libs.plugins.ksp.get().pluginId)
 }
 
 version = "1.0"
@@ -24,7 +24,7 @@ kotlin {
         }
         val commonTest by getting
         val androidMain by getting
-        val androidTest by getting
+        val androidUnitTest by getting
     }
 }
 
@@ -35,6 +35,10 @@ dependencies {
     add("kspIosArm64", libs.koin.kspCompiler)
 }
 
+android {
+    namespace = "de.julianostarek.motif.client"
+}
+
 /*
 Update schema:
 ./gradlew client:downloadApolloSchema --endpoint='https://motif.julianostarek.de/graphql' --schema=client/src/commonMain/graphql/de/julianostarek/motif/client/schema.graphqls
@@ -42,7 +46,9 @@ Update schema:
  */
 
 apollo {
-    packageName.set("de.julianostarek.motif.client")
-    mapScalar("DateTime", "kotlinx.datetime.Instant")
-    mapScalarToKotlinString("UUID")
+    service("service") {
+        packageName.set("de.julianostarek.motif.client")
+        mapScalar("DateTime", "kotlinx.datetime.Instant")
+        mapScalarToKotlinString("UUID")
+    }
 }

@@ -36,8 +36,16 @@ struct ProfileSearchView: View {
         case let results as Shared.ProfileSearchState.Results:
             List {
                 ForEach(results.results, id: \.id) { profile in
-                    NavigationLink(destination: ProfileView(viewModel: ProfileViewModelShim(for: ProfileReference.Simple(simple: profile as! ProfileSimple)))) {
-                        ProfileSearchProfile(profile: profile)
+                    if let simple = profile as? ProfileSimple {
+                        NavigationLink(
+                            destination: ProfileView(
+                                viewModel: ProfileViewModelShim(
+                                    for: ProfileReference.Simple(simple: simple)
+                                )
+                            )
+                        ) {
+                            ProfileSearchProfile(profile: profile)
+                        }
                     }
                 }
             }

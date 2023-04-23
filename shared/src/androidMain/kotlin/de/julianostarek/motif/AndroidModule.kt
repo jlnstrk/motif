@@ -17,9 +17,9 @@
 package de.julianostarek.motif
 
 import android.content.Context
-import com.russhwolf.settings.AndroidSettings
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.SharedPreferencesSettings
 import de.julianostarek.motif.client.auth.BackendAuthRepository
 import de.julianostarek.motif.client.auth.Service
 import de.julianostarek.motif.persist.DriverFactory
@@ -87,7 +87,7 @@ class AndroidModule {
         context: Context
     ): ObservableSettings {
         val preferences = context.getSharedPreferences("login", Context.MODE_PRIVATE)
-        return AndroidSettings(preferences)
+        return SharedPreferencesSettings(preferences)
     }
 }
 

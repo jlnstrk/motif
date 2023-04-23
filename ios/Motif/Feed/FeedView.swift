@@ -33,7 +33,7 @@ struct FeedView: View {
 
     private var sections: [(Recentness, [ProfileWithMotifs])] {
         Dictionary(grouping: viewModel.feedState.profilesOrEmpty, by: { $0.motifs.first!.recentness })
-            .sorted(by: { a, b in a.key.rawValue < b.key.rawValue })
+            .sorted(by: { $0.key.rawValue < $1.key.rawValue })
     }
 
     var body: some View {

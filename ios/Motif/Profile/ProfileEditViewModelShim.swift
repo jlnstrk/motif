@@ -44,26 +44,26 @@ class ProfileEditViewModelShim : ObservableObject {
             })
             .store(in: &cancellables)
 
-        createPublisher(for: shared.usernameAvailabilityNative)
+        createPublisher(for: shared.usernameAvailabilityFlow)
             .assertNoFailure()
             .receive(on: RunLoop.main)
             .assign(to: \.usernameAvailability, on: self)
             .store(in: &cancellables)
 
-        createPublisher(for: shared.submissionStatusNative)
+        createPublisher(for: shared.submissionStatusFlow)
             .assertNoFailure()
             .receive(on: RunLoop.main)
             .assign(to: \.submissionStatus, on: self)
             .store(in: &cancellables)
 
-        createPublisher(for: shared.canSubmitNative)
+        createPublisher(for: shared.canSubmitFlow)
             .assertNoFailure()
             .receive(on: RunLoop.main)
             .map { value in value.boolValue }
             .assign(to: \.canSubmit, on: self)
             .store(in: &cancellables)
 
-        createPublisher(for: shared.userInputNative)
+        createPublisher(for: shared.userInputFlow)
             .assertNoFailure()
             .receive(on: RunLoop.main)
             .sink(receiveValue: { [weak self] input in

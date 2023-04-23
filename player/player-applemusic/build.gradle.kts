@@ -2,6 +2,12 @@ plugins {
     `multiplatform-conventions`
     `ios-conventions`
 }
+android {
+    namespace = "de.julianostarek.motif.player.applemusic"
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
+}
 
 kotlin {
     explicitApi()
@@ -18,7 +24,12 @@ kotlin {
             dependencies {
                 api(libs.appleMusic.authentication)
                 api(libs.appleMusic.playback)
+                implementation(libs.androidx.appcompat)
             }
         }
     }
+}
+
+dependencies {
+    coreLibraryDesugaring(libs.core.jdk.desugaring)
 }

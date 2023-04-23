@@ -39,15 +39,15 @@ class PlayerViewModelShim: ObservableObject {
     }
     
     init() {
-        createPublisher(for: shared.remoteStateNative)
+        let remoteState = createPublisher(for: shared.remoteStateFlow)
             .assertNoFailure()
-            .receive(on: DispatchQueue.main)
+            .share()
+
+        remoteState.receive(on: DispatchQueue.main)
             .assign(to: \.remoteState, on: self)
             .store(in: &cancellables)
         
-        createPublisher(for: shared.remoteStateNative)
-            .assertNoFailure()
-            .map { ($0 as? Shared.RemoteState.ConnectedPlayback)?.track }
+        remoteState.map { ($0 as? Shared.RemoteState.ConnectedPlayback)?.track }
             .removeDuplicates { old, new in old?.url == new?.url }
             .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
             .sink { [weak self] track in

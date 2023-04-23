@@ -33,7 +33,7 @@ class ProfileViewModelShim: ObservableObject {
         self.shared = Shared.ProfileViewModel(reference: reference)
         self.state = .NotLoaded(reference: reference)
 
-        createPublisher(for: shared.stateNative)
+        createPublisher(for: shared.stateFlow)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)
@@ -41,6 +41,6 @@ class ProfileViewModelShim: ObservableObject {
     }
 
     func refresh() async {
-        let _ = await asyncResult(for: shared.refreshSuspendNative())
+        let _ = await asyncResult(for: shared.refreshSuspending())
     }
 }

@@ -1,0 +1,6 @@
+framework module Pods_Motif {
+  umbrella header "Pods-Motif-umbrella.h"
+
+  export *
+  module * { export * }
+}

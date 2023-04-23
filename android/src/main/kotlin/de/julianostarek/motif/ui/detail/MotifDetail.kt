@@ -120,7 +120,9 @@ fun MotifDetail(
         contentColor = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { padding ->
-        Comments(viewModel)
+        Box(modifier = Modifier.padding(padding)) {
+            Comments(viewModel)
+        }
     }
 }
 

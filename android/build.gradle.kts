@@ -44,6 +44,12 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    namespace = "de.julianostarek.motif"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -58,11 +64,10 @@ dependencies {
     implementation(libs.accompanist.placeholder.material)
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.palette)
 
     implementation(libs.androidx.activity.compose)
-
-    implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material)
@@ -83,9 +88,6 @@ dependencies {
     implementation(libs.androidx.window)
 
     implementation(libs.accompanist.pager)
-
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
 
     coreLibraryDesugaring(libs.core.jdk.desugaring)
 }

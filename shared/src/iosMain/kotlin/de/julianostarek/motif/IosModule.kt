@@ -16,8 +16,7 @@
 
 package de.julianostarek.motif
 
-import com.russhwolf.settings.AppleSettings
-import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.ObservableSettings
 import de.julianostarek.motif.client.auth.BackendAuthRepository
 import de.julianostarek.motif.client.auth.Service
@@ -39,7 +38,6 @@ import org.koin.ksp.generated.module
 
 @Module
 class IosModule {
-
     @Scope(PlayerViewModel::class)
     @Scoped
     fun appleMusicAuthentication(
@@ -87,18 +85,19 @@ class IosModule {
     @Single
     fun driverFactory(): DriverFactory = DriverFactory()
 
-    @OptIn(ExperimentalSettingsApi::class)
     @Named("LoginSettings")
     @Single
     fun loginSettings(): ObservableSettings {
         val defaults = NSUserDefaults("login")
-        return AppleSettings(defaults)
+        return NSUserDefaultsSettings(defaults)
     }
 }
 
+expect fun IosModule.module(): org.koin.core.module.Module
+
 fun iosStartKoin() {
     val iosModule = module {
-        includes(IosModule().module)
+        includes(IosModule().module())
     }
 
     sharedStartKoin(platformModule = iosModule)

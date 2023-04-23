@@ -17,6 +17,8 @@
 package de.julianostarek.motif.profile
 
 import com.kuuurt.paging.multiplatform.PagingData
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.domain.Profile
@@ -40,6 +42,7 @@ class ProfileViewModel(
     private val profile: MutableSharedFlow<Profile.Detail?> = MutableSharedFlow()
     private val motifs: MutableSharedFlow<PagingData<Motif.Simple>> = MutableSharedFlow()
     private val _state: MutableStateFlow<ProfileState> = MutableStateFlow(ProfileState.NotLoaded(reference))
+    @NativeCoroutinesState
     val state: StateFlow<ProfileState> get() = _state
 
     val isMyProfile: Boolean get() = reference == null
@@ -59,7 +62,8 @@ class ProfileViewModel(
         refresh()
     }
 
-    suspend fun refreshSuspend() {
+    @NativeCoroutines
+    suspend fun refreshSuspending() {
         withContext(viewModelScope.coroutineContext) {
             refresh()
             state.first { it is ProfileState.Loading }
@@ -67,7 +71,7 @@ class ProfileViewModel(
         }
     }
 
-    fun refresh(): Job {
+    fun refresh() {
         refreshJob?.cancel()
         refreshJob = SupervisorJob()
         viewModelScope.launch(refreshJob!!) {
@@ -81,7 +85,6 @@ class ProfileViewModel(
             (if (reference != null) repository.motifs(reference.id) else repository.myMotifs())
                 .pagingData.collect(motifs)
         }
-        return refreshJob!!
     }
 
     fun follow() = viewModelScope.launch {

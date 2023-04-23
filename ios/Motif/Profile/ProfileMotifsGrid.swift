@@ -29,7 +29,7 @@ struct ProfileMotifsGrid: View {
     
     private var sections: [(Recentness, [Shared.MotifSimple])] {
         Dictionary(grouping: motifs, by: { $0.recentness })
-            .sorted(by: { a, b in a.key.rawValue < b.key.rawValue })
+            .sorted(by: { $0.key.rawValue < $1.key.rawValue })
     }
     
     var body: some View {

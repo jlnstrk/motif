@@ -5,6 +5,7 @@ import kotlinx.cinterop.CValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import platform.CoreGraphics.CGSize
 import platform.CoreGraphics.CGSizeMake
 import platform.UIKit.UIImage
 import platform.darwin.NSObject
@@ -192,7 +193,7 @@ public actual class ImagesApi(public val ios: SPTAppRemoteImageAPIProtocol) {
             @Suppress("UNCHECKED_CAST")
             ios.fetchImageForItem(
                 track.ios,
-                CGSizeMake(width.toDouble(), height.toDouble()) as CValue<CGSize>,
+                CGSizeMake(width.toDouble(), height.toDouble()),
                 it
             )
         }

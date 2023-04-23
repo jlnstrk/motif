@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.feed
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ open class FeedViewModel : SharedViewModel(), KoinComponent {
     private val repository: FeedRepository by inject { parametersOf(viewModelScope) }
 
     private val _state: MutableStateFlow<FeedState> = MutableStateFlow(FeedState.NotLoading)
+    @NativeCoroutinesState
     val state: StateFlow<FeedState> get() = _state
 
     private var feedJob: Job? = null

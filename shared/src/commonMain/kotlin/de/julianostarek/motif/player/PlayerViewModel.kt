@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.player
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import de.julianostarek.motif.domain.Motif
 import de.julianostarek.motif.player.matching.MatchingCredentialsProvider
@@ -39,6 +40,7 @@ class PlayerViewModel : SharedViewModel(), KoinScopeComponent {
     private val _remoteState: MutableStateFlow<RemoteState> = MutableStateFlow(RemoteState.Disconnected)
 
     val availableServices: List<PlayerServiceAvailabilityInfo.ServiceStatus> get() = serviceAvailabilityInfo.availableServices()
+    @NativeCoroutinesState
     val remoteState: StateFlow<RemoteState> get() = _remoteState
 
     init {

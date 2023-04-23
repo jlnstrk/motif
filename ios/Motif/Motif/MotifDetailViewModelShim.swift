@@ -34,7 +34,7 @@ class MotifDetailViewModelShim: ObservableObject {
         self.shared = Shared.MotifDetailViewModel(motifId: Int32(motifId))
         self.motifId = motifId
 
-        createPublisher(for: shared.stateNative)
+        createPublisher(for: shared.stateFlow)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)
             .assign(to: \.state, on: self)

@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.login
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import de.julianostarek.motif.client.auth.Service
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ open class LoginViewModel : SharedViewModel(), KoinComponent {
     private val loginRepository: LoginRepository by inject()
 
     private val _state: MutableStateFlow<LoginState> = MutableStateFlow(LoginState.NotDetermined)
+    @NativeCoroutinesState
     val state: StateFlow<LoginState> get() = _state
 
     init {

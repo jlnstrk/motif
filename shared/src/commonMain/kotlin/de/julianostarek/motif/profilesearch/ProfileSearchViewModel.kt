@@ -16,6 +16,8 @@
 
 package de.julianostarek.motif.profilesearch
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -29,6 +31,7 @@ class ProfileSearchViewModel : SharedViewModel(), KoinComponent {
     private val query: MutableStateFlow<String?> = MutableStateFlow(null)
 
     private val _state: MutableStateFlow<ProfileSearchState> = MutableStateFlow(ProfileSearchState.NoQuery)
+    @NativeCoroutinesState
     val state: StateFlow<ProfileSearchState> get() = _state
 
     init {
@@ -53,6 +56,7 @@ class ProfileSearchViewModel : SharedViewModel(), KoinComponent {
         }
     }
 
+    @NativeCoroutines
     suspend fun setQuery(query: String?) {
         this.query.emit(query)
     }

@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
-}
+package de.julianostarek.motif
 
-kotlin {
-    android()
-    ios()
+import org.koin.core.module.Module
+import org.koin.ksp.generated.module
 
-    sourceSets.all {
-        languageSettings.optIn("kotlin.experimental.ExperimentalObjCName")
-    }
-}
-
-android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-    }
-}
-
+actual fun IosModule.module(): Module = module

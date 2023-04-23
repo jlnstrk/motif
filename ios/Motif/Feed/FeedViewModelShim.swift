@@ -29,7 +29,7 @@ class FeedViewModelShim: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 
     init() {
-        createPublisher(for: shared.stateNative)
+        createPublisher(for: shared.stateFlow)
             .assertNoFailure()
             .receive(on: DispatchQueue.main)
             .assign(to: \.feedState, on: self)

@@ -16,6 +16,7 @@
 
 package de.julianostarek.motif.profileedit
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutinesState
 import de.julianostarek.motif.SharedViewModel
 import de.julianostarek.motif.domain.Profile
 import de.julianostarek.motif.profile.ProfileRepository
@@ -31,6 +32,7 @@ class ProfileEditViewModel : SharedViewModel(), KoinComponent {
     private val profile: MutableStateFlow<Profile.Detail?> = MutableStateFlow(null)
 
     private val _userInput: MutableStateFlow<ProfileEdit?> = MutableStateFlow(null)
+    @NativeCoroutinesState
     val userInput: StateFlow<ProfileEdit?> get() = _userInput
 
     private val changedFields: StateFlow<ProfileEdit?> = combine(profile, _userInput) { profile, input ->
@@ -46,11 +48,13 @@ class ProfileEditViewModel : SharedViewModel(), KoinComponent {
 
     private val _usernameAvailability: MutableStateFlow<ProfileUsernameAvailability> =
         MutableStateFlow(ProfileUsernameAvailability.IS_OWN)
+    @NativeCoroutinesState
     val usernameAvailability: StateFlow<ProfileUsernameAvailability> get() = _usernameAvailability
 
     private val submissionSignal: MutableSharedFlow<Unit> = MutableSharedFlow()
     private val rawSubmissionStatus: MutableStateFlow<ProfileEditSubmissionStatus> =
         MutableStateFlow(ProfileEditSubmissionStatus.SUBMITTED)
+    @NativeCoroutinesState
     val submissionStatus: StateFlow<ProfileEditSubmissionStatus> = rawSubmissionStatus.flatMapLatest { rawStatus ->
         flow {
             emit(rawStatus)
@@ -73,6 +77,7 @@ class ProfileEditViewModel : SharedViewModel(), KoinComponent {
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ProfileEditSubmissionStatus.SUBMITTED)
 
+    @NativeCoroutinesState
     val canSubmit: StateFlow<Boolean> =
         combine(submissionStatus, usernameAvailability) { submissionStatus, usernameAvailability ->
             submissionStatus == ProfileEditSubmissionStatus.OUTSTANDING && usernameAvailability != ProfileUsernameAvailability.UNAVAILABLE
